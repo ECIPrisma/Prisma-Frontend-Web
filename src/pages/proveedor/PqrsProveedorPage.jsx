@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatearComision } from '../../config/comision';
 import { proveedorService } from '../../services/api';
 import { 
   MessageSquareWarning, 
@@ -586,7 +587,7 @@ export const PqrsProveedorPage = () => {
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { id: 'DISPUTA_COMISION_PRISMA', label: 'Discrepancia en Comisiones o Cartera (2.5%)', desc: 'Revisión del valor facturado o saldo de comisiones' },
+                    { id: 'DISPUTA_COMISION_PRISMA', label: `Discrepancia en Comisiones o Cartera (${formatearComision()})`, desc: 'Revisión del valor facturado o saldo de comisiones' },
                     { id: 'SOPORTE_TECNICO_PLATAFORMA', label: 'Falla Técnica en la Plataforma', desc: 'Error en la sincronización, catálogo o app móvil' },
                     { id: 'RECLAMO_TENDERO_IRREGULAR', label: 'Reporte de Tienda Irregular o Cartera Vencida', desc: 'Tendero con comportamiento indebido o fraude' },
                     { id: 'SOLICITUD_AJUSTE_RUTA', label: 'Solicitud de Asistencia o Ajuste Logístico', desc: 'Reasignación de despachos o auxilio en ruta' },

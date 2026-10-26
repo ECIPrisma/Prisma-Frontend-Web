@@ -1,0 +1,19 @@
+// Comisión de la plataforma (N-02). Plan original: 3.5 % (split 3.5 / 96.5).
+// Se puede sobreescribir en build con VITE_COMISION_PCT sin tocar el código.
+export const COMISION_POR_DEFECTO = 3.5;
+
+export const parsearComision = (valor) => {
+  const n = Number.parseFloat(String(valor ?? '').replace(',', '.'));
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : COMISION_POR_DEFECTO;
+};
+
+export const COMISION_PCT = parsearComision(import.meta.env?.VITE_COMISION_PCT);
+
+export const formatearComision = (pct = COMISION_PCT) =>
+  `${Number(pct).toLocaleString('en-US', { maximumFractionDigits: 2 })}%`;
+
+export const calcularSplit = (monto, pct = COMISION_PCT) => {
+  const total = Number(monto) || 0;
+  const comision = Math.round(total * pct) / 100;
+  return { comision, proveedor: Math.round((total - comision) * 100) / 100 };
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatearComision } from '../config/comision';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -37,7 +38,7 @@ export const Sidebar = () => {
     { to: '/despachos', label: 'Despachos y Rutas', icon: Truck },
     { to: '/flota', label: 'Flota de Camiones', icon: Navigation },
     { to: '/estadisticas', label: 'Estadísticas Económicas', icon: DollarSign },
-    { to: '/liquidaciones', label: 'Liquidaciones (2.5%)', icon: Receipt },
+    { to: '/liquidaciones', label: `Liquidaciones (${formatearComision()})`, icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
   ];
 

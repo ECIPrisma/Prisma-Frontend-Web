@@ -1,0 +1,21 @@
+name: CI (lint + test + build)
+
+# Corre en runners gratuitos de GitHub. No toca el runner self-hosted ni despliega.
+on:
+  pull_request:
+  push:
+    branches-ignore: [ "main" ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

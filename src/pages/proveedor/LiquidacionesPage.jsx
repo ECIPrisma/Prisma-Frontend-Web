@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatearComision } from '../../config/comision';
 import { proveedorService } from '../../services/api';
 import { DollarSign, FileText, CheckCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -66,7 +67,7 @@ export const LiquidacionesPage = () => {
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-prisma-border shadow-sm">
-          <p className="text-xs text-prisma-text-secondary font-medium">Comisión Tecnológica PRISMA (2.5%)</p>
+          <p className="text-xs text-prisma-text-secondary font-medium">Comisión Tecnológica PRISMA ({formatearComision()})</p>
           <p className="text-2xl font-bold text-amber-600 mt-1">
             ${totalComisiones.toLocaleString('es-CO')}
           </p>
@@ -109,7 +110,7 @@ export const LiquidacionesPage = () => {
                   <th className="p-4">Periodo Facturado</th>
                   <th className="p-4">Pedidos Entregados</th>
                   <th className="p-4">Venta Bruta</th>
-                  <th className="p-4">Comisión PRISMA (2.5%)</th>
+                  <th className="p-4">Comisión PRISMA ({formatearComision()})</th>
                   <th className="p-4">Neto Distribuidor</th>
                   <th className="p-4">Estado</th>
                 </tr>
