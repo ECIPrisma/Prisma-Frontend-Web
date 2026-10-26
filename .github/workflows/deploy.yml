@@ -9,8 +9,14 @@ jobs:
   deploy:
     runs-on: [ self-hosted, server-sabio ]
     steps:
+      - name: Fix Workspace Permissions
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/app" alpine chown -R $(id -u):$(id -g) /app 2>/dev/null || true
+
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Build Web Application
         run: |
@@ -20,6 +26,7 @@ jobs:
             -w /app \
             node:20-alpine \
             sh -c "npm install && npm run build"
+          docker run --rm -v "$GITHUB_WORKSPACE:/app" alpine chown -R $(id -u):$(id -g) /app
 
       - name: Deploy to Nginx Web Root
         run: |
@@ -32,4 +39,4 @@ jobs:
           echo "Reiniciando contenedores web prisma-web y prisma-ssl..."
           docker restart prisma-web 2>/dev/null || true
           docker restart prisma-ssl 2>/dev/null || true
-          echo "¡Despliegue finalizado con éxito en Server Sabio!"
+          echo "Despliegue finalizado con exito en Server Sabio"
