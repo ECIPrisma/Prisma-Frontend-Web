@@ -148,6 +148,18 @@ Para probar la compilación localmente antes de desplegar:
 npm run preview
 ```
 
+### 7. Ejecución con Docker (Nginx en Contenedor)
+Puedes compilar y servir el frontend en un contenedor Nginx listo para producción:
+
+```bash
+# Construir la imagen Docker multi-etapa
+docker build -t prisma-frontend-web .
+
+# Levantar el contenedor en el puerto 8080 (o el puerto deseado)
+docker run -d -p 8088:80 --name prisma-frontend-web prisma-frontend-web
+```
+El portal web estara disponible en `http://localhost:8088`.
+
 ---
 
 ## Equipo y Atribución
