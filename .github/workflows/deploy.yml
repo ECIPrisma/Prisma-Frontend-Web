@@ -1,0 +1,35 @@
+name: Deploy Prisma Web to Server Sabio
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, server-sabio ]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Web Application
+        run: |
+          echo "Compilando portal web con Node.js en Server Sabio..."
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/app" \
+            -w /app \
+            node:20-alpine \
+            sh -c "npm install && npm run build"
+
+      - name: Deploy to Nginx Web Root
+        run: |
+          echo "Actualizando archivos estáticos en /home/juan/prisma-web/dist..."
+          mkdir -p /home/juan/prisma-web/dist
+          rsync -av --delete "$GITHUB_WORKSPACE/dist/" /home/juan/prisma-web/dist/
+
+      - name: Reload Nginx Containers
+        run: |
+          echo "Reiniciando contenedores web prisma-web y prisma-ssl..."
+          docker restart prisma-web 2>/dev/null || true
+          docker restart prisma-ssl 2>/dev/null || true
+          echo "¡Despliegue finalizado con éxito en Server Sabio!"
