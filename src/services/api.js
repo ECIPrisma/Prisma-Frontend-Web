@@ -1,8 +1,18 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || API_BASE_URL;
 
+const leerUsuarioGuardado = () => {
+  try {
+    return JSON.parse(localStorage.getItem('prisma_user') || '{}') || {};
+  } catch {
+    return {};
+  }
+};
+
+export const EVENTO_SESION_EXPIRADA = 'prisma:sesion-expirada';
+
 const getAuthHeaders = () => {
-  const user = JSON.parse(localStorage.getItem('prisma_user') || '{}');
+  const user = leerUsuarioGuardado();
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -14,6 +24,11 @@ const getAuthHeaders = () => {
 };
 
 const handleResponse = async (response) => {
+  if (response.status === 401 && localStorage.getItem('prisma_user')) {
+    // El token venció o es inválido: se cierra la sesión local y la app vuelve al login.
+    localStorage.removeItem('prisma_user');
+    window.dispatchEvent(new Event(EVENTO_SESION_EXPIRADA));
+  }
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const message = errorData.mensaje || errorData.error || `Error HTTP ${response.status}`;

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { EVENTO_SESION_EXPIRADA } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -12,17 +13,29 @@ export const AuthProvider = ({ children }) => {
       email: usuario.email,
       nombreCompleto: usuario.nombreCompleto,
       telefono: usuario.telefono,
+      ...raw,
+      // Asegurar que rol y proveedorId queden en la raíz
       rol: usuario.rol || raw.rol,
       proveedorId: usuario.proveedorId || raw.proveedorId,
-      ...raw,
-      rol: usuario.rol || raw.rol, // Asegurar que rol quede en la raíz
     };
   };
 
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('prisma_user');
-    return saved ? normalizeUser(JSON.parse(saved)) : null;
+    try {
+      const saved = localStorage.getItem('prisma_user');
+      return saved ? normalizeUser(JSON.parse(saved)) : null;
+    } catch {
+      // Sesión guardada corrupta: se descarta en vez de dejar la app en blanco.
+      localStorage.removeItem('prisma_user');
+      return null;
+    }
   });
+
+  useEffect(() => {
+    const cerrar = () => setUser(null);
+    window.addEventListener(EVENTO_SESION_EXPIRADA, cerrar);
+    return () => window.removeEventListener(EVENTO_SESION_EXPIRADA, cerrar);
+  }, []);
 
   const login = (userData) => {
     const normalized = normalizeUser(userData);

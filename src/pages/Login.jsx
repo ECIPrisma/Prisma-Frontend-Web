@@ -3,10 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/api';
 import { LogIn, AlertCircle, Shield, ArrowRight } from 'lucide-react';
 
+// Las cuentas semilla solo se ofrecen en desarrollo o si se habilita explícitamente en el build.
+const MOSTRAR_CUENTAS_DEMO = import.meta.env.DEV || import.meta.env.VITE_MOSTRAR_CUENTAS_DEMO === 'true';
+
 export const Login = () => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('admin@prisma.com.co');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
 
@@ -96,6 +99,7 @@ export const Login = () => {
         </form>
 
         {/* Acceso Rápido con Cuentas Semilla */}
+        {MOSTRAR_CUENTAS_DEMO && (
         <div className="pt-4 border-t border-prisma-border/80 space-y-2">
           <p className="text-[11px] font-semibold text-prisma-text-secondary uppercase text-center">
             Cuentas Semilla de Prueba
@@ -119,6 +123,7 @@ export const Login = () => {
             </button>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

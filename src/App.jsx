@@ -43,7 +43,7 @@ const MainLayout = ({ children }) => {
   );
 };
 
-const RoleRoute = ({ allowedRoles, userRol, children }) => {
+export const RoleRoute = ({ allowedRoles, userRol, children }) => {
   if (!allowedRoles.includes(userRol)) {
     return <Navigate to="/" replace />;
   }
