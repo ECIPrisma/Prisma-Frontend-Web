@@ -23,12 +23,48 @@ const handleResponse = async (response) => {
   return result.datos !== undefined ? result.datos : result;
 };
 
+// HU-03: renovación en curso compartida para no disparar varios /auth/refresh a la vez
+let refreshEnCurso = null;
+
 export const authService = {
   login: async (email, password) => {
     const res = await fetch(`${AUTH_API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
+    });
+    return handleResponse(res);
+  },
+
+  // El refresh token viaja en una cookie HttpOnly, por eso no se envía Authorization
+  refresh: () => {
+    if (!refreshEnCurso) {
+      refreshEnCurso = fetch(`${AUTH_API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'include',
+      })
+        .then((res) => {
+          if (res.status === 401) {
+            const error = new Error('Sesión expirada. Inicie sesión nuevamente.');
+            error.status = 401;
+            throw error;
+          }
+          return handleResponse(res);
+        })
+        .finally(() => {
+          refreshEnCurso = null;
+        });
+    }
+    return refreshEnCurso;
+  },
+
+  logout: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      credentials: 'include',
     });
     return handleResponse(res);
   },
@@ -409,6 +445,23 @@ export const proveedorService = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ tipoIncidente, descripcion, pedidoId }),
+    });
+    return handleResponse(res);
+  },
+
+  // HU-04: perfil comercial propio (el backend resuelve el proveedor desde el JWT)
+  getPerfil: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/perfil`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  actualizarPerfil: async (datos) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/perfil`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(datos),
     });
     return handleResponse(res);
   },

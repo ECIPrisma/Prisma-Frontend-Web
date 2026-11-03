@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { MainLayout } from '../components/layout/MainLayout';
 import { RoleRoute } from '../components/common/RoleRoute';
+import { RenovadorSesion } from '../components/common/RenovadorSesion';
 import { Login } from '../pages/Login';
 import { ADMIN_ROLES, PROVEEDOR_ROLES } from '../constants/roles';
 
@@ -22,12 +23,18 @@ import { EstadisticasEconomicasPage } from '../pages/proveedor/EstadisticasEcono
 import { TiendasProveedorPage } from '../pages/proveedor/TiendasProveedorPage';
 import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
+import { PerfilProveedorPage } from '../pages/proveedor/PerfilProveedorPage';
 
 export const AppRoutes = () => {
   const { user } = useAuth();
 
   if (!user) {
-    return <Login />;
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
   const rol = user?.rol || user?.usuario?.rol;
@@ -35,8 +42,10 @@ export const AppRoutes = () => {
 
   return (
     <MainLayout>
+      <RenovadorSesion />
       <Routes>
         <Route path="/" element={isPlatformAdmin ? <AdminDashboard /> : <ProveedorDashboard />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
 
         {/* Rutas exclusivas de Administración */}
         <Route path="/pedidos-soporte" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><PedidosSoportePage /></RoleRoute>} />
@@ -53,6 +62,7 @@ export const AppRoutes = () => {
         <Route path="/estadisticas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><EstadisticasEconomicasPage /></RoleRoute>} />
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
+        <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
