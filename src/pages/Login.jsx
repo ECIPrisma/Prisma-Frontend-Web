@@ -5,8 +5,8 @@ import { AlertCircle, ArrowRight } from 'lucide-react';
 
 export const Login = () => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('admin@prisma.com.co');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,18 +16,13 @@ export const Login = () => {
     setError('');
 
     try {
-      const data = await authService.login(email, password);
+      const data = await authService.login(email.trim(), password);
       login(data);
     } catch (err) {
       setError(err.message || 'Error de conexión con el backend de Prisma');
     } finally {
       setCargando(false);
     }
-  };
-
-  const setCredencialPrueba = (correo, clave) => {
-    setEmail(correo);
-    setPassword(clave);
   };
 
   return (
@@ -63,8 +58,9 @@ export const Login = () => {
               type="email"
               required
               value={email}
+              autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="ejemplo@prisma.com.co"
+              placeholder="nombre@empresa.com"
               className="w-full text-xs p-3 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none bg-white"
             />
           </div>
@@ -75,6 +71,7 @@ export const Login = () => {
               type="password"
               required
               value={password}
+              autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="w-full text-xs p-3 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none bg-white"
@@ -95,29 +92,8 @@ export const Login = () => {
           </button>
         </form>
 
-        {/* Acceso Rápido con Cuentas Semilla */}
-        <div className="pt-4 border-t border-prisma-border/80 space-y-2">
-          <p className="text-[11px] font-semibold text-prisma-text-secondary uppercase text-center">
-            Cuentas Semilla de Prueba
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <button
-              type="button"
-              onClick={() => setCredencialPrueba('admin@prisma.com.co', 'admin123')}
-              className="p-2.5 border border-slate-200 bg-slate-50 hover:bg-slate-100 rounded-xl text-left transition"
-            >
-              <p className="font-bold text-slate-800">Admin Prisma</p>
-              <p className="text-slate-500 truncate">admin@prisma.com.co</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setCredencialPrueba('logistica@femsa.com.co', 'femsa123')}
-              className="p-2.5 border border-slate-200 bg-slate-50 hover:bg-slate-100 rounded-xl text-left transition"
-            >
-              <p className="font-bold text-slate-800">FEMSA Coca-Cola</p>
-              <p className="text-slate-500 truncate">logistica@femsa...</p>
-            </button>
-          </div>
+        <div className="pt-2 text-center text-[11px] text-prisma-text-secondary">
+          <span>Acceso seguro protegido mediante cifrado JWT y SSL</span>
         </div>
       </div>
     </div>
