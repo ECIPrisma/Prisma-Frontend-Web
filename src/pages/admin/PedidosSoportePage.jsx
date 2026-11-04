@@ -59,8 +59,9 @@ export const PedidosSoportePage = () => {
   useEffect(() => {
     cargarPedidos();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarPedidos(true);
-    }, 4000);
+    }, 15000);
     const timer = setInterval(() => {
       setSegundosSync(s => s + 1);
     }, 1000);

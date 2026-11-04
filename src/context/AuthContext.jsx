@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     if (!raw) return null;
     const usuario = raw.usuario || raw;
     return {
+      ...raw,
       token: raw.token || usuario.token,
       id: usuario.id,
       email: usuario.email,
@@ -14,26 +15,52 @@ export const AuthProvider = ({ children }) => {
       telefono: usuario.telefono,
       rol: usuario.rol || raw.rol,
       proveedorId: usuario.proveedorId || raw.proveedorId,
-      ...raw,
-      rol: usuario.rol || raw.rol, // Asegurar que rol quede en la raíz
     };
   };
 
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('prisma_user');
-    return saved ? normalizeUser(JSON.parse(saved)) : null;
+    try {
+      const saved = localStorage.getItem('prisma_user');
+      return saved ? normalizeUser(JSON.parse(saved)) : null;
+    } catch {
+      localStorage.removeItem('prisma_user');
+      return null;
+    }
   });
 
   const login = (userData) => {
     const normalized = normalizeUser(userData);
     setUser(normalized);
-    localStorage.setItem('prisma_user', JSON.stringify(normalized));
+    try {
+      localStorage.setItem('prisma_user', JSON.stringify(normalized));
+    } catch {
+      // Ignorar si cookies/storage están restringidas
+    }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('prisma_user');
-  };
+    try {
+      localStorage.removeItem('prisma_user');
+    } catch {
+      // Ignorar
+    }
+  }, []);
+
+  // Escuchar eventos globales de 401 (token expirado o sesión revocada)
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    };
+
+    window.addEventListener('prisma:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('prisma:unauthorized', handleUnauthorized);
+    };
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

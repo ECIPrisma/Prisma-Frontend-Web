@@ -105,8 +105,9 @@ export const ProveedorDashboard = () => {
     if (!autoSyncActivo) return;
 
     const intervalId = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarProductos(true);
-    }, 4000);
+    }, 15000);
 
     const timerSec = setInterval(() => {
       setSegundosDesdeSync(prev => prev + 1);

@@ -88,8 +88,9 @@ export const DespachosPage = () => {
   useEffect(() => {
     if (!autoSync) return;
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
 
     const timer = setInterval(() => {
       setSegundosSync(s => s + 1);

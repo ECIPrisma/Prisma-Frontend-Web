@@ -2,7 +2,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || API_BASE_URL;
 
 const getAuthHeaders = () => {
-  const user = JSON.parse(localStorage.getItem('prisma_user') || '{}');
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem('prisma_user') || '{}');
+  } catch {
+    user = {};
+  }
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -15,6 +20,9 @@ const getAuthHeaders = () => {
 
 const handleResponse = async (response) => {
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('prisma:unauthorized'));
+    }
     const errorData = await response.json().catch(() => ({}));
     const message = errorData.mensaje || errorData.error || `Error HTTP ${response.status}`;
     throw new Error(message);

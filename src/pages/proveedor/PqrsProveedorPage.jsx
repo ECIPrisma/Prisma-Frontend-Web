@@ -65,8 +65,9 @@ export const PqrsProveedorPage = () => {
   useEffect(() => {
     cargarPqrs();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarPqrs(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

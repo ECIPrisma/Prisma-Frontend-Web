@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/api';
-import { Sliders, RefreshCw, AlertCircle, Check, Edit, Save, X } from 'lucide-react';
+import { Sliders, RefreshCw, AlertCircle, Edit, Save } from 'lucide-react';
 
 export const ConfiguracionPage = () => {
   const [configuraciones, setConfiguraciones] = useState([]);
@@ -30,10 +30,11 @@ export const ConfiguracionPage = () => {
   useEffect(() => {
     cargarConfiguraciones();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       if (!editandoClave) {
         cargarConfiguraciones(true);
       }
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [editandoClave]);
 

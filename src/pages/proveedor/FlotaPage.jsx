@@ -59,8 +59,9 @@ export const FlotaPage = () => {
   useEffect(() => {
     cargarDatos();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

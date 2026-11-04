@@ -49,8 +49,9 @@ export const DisputasPage = () => {
   useEffect(() => {
     cargarDisputas();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDisputas(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

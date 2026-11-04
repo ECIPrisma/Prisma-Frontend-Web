@@ -27,8 +27,9 @@ export const AuditoriaPage = () => {
   useEffect(() => {
     cargarLogs();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarLogs(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

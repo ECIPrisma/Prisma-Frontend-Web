@@ -75,8 +75,9 @@ export const TiendasProveedorPage = () => {
     cargarTiendas();
     // Auto-actualización continua y silenciosa cada 4 segundos sin intervención del usuario
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarTiendas(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

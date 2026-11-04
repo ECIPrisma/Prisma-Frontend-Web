@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { proveedorService } from '../../services/api';
-import { DollarSign, FileText, CheckCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import { DollarSign, FileText, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 
 export const LiquidacionesPage = () => {
   const [liquidaciones, setLiquidaciones] = useState([]);
@@ -25,8 +25,9 @@ export const LiquidacionesPage = () => {
   useEffect(() => {
     cargarLiquidaciones();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarLiquidaciones(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

@@ -43,8 +43,9 @@ export const AdminDashboard = () => {
   useEffect(() => {
     cargarDatos();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
     const timer = setInterval(() => {
       setUltimaSync(s => s + 1);
     }, 1000);

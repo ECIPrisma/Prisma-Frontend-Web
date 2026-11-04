@@ -136,7 +136,10 @@ export const Navbar = () => {
     };
 
     cargarAlertas();
-    const interval = setInterval(cargarAlertas, 4000);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      cargarAlertas();
+    }, 15000);
     return () => {
       cancelado = true;
       clearInterval(interval);
