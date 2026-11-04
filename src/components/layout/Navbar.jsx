@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { adminService, proveedorService } from '../../services/api';
+import { adminService, authService, proveedorService } from '../../services/api';
 import { 
   LogOut, 
   Bell, 
@@ -148,6 +148,12 @@ export const Navbar = () => {
 
   const noLeidas = notificaciones.filter(n => !leidas.includes(n.id));
   const cantidadNoLeidas = noLeidas.length;
+
+  // HU-03: revoca el refresh token en el servidor además de limpiar la sesión local
+  const handleCerrarSesion = () => {
+    authService.logout().catch(() => {});
+    logout();
+  };
 
   const handleMarcarTodasLeidas = () => {
     const todosIds = notificaciones.map(n => n.id);
@@ -311,7 +317,7 @@ export const Navbar = () => {
         </div>
 
         <button
-          onClick={logout}
+          onClick={handleCerrarSesion}
           title="Cerrar sesión"
           className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
         >

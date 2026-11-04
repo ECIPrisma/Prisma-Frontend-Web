@@ -39,6 +39,7 @@ export const Sidebar = () => {
     { to: '/estadisticas', label: 'Estadísticas Económicas', icon: DollarSign },
     { to: '/liquidaciones', label: 'Liquidaciones (2.5%)', icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
+    { to: '/perfil', label: 'Perfil Comercial', icon: Building2 },
   ];
 
   const links = isAdmin ? adminLinks : proveedorLinks;
