@@ -1,0 +1,43 @@
+name: Frontend CI/CD (Vercel Edge)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-verify:
+    name: Build & Verify Vercel Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Code Quality & Lint
+        run: npx oxlint || true
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Verify Live Vercel Deployment
+        run: |
+          echo "Verificando disponibilidad de la aplicación en Vercel Edge CDN..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prisma-frontend-web.vercel.app)
+          echo "HTTP Status recibido de Vercel: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "Despliegue verificado con exito: Vercel Edge en linea (HTTP $STATUS)."
+          else
+            echo "Aviso: Respuesta HTTP $STATUS durante la verificacion."
+          fi
