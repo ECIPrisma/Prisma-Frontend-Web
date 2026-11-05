@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { proveedorService } from '../../services/api';
+import { saveCatalogToOfflineCache, loadCatalogFromOfflineCache } from '../../utils/offlineCatalog';
 import { 
   Package, 
   Plus, 
@@ -82,13 +83,19 @@ export const ProveedorDashboard = () => {
     if (!silencioso && productos.length === 0) setCargando(true);
     try {
       const data = await proveedorService.getMisProductos();
-      setProductos(Array.isArray(data) ? data : []);
+      const lista = Array.isArray(data) ? data : [];
+      setProductos(lista);
+      saveCatalogToOfflineCache(lista);
       setErrorApi('');
       setUltimaActualizacion(new Date());
       setSegundosDesdeSync(0);
     } catch (err) {
-      if (!silencioso && productos.length === 0) {
-        setErrorApi(err.message || 'No se pudieron cargar los productos del proveedor');
+      const cached = loadCatalogFromOfflineCache();
+      if (cached.hasCache) {
+        setProductos(cached.items);
+        setErrorApi('');
+      } else if (!silencioso && productos.length === 0) {
+        setErrorApi(cached.message || err.message || 'No se pudieron cargar los productos del proveedor');
       }
     } finally {
       if (!silencioso && productos.length === 0) setCargando(false);
