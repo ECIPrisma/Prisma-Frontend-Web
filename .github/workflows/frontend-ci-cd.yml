@@ -28,6 +28,9 @@ jobs:
       - name: Code Quality & Lint
         run: npx oxlint || true
 
+      - name: Run Automated Frontend Tests (Vitest)
+        run: npm test
+
       - name: Build Web Application
         run: npm run build
 

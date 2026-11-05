@@ -53,8 +53,9 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-prisma-text-primary mb-1">Correo Electrónico</label>
+            <label htmlFor="email" className="block text-xs font-bold text-prisma-text-primary mb-1">Correo Electrónico</label>
             <input
+              id="email"
               type="email"
               required
               value={email}
@@ -66,8 +67,9 @@ export const Login = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-prisma-text-primary mb-1">Contraseña</label>
+            <label htmlFor="password" className="block text-xs font-bold text-prisma-text-primary mb-1">Contraseña</label>
             <input
+              id="password"
               type="password"
               required
               value={password}
