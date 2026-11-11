@@ -18,9 +18,9 @@ const getAuthHeaders = () => {
   return headers;
 };
 
-const handleResponse = async (response) => {
+const handleResponse = async (response, { dispatchUnauthorized = true } = {}) => {
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== 'undefined') {
+    if (dispatchUnauthorized && response.status === 401 && typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('prisma:unauthorized'));
     }
     const errorData = await response.json().catch(() => ({}));
@@ -35,14 +35,16 @@ const handleResponse = async (response) => {
 let refreshEnCurso = null;
 
 export const authService = {
-  login: async (email, password) => {
+  login: async (email, password, codigoTotp) => {
+    const body = { email, password };
+    if (codigoTotp) body.codigoTotp = codigoTotp;
     const res = await fetch(`${AUTH_API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(body),
     });
-    return handleResponse(res);
+    return handleResponse(res, { dispatchUnauthorized: false });
   },
 
   // El refresh token viaja en una cookie HttpOnly, por eso no se envía Authorization
@@ -100,6 +102,39 @@ export const authService = {
   getMe: async () => {
     const res = await fetch(`${AUTH_API_URL}/auth/me`, {
       headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  getTotpStatus: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/status`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  setupTotp: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/setup`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  enableTotp: async (codigo) => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/enable`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ codigo }),
+    });
+    return handleResponse(res);
+  },
+
+  disableTotp: async (password, codigo) => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ password, codigo }),
     });
     return handleResponse(res);
   },

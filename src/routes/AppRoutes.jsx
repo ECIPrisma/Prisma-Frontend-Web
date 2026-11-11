@@ -5,6 +5,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { RoleRoute } from '../components/common/RoleRoute';
 import { RenovadorSesion } from '../components/common/RenovadorSesion';
 import { Login } from '../pages/Login';
+import { SeguridadPage } from '../pages/SeguridadPage';
 import { ADMIN_ROLES, PROVEEDOR_ROLES } from '../constants/roles';
 
 // Páginas de Administrador
@@ -46,6 +47,7 @@ export const AppRoutes = () => {
       <Routes>
         <Route path="/" element={isPlatformAdmin ? <AdminDashboard /> : <ProveedorDashboard />} />
         <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/seguridad" element={<SeguridadPage />} />
 
         {/* Rutas exclusivas de Administración */}
         <Route path="/pedidos-soporte" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><PedidosSoportePage /></RoleRoute>} />

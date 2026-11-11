@@ -11,7 +11,8 @@ import {
   Truck, 
   ChevronRight, 
   X, 
-  CheckCheck 
+  CheckCheck,
+  Shield
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -315,6 +316,16 @@ export const Navbar = () => {
             <p className="text-prisma-text-secondary">{email}</p>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => navigate('/seguridad')}
+          aria-label="Seguridad de la cuenta"
+          title="Seguridad de la cuenta"
+          className="p-2 text-gray-500 hover:text-prisma-teal hover:bg-prisma-teal/10 rounded-lg transition cursor-pointer"
+        >
+          <Shield className="w-5 h-5" />
+        </button>
 
         <button
           onClick={handleCerrarSesion}

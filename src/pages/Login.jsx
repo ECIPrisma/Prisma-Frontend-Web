@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/api';
 import { AlertCircle, ArrowRight } from 'lucide-react';
 
 export const Login = () => {
   const { login } = useAuth();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [codigoTotp, setCodigoTotp] = useState('');
+  const [requiereTotp, setRequiereTotp] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
+  const aviso = location.state?.message || '';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,10 +21,21 @@ export const Login = () => {
     setError('');
 
     try {
-      const data = await authService.login(email.trim(), password);
+      const data = requiereTotp
+        ? await authService.login(email.trim(), password, codigoTotp)
+        : await authService.login(email.trim(), password);
+      setPassword('');
+      setCodigoTotp('');
       login(data);
     } catch (err) {
-      setError(err.message || 'Error de conexión con el backend de Prisma');
+      if (err.message === 'Se requiere un código TOTP de 6 dígitos.') {
+        setRequiereTotp(true);
+        setCodigoTotp('');
+        setError('');
+      } else {
+        if (requiereTotp) setCodigoTotp('');
+        setError(err.message || 'Error de conexión con el backend de Prisma');
+      }
     } finally {
       setCargando(false);
     }
@@ -45,9 +61,14 @@ export const Login = () => {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-center gap-2">
+          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
+          </div>
+        )}
+        {aviso && (
+          <div role="status" className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs">
+            {aviso}
           </div>
         )}
 
@@ -80,9 +101,38 @@ export const Login = () => {
             />
           </div>
 
+          {requiereTotp && (
+            <div>
+              <label htmlFor="codigoTotp" className="block text-xs font-bold text-prisma-text-primary mb-1">
+                Código de autenticación
+              </label>
+              <p id="codigoTotpAyuda" className="text-xs text-prisma-text-secondary mb-2">
+                Ingresa el código de 6 dígitos de tu aplicación de autenticación.
+              </p>
+              <input
+                id="codigoTotp"
+                name="codigoTotp"
+                type="text"
+                required
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                autoComplete="one-time-code"
+                aria-describedby="codigoTotpAyuda"
+                value={codigoTotp}
+                onChange={(e) => {
+                  setCodigoTotp(e.target.value.replace(/\D/g, '').slice(0, 6));
+                  setError('');
+                }}
+                placeholder="000000"
+                className="w-full text-xs p-3 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none bg-white"
+              />
+            </div>
+          )}
+
           <button
             type="submit"
-            disabled={cargando}
+            disabled={cargando || (requiereTotp && !/^\d{6}$/.test(codigoTotp))}
             className="w-full py-3 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {cargando ? 'Autenticando...' : (
