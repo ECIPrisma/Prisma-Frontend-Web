@@ -96,6 +96,37 @@ const crearIconoTienda = (numero, entregado) => {
   });
 };
 
+// Icono personalizado para "Mi Ubicación Actual" (punto azul pulsante tipo Google Maps)
+const crearIconoUsuario = () => {
+  return L.divIcon({
+    className: 'custom-user-location-icon',
+    html: `
+      <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+        <div style="
+          position: absolute;
+          width: 32px;
+          height: 32px;
+          border-radius: 9999px;
+          background-color: rgba(37, 99, 235, 0.3);
+          box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        "></div>
+        <div style="
+          width: 16px;
+          height: 16px;
+          border-radius: 9999px;
+          background-color: #2563eb;
+          border: 3px solid white;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+          z-index: 10;
+        "></div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16]
+  });
+};
+
 export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
   const paradas = ruta?.paradas || [];
   const placa = ruta?.placaCamion || 'Camión';
@@ -128,6 +159,8 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
   const [velocidad, setVelocidad] = useState(Number(ruta?.ubicacionActual?.velocidadKmh || 0));
   const [simulando, setSimulando] = useState(false);
   const [pasoSimulacion, setPasoSimulacion] = useState(0);
+  const [miUbicacion, setMiUbicacion] = useState(null);
+  const [obteniendoUbicacion, setObteniendoUbicacion] = useState(false);
 
   // Línea poligonal para el trayecto entre paradas
   const coordenadasRuta = useMemo(() => {
@@ -138,8 +171,11 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
   // Límites para auto-centrar el mapa
   const bounds = useMemo(() => {
     const todos = [posCamion, ...puntosTiendas.map((p) => [p.lat, p.lng])];
+    if (miUbicacion) {
+      todos.push(miUbicacion);
+    }
     return todos;
-  }, [posCamion, puntosTiendas]);
+  }, [posCamion, puntosTiendas, miUbicacion]);
 
   // Generador de trayecto interpolado entre paradas para simulación en vivo
   const pasosInterpolados = useMemo(() => {
@@ -208,6 +244,42 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
     setVelocidad(0);
   };
 
+  // Localizar la posición GPS del dispositivo del usuario (Proveedor / Administrador)
+  const obtenerMiUbicacion = () => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      alert('Tu navegador o dispositivo no soporta geolocalización GPS.');
+      return;
+    }
+    setObteniendoUbicacion(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setMiUbicacion([pos.coords.latitude, pos.coords.longitude]);
+        setObteniendoUbicacion(false);
+      },
+      (err) => {
+        setObteniendoUbicacion(false);
+        alert('No se pudo acceder al GPS del dispositivo: ' + (err.message || 'Permiso denegado'));
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  // Cálculo de distancia euclidiana/Haversine entre el usuario y el camión
+  const distanciaAlCamionKm = useMemo(() => {
+    if (!miUbicacion || !posCamion) return null;
+    const R = 6371;
+    const dLat = ((posCamion[0] - miUbicacion[0]) * Math.PI) / 180;
+    const dLon = ((posCamion[1] - miUbicacion[1]) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((miUbicacion[0] * Math.PI) / 180) *
+        Math.cos((posCamion[0] * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (R * c).toFixed(2);
+  }, [miUbicacion, posCamion]);
+
   return (
     <div className="space-y-4">
       {/* Barra de Controles y Telemetría en Vivo */}
@@ -245,8 +317,29 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
           </div>
         </div>
 
-        {/* Botones de Simulación para Sustentación */}
-        <div className="flex items-center gap-2">
+        {/* Botones de Control, Ubicación del Usuario y Simulación */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={obtenerMiUbicacion}
+            disabled={obteniendoUbicacion}
+            title="Localizar la posición GPS de mi dispositivo actual"
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border ${
+              miUbicacion
+                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-400'
+                : 'bg-slate-800 hover:bg-slate-700 text-blue-300 border-slate-700'
+            }`}
+          >
+            <Navigation className={`w-3.5 h-3.5 ${obteniendoUbicacion ? 'animate-spin' : ''}`} />
+            <span>
+              {obteniendoUbicacion 
+                ? 'Ubicando...' 
+                : miUbicacion 
+                  ? `Mi GPS (${distanciaAlCamionKm ? distanciaAlCamionKm + ' km' : 'Activo'})` 
+                  : 'Ver Mi Ubicación'}
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={toggleSimulacion}
@@ -313,6 +406,29 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
             </Popup>
           </Marker>
 
+          {/* Marcador de Mi Ubicación (Dispositivo del Usuario / Proveedor) */}
+          {miUbicacion && (
+            <Marker position={miUbicacion} icon={crearIconoUsuario()}>
+              <Popup>
+                <div className="p-1.5 space-y-1 text-xs">
+                  <p className="font-bold text-blue-700 flex items-center gap-1">
+                    <Navigation className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Usted está aquí</span>
+                  </p>
+                  <p className="text-slate-600 font-medium">Dispositivo GPS actual</p>
+                  {distanciaAlCamionKm && (
+                    <div className="bg-teal-50 border border-teal-200 text-teal-800 p-1 rounded font-bold text-[11px] mt-1">
+                      Distancia al camión: {distanciaAlCamionKm} km
+                    </div>
+                  )}
+                  <p className="text-[10px] text-slate-400 font-mono pt-0.5">
+                    Coord: {miUbicacion[0].toFixed(5)}, {miUbicacion[1].toFixed(5)}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
           {/* Marcadores de Tiendas (Paradas) */}
           {puntosTiendas.map((tienda) => (
             <Marker
@@ -367,6 +483,14 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
             <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 border border-white inline-block"></span>
             <span className="text-slate-700 font-medium">Tienda Entregada</span>
           </div>
+          {miUbicacion && (
+            <div className="flex items-center gap-1.5 animate-in fade-in">
+              <span className="w-3.5 h-3.5 rounded-full bg-blue-600 border border-white inline-block shadow-sm"></span>
+              <span className="text-blue-700 font-bold">
+                Su Ubicación {distanciaAlCamionKm ? `(${distanciaAlCamionKm} km al camión)` : ''}
+              </span>
+            </div>
+          )}
         </div>
 
         <p className="text-slate-400 text-[11px]">

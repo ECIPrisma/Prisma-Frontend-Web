@@ -84,4 +84,26 @@ describe('MapaRutaEnVivo Component', () => {
     fireEvent.click(botonSimular);
     expect(screen.getByText(/Pausar Simulación/i)).toBeInTheDocument();
   });
+
+  it('permite solicitar la geolocalización del usuario y renderiza su marcador', () => {
+    const mockGeolocation = {
+      getCurrentPosition: vi.fn().mockImplementationOnce((success) =>
+        success({
+          coords: {
+            latitude: 4.6097,
+            longitude: -74.0817
+          }
+        })
+      )
+    };
+    global.navigator.geolocation = mockGeolocation;
+
+    render(<MapaRutaEnVivo ruta={rutaMock} />);
+    const botonUbicacion = screen.getByText(/Ver Mi Ubicación/i);
+    expect(botonUbicacion).toBeInTheDocument();
+
+    fireEvent.click(botonUbicacion);
+    expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
+    expect(screen.getByText(/Mi GPS/i)).toBeInTheDocument();
+  });
 });
