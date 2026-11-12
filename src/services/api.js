@@ -508,6 +508,39 @@ export const proveedorService = {
     });
     return handleResponse(res);
   },
+
+  // HU-12: cuenta de cobro en Mercado Pago (OAuth) para recibir pagos divididos
+  getCuentaCobro: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  iniciarVinculacionCobro: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/vinculacion`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  completarVinculacionCobro: async ({ code, state, error }) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/vinculacion/callback`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ code: code || null, state: state || null, error: error || null }),
+    });
+    return handleResponse(res);
+  },
+
+  desvincularCuentaCobro: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
 };
 
 export const tiendaService = {
