@@ -195,7 +195,7 @@ export const UsuariosAdminPage = () => {
       )}
 
       {/* Clasificación por Roles (Pestañas de Navegación) */}
-      <div className="flex flex-wrap gap-2 border-b border-prisma-border pb-3">
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
         {tabsRol.map((tab) => {
           const Icon = tab.icon;
           const activo = filtroRol === tab.id;
@@ -203,17 +203,17 @@ export const UsuariosAdminPage = () => {
             <button
               key={tab.id}
               onClick={() => setFiltroRol(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
                 activo
                   ? 'bg-prisma-teal text-white shadow-md'
-                  : 'bg-white text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100 border border-prisma-border'
+                  : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shadow-sm'
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
               <span
                 className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-                  activo ? 'bg-white/20 text-white' : 'bg-gray-100 text-prisma-text-secondary'
+                  activo ? 'bg-teal-900 text-white' : 'bg-slate-100 text-slate-700'
                 }`}
               >
                 {tab.count}
@@ -224,25 +224,25 @@ export const UsuariosAdminPage = () => {
       </div>
 
       {/* Barra de Búsqueda y Filtro secundario de 2FA */}
-      <div className="bg-white p-4 rounded-2xl border border-prisma-border shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-96">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+          <Search className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por nombre, correo, rol o empresa..."
-            className="w-full pl-10 pr-4 py-2 text-sm border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none bg-white text-slate-900"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <span className="text-xs font-semibold text-prisma-text-secondary whitespace-nowrap">Estado 2FA:</span>
-          <div className="inline-flex rounded-xl p-1 bg-gray-100 border border-prisma-border">
+          <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">Estado 2FA:</span>
+          <div className="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200">
             <button
               onClick={() => setFiltro2FA('TODOS')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                filtro2FA === 'TODOS' ? 'bg-white text-prisma-text-primary shadow-sm font-bold' : 'text-prisma-text-secondary hover:text-prisma-text-primary'
+                filtro2FA === 'TODOS' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Todos ({usuarios.length})
@@ -250,7 +250,7 @@ export const UsuariosAdminPage = () => {
             <button
               onClick={() => setFiltro2FA('ACTIVO')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                filtro2FA === 'ACTIVO' ? 'bg-white text-prisma-text-primary shadow-sm font-bold' : 'text-prisma-text-secondary hover:text-prisma-text-primary'
+                filtro2FA === 'ACTIVO' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Con 2FA ({usuarios.filter((u) => u.totpEnabled).length})
@@ -258,7 +258,7 @@ export const UsuariosAdminPage = () => {
             <button
               onClick={() => setFiltro2FA('INACTIVO')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                filtro2FA === 'INACTIVO' ? 'bg-white text-prisma-text-primary shadow-sm font-bold' : 'text-prisma-text-secondary hover:text-prisma-text-primary'
+                filtro2FA === 'INACTIVO' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Sin 2FA ({usuarios.filter((u) => !u.totpEnabled).length})
@@ -268,10 +268,10 @@ export const UsuariosAdminPage = () => {
       </div>
 
       {/* Tabla de Usuarios */}
-      <div className="bg-white rounded-2xl border border-prisma-border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-prisma-text-primary">
-            <thead className="bg-gray-50 border-b border-prisma-border text-xs uppercase text-prisma-text-secondary font-semibold">
+          <table className="w-full text-left text-sm text-slate-800">
+            <thead className="bg-slate-100 border-b border-slate-200 text-xs uppercase text-slate-700 font-semibold tracking-wider">
               <tr>
                 <th className="px-6 py-3.5">Usuario</th>
                 <th className="px-6 py-3.5">Rol y Clasificación</th>
@@ -281,23 +281,23 @@ export const UsuariosAdminPage = () => {
                 <th className="px-6 py-3.5 text-right">Acciones de Soporte</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-prisma-border">
+            <tbody className="divide-y divide-slate-100">
               {cargando ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-prisma-text-secondary">
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-prisma-teal" />
                     Cargando directorio de usuarios...
                   </td>
                 </tr>
               ) : usuariosFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-prisma-text-secondary">
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
                     No se encontraron usuarios en esta categoría o filtro.
                   </td>
                 </tr>
               ) : (
                 usuariosFiltrados.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50/80 transition">
+                  <tr key={u.id} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-4">
                       <div className="font-semibold text-prisma-text-primary">{u.nombreCompleto}</div>
                       <div className="text-xs text-prisma-text-secondary">{u.email}</div>
@@ -360,9 +360,9 @@ export const UsuariosAdminPage = () => {
         <div 
           role="dialog" 
           aria-modal="true" 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-in fade-in duration-150"
         >
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-prisma-border space-y-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 text-amber-600">
                 <AlertTriangle className="w-6 h-6" />

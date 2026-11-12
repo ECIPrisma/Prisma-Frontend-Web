@@ -621,7 +621,7 @@ export const DespachosPage = () => {
 
       {/* MODAL SIMPLIFICADO A 1 CLIC: REPORTE DE INCIDENCIA */}
       {modalProblema && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -737,7 +737,7 @@ export const DespachosPage = () => {
 
       {/* MODAL REPROGRAMAR FECHA */}
       {modalReprogramar && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -805,7 +805,7 @@ export const DespachosPage = () => {
       )}
       {/* MODAL: VER DÓNDE ESTÁ EL CAMIÓN (RUTA PREDEFINIDA PASO A PASO) */}
       {modalUbicacionRuta && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start border-b border-prisma-border pb-4">
               <div className="flex items-center gap-3">
@@ -976,7 +976,7 @@ export const DespachosPage = () => {
 
       {/* MODAL: REPORTAR CAMIÓN VARADO */}
       {modalVarado && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>

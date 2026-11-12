@@ -247,7 +247,7 @@ export const DisputasPage = () => {
 
       {/* Modal Resolver Disputa / Responder Caso Admin */}
       {modalResolucion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
             <div className="flex justify-between items-center pb-3 border-b border-prisma-border">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
@@ -334,7 +334,7 @@ export const DisputasPage = () => {
 
       {/* Modal de Justificación Obligatoria para Override PIN */}
       {selectedCase && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center pb-3 border-b border-prisma-border">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
