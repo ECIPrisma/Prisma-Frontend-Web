@@ -426,6 +426,15 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
+  simularPosicionGps: async (rutaId, coords) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/rutas/${rutaId}/simular-posicion`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(coords),
+    });
+    return handleResponse(res);
+  },
+
   getTiendasClientes: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/tiendas`, {
       headers: getAuthHeaders(),

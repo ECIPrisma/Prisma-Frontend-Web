@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { proveedorService } from '../../services/api';
+import { MapaRutaEnVivo } from '../../components/mapa/MapaRutaEnVivo';
 import { 
   Truck, 
   Package, 
@@ -803,10 +804,10 @@ export const DespachosPage = () => {
           </div>
         </div>
       )}
-      {/* MODAL: VER DÓNDE ESTÁ EL CAMIÓN (RUTA PREDEFINIDA PASO A PASO) */}
+      {/* MODAL: VER DÓNDE ESTÁ EL CAMIÓN (MAPA SATELITAL EN VIVO + PASO A PASO) */}
       {modalUbicacionRuta && (
         <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in duration-200 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-start border-b border-prisma-border pb-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-prisma-teal/10 text-prisma-teal rounded-2xl">
@@ -814,7 +815,7 @@ export const DespachosPage = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-prisma-text-primary flex items-center gap-2">
-                    Ubicación GPS en Vivo: {modalUbicacionRuta.placaCamion}
+                    Ubicación GPS Satelital: {modalUbicacionRuta.placaCamion}
                   </h3>
                   <p className="text-xs text-prisma-text-secondary mt-0.5 flex items-center gap-2">
                     <span>{modalUbicacionRuta.codigoRuta}</span>
@@ -873,6 +874,14 @@ export const DespachosPage = () => {
                 </p>
                 <p className="text-[10px] text-gray-400">tiendas pendientes</p>
               </div>
+            </div>
+
+            {/* MAPA INTERACTIVO LEAFLET + OPENSTREETMAP CON GPS EN VIVO */}
+            <div className="space-y-2">
+              <MapaRutaEnVivo 
+                ruta={modalUbicacionRuta} 
+                onActualizarRuta={() => cargarDatos(true)} 
+              />
             </div>
 
             {/* Timeline Secuencial de la Ruta Predefinida */}
