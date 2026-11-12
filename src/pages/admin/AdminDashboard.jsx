@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { TrendingUp, ShoppingBag, Truck, AlertTriangle, RefreshCw, AlertCircle, Users } from 'lucide-react';
+import { CircuitoPagosCard } from './CircuitoPagosCard';
 
 export const AdminDashboard = () => {
   const { user } = useAuth();
@@ -137,6 +138,9 @@ export const AdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* HU-19: Estado del circuit breaker de la pasarela de pagos */}
+      <CircuitoPagosCard />
 
       {/* Proveedores Registrados */}
       <div className="bg-white rounded-2xl border border-prisma-border shadow-sm overflow-hidden">
