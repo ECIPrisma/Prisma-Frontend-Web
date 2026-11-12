@@ -15,7 +15,8 @@ import {
   Store,
   MessageSquareWarning,
   Receipt,
-  ShieldCheck
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -27,6 +28,7 @@ export const Sidebar = () => {
     { to: '/', label: 'Panel Principal', icon: LayoutDashboard },
     { to: '/pedidos-soporte', label: 'Soporte de Pedidos', icon: ShoppingBag },
     { to: '/proveedores', label: 'Empresas y Cartera', icon: Building2 },
+    { to: '/usuarios-soporte', label: 'Usuarios y 2FA', icon: Users },
     { to: '/disputas', label: 'Reclamos y Disputas', icon: AlertTriangle },
     { to: '/auditoria', label: 'Historial de Actividad', icon: FileText },
     { to: '/configuracion', label: 'Configuración del Sistema', icon: Sliders },
