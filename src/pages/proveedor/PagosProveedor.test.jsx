@@ -103,12 +103,16 @@ describe('HU-12 Cuenta de cobro del proveedor (pasarela simulada)', () => {
       pagos: [{
         id: 1, pedidoId: 10, numeroPedido: 'PED-2026-0042', nombreTienda: 'Tienda La Bendición',
         referencia: 'PRISMA-PED-2026-0042-AB12C', detalleMedio: 'Nequi ••• 1111',
-        monto: 125000, montoProveedor: 120625, estado: 'EN_GARANTIA',
+        monto: 125000, comisionPrisma: 4375, montoProveedor: 120625, tarifaPasarela: 2237.5, estado: 'EN_GARANTIA',
       }],
     });
     montar();
 
     expect(await screen.findByText('PED-2026-0042')).toBeInTheDocument();
+    // HU-13: división 3.5% / 96.5% y tarifa Wompi aparte
+    // (es-CO puede no agrupar números de 4 cifras: se acepta "4.375" o "4375")
+    expect(screen.getByText(/^\$4\.?375$/)).toBeInTheDocument();
+    expect(screen.getByText(/^\$2\.?238$/)).toBeInTheDocument();
     expect(screen.getByText('Tienda La Bendición')).toBeInTheDocument();
     expect(screen.getByText('En garantía')).toBeInTheDocument();
     expect(screen.getByText('Nequi ••• 1111')).toBeInTheDocument();

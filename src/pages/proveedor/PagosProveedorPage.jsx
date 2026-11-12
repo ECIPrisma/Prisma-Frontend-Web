@@ -147,6 +147,10 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                 <ShieldCheck className="w-4 h-4 text-prisma-teal flex-shrink-0" />
                 PRISMA retiene cada pago en garantía y te lo libera cuando el tendero confirma la entrega con su PIN.
               </p>
+              <p className="text-[11px] text-prisma-text-secondary">
+                Wompi cobra aparte su tarifa de procesamiento (PSE desde 1.49% + $900, Nequi desde 1.79%,
+                tarjetas desde 2.65% + $700); es independiente de la comisión de PRISMA.
+              </p>
             </div>
 
             {/* Estado de la vinculación */}
@@ -318,7 +322,9 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                         <th className="p-4">Tienda</th>
                         <th className="p-4">Medio</th>
                         <th className="p-4">Pagado</th>
-                        <th className="p-4">Recibes</th>
+                        <th className="p-4">Comisión PRISMA (3.5%)</th>
+                        <th className="p-4">Recibes (96.5%)</th>
+                        <th className="p-4">Tarifa Wompi</th>
                         <th className="p-4">Estado</th>
                       </tr>
                     </thead>
@@ -334,7 +340,11 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                             <td className="p-4 text-prisma-text-secondary">{pago.nombreTienda}</td>
                             <td className="p-4 text-prisma-text-secondary">{pago.detalleMedio}</td>
                             <td className="p-4 font-bold text-prisma-text-primary">{formatoPesos(pago.monto)}</td>
+                            <td className="p-4 text-amber-600 font-bold">{formatoPesos(pago.comisionPrisma)}</td>
                             <td className="p-4 font-bold text-prisma-teal">{formatoPesos(pago.montoProveedor)}</td>
+                            <td className="p-4 text-prisma-text-secondary">
+                              {pago.tarifaPasarela != null ? formatoPesos(pago.tarifaPasarela) : '-'}
+                            </td>
                             <td className="p-4">
                               <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${etiqueta.clase}`}>{etiqueta.texto}</span>
                             </td>
