@@ -81,9 +81,11 @@ describe('SeguridadPage', () => {
     await user.type(screen.getByLabelText(/código de 6 dígitos/i), '123456');
     await user.click(screen.getByRole('button', { name: /confirmar y activar/i }));
 
-    await waitFor(() => expect(authService.enableTotp).toHaveBeenCalledWith('123456'));
-    expect(logout).toHaveBeenCalledOnce();
-    expect(screen.getByTestId('location')).toHaveTextContent('/login');
+    await waitFor(() => {
+      expect(authService.enableTotp).toHaveBeenCalledWith('123456');
+      expect(logout).toHaveBeenCalledOnce();
+      expect(screen.getByTestId('location')).toHaveTextContent('/login');
+    });
     expect(screen.getByText('La autenticación en dos pasos se activó. Por seguridad, debes volver a iniciar sesión.')).toBeInTheDocument();
   });
 

@@ -14,7 +14,8 @@ import {
   ShoppingBag,
   Store,
   MessageSquareWarning,
-  Receipt
+  Receipt,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -70,6 +71,22 @@ export const Sidebar = () => {
           );
         })}
       </nav>
+
+      <div className="pt-4 border-t border-prisma-border">
+        <NavLink
+          to="/seguridad"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              isActive
+                ? 'bg-prisma-teal text-white shadow-sm'
+                : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100'
+            }`
+          }
+        >
+          <ShieldCheck className="w-5 h-5 flex-shrink-0" />
+          <span>Seguridad (2FA)</span>
+        </NavLink>
+      </div>
     </aside>
   );
 };
