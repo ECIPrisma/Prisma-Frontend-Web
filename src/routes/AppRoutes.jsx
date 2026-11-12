@@ -26,7 +26,6 @@ import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
 import { PerfilProveedorPage } from '../pages/proveedor/PerfilProveedorPage';
 import { PagosProveedorPage } from '../pages/proveedor/PagosProveedorPage';
-import { PagosCallbackPage } from '../pages/proveedor/PagosCallbackPage';
 
 export const AppRoutes = () => {
   const { user } = useAuth();
@@ -68,7 +67,6 @@ export const AppRoutes = () => {
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
         <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />
         <Route path="/proveedor/pagos" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PagosProveedorPage /></RoleRoute>} />
-        <Route path="/proveedor/pagos/callback" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PagosCallbackPage /></RoleRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

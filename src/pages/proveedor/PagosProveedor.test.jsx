@@ -1,91 +1,82 @@
-import React, { StrictMode } from 'react';
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PagosProveedorPage } from './PagosProveedorPage';
-import { PagosCallbackPage } from './PagosCallbackPage';
 import { proveedorService } from '../../services/api';
 
 vi.mock('../../services/api', () => ({
   proveedorService: {
     getCuentaCobro: vi.fn(),
-    iniciarVinculacionCobro: vi.fn(),
-    completarVinculacionCobro: vi.fn(),
+    vincularCuentaCobro: vi.fn(),
     desvincularCuentaCobro: vi.fn(),
+    getRecaudosEnLinea: vi.fn(),
   },
 }));
 
 const SIN_VINCULAR = {
-  disponible: true, vinculada: false, habilitadoPagosDivididos: false,
+  disponible: true, simulada: true, vinculada: false, habilitadoPagosDivididos: false,
   comisionPrismaPorcentaje: 3.5, porcentajeProveedor: 96.5,
 };
 const VINCULADA = {
-  ...SIN_VINCULAR, vinculada: true, habilitadoPagosDivididos: true,
-  cuentaExternaId: '123456789', modoProduccion: false, vinculadaEn: '2026-11-11T10:00:00-05:00',
+  ...SIN_VINCULAR, vinculada: true, habilitadoPagosDivididos: true, cuentaExternaId: 'WMP-SBX-4K8Z2QH1',
+  banco: 'Bancolombia', tipoCuenta: 'AHORROS', numeroCuentaEnmascarado: '•••• 8912', titular: 'FEMSA Colombia',
+  modoProduccion: false, vinculadaEn: '2026-11-12T10:00:00-05:00',
+};
+const SIN_RECAUDOS = { totalEnGarantia: 0, totalLiberado: 0, cantidadEnGarantia: 0, cantidadLiberados: 0, pagos: [] };
+
+const montar = () => render(<PagosProveedorPage demoraVerificacionMs={0} />);
+
+const llenarFormulario = async (user, numeroCuenta) => {
+  await user.click(await screen.findByRole('button', { name: /vincular cuenta de cobro/i }));
+  await user.selectOptions(screen.getByLabelText('Banco'), 'Bancolombia');
+  await user.type(screen.getByLabelText('Número de cuenta'), numeroCuenta);
+  await user.type(screen.getByLabelText('Titular de la cuenta'), 'FEMSA Colombia');
+  await user.click(screen.getByRole('button', { name: /verificar y vincular/i }));
 };
 
-const montar = (rutaInicial) =>
-  render(
-    <StrictMode>
-      <MemoryRouter initialEntries={[rutaInicial]}>
-        <Routes>
-          <Route path="/proveedor/pagos" element={<PagosProveedorPage />} />
-          <Route path="/proveedor/pagos/callback" element={<PagosCallbackPage />} />
-        </Routes>
-      </MemoryRouter>
-    </StrictMode>
-  );
-
-describe('HU-12 Cuenta de cobro del proveedor', () => {
-  const ubicacionOriginal = window.location;
-  let assign;
-
+describe('HU-12 Cuenta de cobro del proveedor (pasarela simulada)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    assign = vi.fn();
-    Object.defineProperty(window, 'location', { configurable: true, value: { ...ubicacionOriginal, assign } });
+    proveedorService.getRecaudosEnLinea.mockResolvedValue(SIN_RECAUDOS);
   });
 
-  afterEach(() => {
-    Object.defineProperty(window, 'location', { configurable: true, value: ubicacionOriginal });
-  });
-
-  it('sin cuenta vinculada muestra el 96.5% y redirige a Mercado Pago al vincular', async () => {
-    const user = userEvent.setup();
+  it('sin cuenta vinculada muestra el 96,5% y el aviso de ambiente simulado', async () => {
     proveedorService.getCuentaCobro.mockResolvedValue(SIN_VINCULAR);
-    proveedorService.iniciarVinculacionCobro.mockResolvedValue({ urlAutorizacion: 'https://auth.mercadopago.com/authorization?state=abc' });
-
-    montar('/proveedor/pagos');
+    montar();
 
     expect(await screen.findByText('96,5%')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /vincular con mercado pago/i }));
-
-    expect(proveedorService.iniciarVinculacionCobro).toHaveBeenCalledTimes(1);
-    expect(assign).toHaveBeenCalledWith('https://auth.mercadopago.com/authorization?state=abc');
+    expect(screen.getByText(/ambiente de pruebas simulado/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /vincular cuenta de cobro/i })).toBeEnabled();
   });
 
-  it('criterio 1: al volver autorizado envía code y state UNA sola vez y muestra la cuenta habilitada', async () => {
-    proveedorService.completarVinculacionCobro.mockResolvedValue(VINCULADA);
-    proveedorService.getCuentaCobro.mockResolvedValue(VINCULADA);
+  it('criterio 1: vincula la cuenta y muestra solo los últimos 4 dígitos', async () => {
+    const user = userEvent.setup();
+    proveedorService.getCuentaCobro.mockResolvedValue(SIN_VINCULAR);
+    proveedorService.vincularCuentaCobro.mockResolvedValue(VINCULADA);
+    montar();
 
-    montar('/proveedor/pagos/callback?code=TG-123&state=abc');
+    await llenarFormulario(user, '12345678912');
 
     expect(await screen.findByText(/tu cuenta de cobro quedó vinculada/i)).toBeInTheDocument();
-    expect(await screen.findByText(/habilitado para recibir pagos divididos/i)).toBeInTheDocument();
-    expect(proveedorService.completarVinculacionCobro).toHaveBeenCalledTimes(1);
-    expect(proveedorService.completarVinculacionCobro).toHaveBeenCalledWith({ code: 'TG-123', state: 'abc', error: null });
+    expect(screen.getByText(/habilitado para recibir pagos divididos/i)).toBeInTheDocument();
+    expect(screen.getByText('•••• 8912')).toBeInTheDocument();
+    expect(proveedorService.vincularCuentaCobro).toHaveBeenCalledWith({
+      banco: 'Bancolombia', tipoCuenta: 'AHORROS', numeroCuenta: '12345678912', titular: 'FEMSA Colombia',
+    });
   });
 
-  it('criterio 2: si se cancela en Mercado Pago no queda vinculada y muestra el mensaje exacto', async () => {
-    proveedorService.completarVinculacionCobro.mockRejectedValue(new Error('No se pudo vincular tu cuenta de cobro, intenta nuevamente'));
+  it('criterio 2: si la pasarela rechaza la cuenta muestra el mensaje exacto y no queda vinculada', async () => {
+    const user = userEvent.setup();
     proveedorService.getCuentaCobro.mockResolvedValue(SIN_VINCULAR);
+    proveedorService.vincularCuentaCobro.mockRejectedValue(new Error('No se pudo vincular tu cuenta de cobro, intenta nuevamente'));
+    montar();
 
-    montar('/proveedor/pagos/callback?error=access_denied&state=abc');
+    await llenarFormulario(user, '1234560000');
 
     expect(await screen.findByText('No se pudo vincular tu cuenta de cobro, intenta nuevamente')).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: /vincular con mercado pago/i })).toBeInTheDocument();
-    expect(proveedorService.completarVinculacionCobro).toHaveBeenCalledWith({ code: null, state: 'abc', error: 'access_denied' });
+    expect(screen.queryByText(/habilitado para recibir pagos divididos/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /verificar y vincular/i })).toBeEnabled();
   });
 
   it('con la cuenta vinculada permite desvincular tras confirmar', async () => {
@@ -95,22 +86,31 @@ describe('HU-12 Cuenta de cobro del proveedor', () => {
       proveedorService.getCuentaCobro.mockResolvedValue(SIN_VINCULAR);
       return null;
     });
-
-    montar('/proveedor/pagos');
+    montar();
 
     await user.click(await screen.findByRole('button', { name: /desvincular cuenta/i }));
     await user.click(screen.getByRole('button', { name: /sí, desvincular/i }));
 
     await waitFor(() => expect(proveedorService.desvincularCuentaCobro).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/fue desvinculada/i)).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: /vincular con mercado pago/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /vincular cuenta de cobro/i })).toBeInTheDocument();
   });
 
-  it('si el servidor no tiene Mercado Pago configurado, el botón queda deshabilitado', async () => {
-    proveedorService.getCuentaCobro.mockResolvedValue({ ...SIN_VINCULAR, disponible: false });
+  it('N-08: lista los pagos en línea de tenderos con su estado de garantía', async () => {
+    proveedorService.getCuentaCobro.mockResolvedValue(VINCULADA);
+    proveedorService.getRecaudosEnLinea.mockResolvedValue({
+      totalEnGarantia: 120625, totalLiberado: 0, cantidadEnGarantia: 1, cantidadLiberados: 0,
+      pagos: [{
+        id: 1, pedidoId: 10, numeroPedido: 'PED-2026-0042', nombreTienda: 'Tienda La Bendición',
+        referencia: 'PRISMA-PED-2026-0042-AB12C', detalleMedio: 'Nequi ••• 1111',
+        monto: 125000, montoProveedor: 120625, estado: 'EN_GARANTIA',
+      }],
+    });
+    montar();
 
-    montar('/proveedor/pagos');
-
-    expect(await screen.findByRole('button', { name: /vincular con mercado pago/i })).toBeDisabled();
+    expect(await screen.findByText('PED-2026-0042')).toBeInTheDocument();
+    expect(screen.getByText('Tienda La Bendición')).toBeInTheDocument();
+    expect(screen.getByText('En garantía')).toBeInTheDocument();
+    expect(screen.getByText('Nequi ••• 1111')).toBeInTheDocument();
   });
 });

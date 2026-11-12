@@ -509,7 +509,7 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
-  // HU-12: cuenta de cobro en Mercado Pago (OAuth) para recibir pagos divididos
+  // HU-12: cuenta de cobro del proveedor en la pasarela de pagos (vinculación SIMULADA, sandbox tipo Wompi)
   getCuentaCobro: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
       headers: getAuthHeaders(),
@@ -517,19 +517,19 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
-  iniciarVinculacionCobro: async () => {
-    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/vinculacion`, {
+  vincularCuentaCobro: async ({ banco, tipoCuenta, numeroCuenta, titular }) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
       method: 'POST',
       headers: getAuthHeaders(),
+      body: JSON.stringify({ banco, tipoCuenta, numeroCuenta, titular }),
     });
     return handleResponse(res);
   },
 
-  completarVinculacionCobro: async ({ code, state, error }) => {
-    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/vinculacion/callback`, {
-      method: 'POST',
+  // N-08: pagos en línea de los tenderos (en garantía hasta la entrega / liberados)
+  getRecaudosEnLinea: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/recaudos`, {
       headers: getAuthHeaders(),
-      body: JSON.stringify({ code: code || null, state: state || null, error: error || null }),
     });
     return handleResponse(res);
   },
