@@ -9,8 +9,17 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   KeyRound, 
-  X
+  X,
+  Truck,
+  Store,
+  Building2,
+  ShieldAlert
 } from 'lucide-react';
+
+const ROLES_ADMIN = ['ROLE_PLATFORM_ADMIN', 'ROLE_ADMIN', 'ROLE_SOPORTE'];
+const ROLES_PROV = ['ROLE_PROVEEDOR_ADMIN', 'ROLE_PROVEEDOR'];
+const ROL_REPARTIDOR = 'ROLE_REPARTIDOR';
+const ROL_TENDERO = 'ROLE_TENDERO';
 
 export const UsuariosAdminPage = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -18,6 +27,7 @@ export const UsuariosAdminPage = () => {
   const [error, setError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
   const [busqueda, setBusqueda] = useState('');
+  const [filtroRol, setFiltroRol] = useState('TODOS'); // 'TODOS', 'ADMIN', 'PROVEEDOR', 'REPARTIDOR', 'TENDERO'
   const [filtro2FA, setFiltro2FA] = useState('TODOS'); // 'TODOS', 'ACTIVO', 'INACTIVO'
   
   // Modal de confirmación para restablecer 2FA
@@ -41,8 +51,20 @@ export const UsuariosAdminPage = () => {
     cargarUsuarios();
   }, []);
 
+  // Conteos por categoría de rol
+  const conteoRoles = useMemo(() => {
+    return {
+      todos: usuarios.length,
+      admin: usuarios.filter((u) => ROLES_ADMIN.includes(u.rol)).length,
+      proveedores: usuarios.filter((u) => ROLES_PROV.includes(u.rol)).length,
+      repartidores: usuarios.filter((u) => u.rol === ROL_REPARTIDOR).length,
+      tenderos: usuarios.filter((u) => u.rol === ROL_TENDERO).length,
+    };
+  }, [usuarios]);
+
   const usuariosFiltrados = useMemo(() => {
     return usuarios.filter((u) => {
+      // Filtro por texto
       const coincideTexto = 
         (u.nombreCompleto || '').toLowerCase().includes(busqueda.toLowerCase()) ||
         (u.email || '').toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -51,11 +73,19 @@ export const UsuariosAdminPage = () => {
 
       if (!coincideTexto) return false;
 
+      // Filtro por categoría de Rol
+      if (filtroRol === 'ADMIN' && !ROLES_ADMIN.includes(u.rol)) return false;
+      if (filtroRol === 'PROVEEDOR' && !ROLES_PROV.includes(u.rol)) return false;
+      if (filtroRol === 'REPARTIDOR' && u.rol !== ROL_REPARTIDOR) return false;
+      if (filtroRol === 'TENDERO' && u.rol !== ROL_TENDERO) return false;
+
+      // Filtro por Estado 2FA
       if (filtro2FA === 'ACTIVO') return u.totpEnabled === true;
       if (filtro2FA === 'INACTIVO') return u.totpEnabled !== true;
+
       return true;
     });
-  }, [usuarios, busqueda, filtro2FA]);
+  }, [usuarios, busqueda, filtroRol, filtro2FA]);
 
   const handleConfirmarReset = async () => {
     if (!usuarioSeleccionado) return;
@@ -74,22 +104,50 @@ export const UsuariosAdminPage = () => {
     }
   };
 
-  const getRolBadgeClass = (rol) => {
+  const getRolEtiqueta = (rol) => {
     switch (rol) {
       case 'ROLE_PLATFORM_ADMIN':
+        return 'Admin Plataforma';
       case 'ROLE_ADMIN':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'Administrador';
+      case 'ROLE_SOPORTE':
+        return 'Soporte Técnico';
       case 'ROLE_PROVEEDOR_ADMIN':
+        return 'Gerente Proveedor';
       case 'ROLE_PROVEEDOR':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'Distribuidor';
       case 'ROLE_REPARTIDOR':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'Conductor / Repartidor';
       case 'ROLE_TENDERO':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        return 'Tendero';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return rol ? rol.replace('ROLE_', '') : 'Usuario';
     }
   };
+
+  const getRolBadgeClass = (rol) => {
+    if (ROLES_ADMIN.includes(rol)) {
+      return 'bg-purple-100 text-purple-800 border-purple-200';
+    }
+    if (ROLES_PROV.includes(rol)) {
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
+    if (rol === ROL_REPARTIDOR) {
+      return 'bg-amber-100 text-amber-800 border-amber-200';
+    }
+    if (rol === ROL_TENDERO) {
+      return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    }
+    return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const tabsRol = [
+    { id: 'TODOS', label: 'Todos', icon: Users, count: conteoRoles.todos },
+    { id: 'ADMIN', label: 'Administración', icon: ShieldAlert, count: conteoRoles.admin },
+    { id: 'PROVEEDOR', label: 'Proveedores', icon: Building2, count: conteoRoles.proveedores },
+    { id: 'REPARTIDOR', label: 'Repartidores', icon: Truck, count: conteoRoles.repartidores },
+    { id: 'TENDERO', label: 'Tenderos', icon: Store, count: conteoRoles.tenderos },
+  ];
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -101,7 +159,7 @@ export const UsuariosAdminPage = () => {
             Gestión de Usuarios y Seguridad (2FA)
           </h1>
           <p className="text-sm text-prisma-text-secondary mt-1">
-            Directorio de personal operativo y administrativo. En caso de pérdida o robo de celular, puedes restablecer el doble factor de cualquier cuenta.
+            Directorio clasificado por roles operativos y administrativos. Permite soporte y restablecimiento de autenticación en dos pasos.
           </p>
         </div>
 
@@ -136,7 +194,36 @@ export const UsuariosAdminPage = () => {
         </div>
       )}
 
-      {/* Barra de Filtros y Búsqueda */}
+      {/* Clasificación por Roles (Pestañas de Navegación) */}
+      <div className="flex flex-wrap gap-2 border-b border-prisma-border pb-3">
+        {tabsRol.map((tab) => {
+          const Icon = tab.icon;
+          const activo = filtroRol === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setFiltroRol(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm ${
+                activo
+                  ? 'bg-prisma-teal text-white shadow-md'
+                  : 'bg-white text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100 border border-prisma-border'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+              <span
+                className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                  activo ? 'bg-white/20 text-white' : 'bg-gray-100 text-prisma-text-secondary'
+                }`}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Barra de Búsqueda y Filtro secundario de 2FA */}
       <div className="bg-white p-4 rounded-2xl border border-prisma-border shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-96">
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
@@ -187,24 +274,25 @@ export const UsuariosAdminPage = () => {
             <thead className="bg-gray-50 border-b border-prisma-border text-xs uppercase text-prisma-text-secondary font-semibold">
               <tr>
                 <th className="px-6 py-3.5">Usuario</th>
-                <th className="px-6 py-3.5">Rol y Empresa</th>
+                <th className="px-6 py-3.5">Rol y Clasificación</th>
+                <th className="px-6 py-3.5">Empresa Asignada</th>
                 <th className="px-6 py-3.5">Teléfono</th>
-                <th className="px-6 py-3.5">Estado 2FA</th>
+                <th className="px-6 py-3.5">Seguridad 2FA</th>
                 <th className="px-6 py-3.5 text-right">Acciones de Soporte</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-prisma-border">
               {cargando ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-prisma-text-secondary">
+                  <td colSpan="6" className="px-6 py-12 text-center text-prisma-text-secondary">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-prisma-teal" />
                     Cargando directorio de usuarios...
                   </td>
                 </tr>
               ) : usuariosFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-prisma-text-secondary">
-                    No se encontraron usuarios que coincidan con la búsqueda.
+                  <td colSpan="6" className="px-6 py-12 text-center text-prisma-text-secondary">
+                    No se encontraron usuarios en esta categoría o filtro.
                   </td>
                 </tr>
               ) : (
@@ -215,11 +303,18 @@ export const UsuariosAdminPage = () => {
                       <div className="text-xs text-prisma-text-secondary">{u.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full border ${getRolBadgeClass(u.rol)}`}>
-                        {u.rol?.replace('ROLE_', '')}
+                      <span className={`inline-block px-2.5 py-1 text-xs font-semibold rounded-full border ${getRolBadgeClass(u.rol)}`}>
+                        {getRolEtiqueta(u.rol)}
                       </span>
-                      {u.proveedorNombre && (
-                        <div className="text-xs text-prisma-text-secondary mt-1">{u.proveedorNombre}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {u.proveedorNombre ? (
+                        <div className="font-medium text-prisma-text-primary text-xs flex items-center gap-1.5">
+                          <Building2 className="w-3.5 h-3.5 text-gray-400" />
+                          {u.proveedorNombre}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">Plataforma Prisma</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-xs text-prisma-text-secondary">
@@ -282,7 +377,7 @@ export const UsuariosAdminPage = () => {
                 <div className="mt-3 p-3 bg-gray-50 border border-prisma-border rounded-xl text-xs space-y-1">
                   <div><strong>Nombre:</strong> {usuarioSeleccionado.nombreCompleto}</div>
                   <div><strong>Correo:</strong> {usuarioSeleccionado.email}</div>
-                  <div><strong>Rol:</strong> {usuarioSeleccionado.rol}</div>
+                  <div><strong>Rol:</strong> {getRolEtiqueta(usuarioSeleccionado.rol)}</div>
                 </div>
                 <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200 mt-3">
                   ⚠️ Esta acción revocará todas las sesiones activas del usuario y le permitirá iniciar sesión inmediatamente solo con su correo y contraseña.
