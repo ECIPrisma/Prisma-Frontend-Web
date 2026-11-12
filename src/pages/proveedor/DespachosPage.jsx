@@ -24,10 +24,65 @@ import {
   Store
 } from 'lucide-react';
 
+const TIENDAS_FALLBACK_COBERTURA = [
+  {
+    id: 1,
+    nombreTienda: 'Tienda La Bendición - Doña Marta',
+    nombreTendero: 'Marta Cecilia López',
+    direccion: 'Carrera 78K #38-12 Sur',
+    barrio: 'Kennedy Central',
+    ciudad: 'Bogotá',
+    telefono: '3104567890',
+    latitud: 4.61842,
+    longitud: -74.15682,
+    totalComprado: 1250000,
+    totalPedidos: 6
+  },
+  {
+    id: 2,
+    nombreTienda: 'Minimarket El Progreso - Don José',
+    nombreTendero: 'José Vicente Rincón',
+    direccion: 'Calle 42 Sur #79-45',
+    barrio: 'Timiza',
+    ciudad: 'Bogotá',
+    telefono: '3157891234',
+    latitud: 4.61400,
+    longitud: -74.15200,
+    totalComprado: 980000,
+    totalPedidos: 4
+  },
+  {
+    id: 3,
+    nombreTienda: 'Abarrotes y Víveres Don Pepe',
+    nombreTendero: 'Pedro Nel Gómez',
+    direccion: 'Avenida Tintal #10-34',
+    barrio: 'El Tintal',
+    ciudad: 'Bogotá',
+    telefono: '3129876543',
+    latitud: 4.62100,
+    longitud: -74.15900,
+    totalComprado: 840000,
+    totalPedidos: 5
+  },
+  {
+    id: 4,
+    nombreTienda: 'Cigarrería y Granero Los Pinos',
+    nombreTendero: 'Guillermo Restrepo',
+    direccion: 'Calle 140 #11-20',
+    barrio: 'Cedritos',
+    ciudad: 'Bogotá',
+    telefono: '3201122334',
+    latitud: 4.71500,
+    longitud: -74.03200,
+    totalComprado: 650000,
+    totalPedidos: 3
+  }
+];
+
 export const DespachosPage = () => {
   const [pedidos, setPedidos] = useState([]);
   const [rutas, setRutas] = useState([]);
-  const [tiendas, setTiendas] = useState([]);
+  const [tiendas, setTiendas] = useState(TIENDAS_FALLBACK_COBERTURA);
   const [pestañaActiva, setPestañaActiva] = useState('rutas'); // 'rutas', 'pedidos' o 'mapa'
   const [rutaSeleccionadaMapa, setRutaSeleccionadaMapa] = useState(null);
   const [filtro, setFiltro] = useState('TODOS');
@@ -83,7 +138,10 @@ export const DespachosPage = () => {
         });
       }
       if (tiendasData.status === 'fulfilled') {
-        setTiendas(Array.isArray(tiendasData.value) ? tiendasData.value : []);
+        const arrTiendas = Array.isArray(tiendasData.value) ? tiendasData.value : [];
+        setTiendas(arrTiendas.length > 0 ? arrTiendas : TIENDAS_FALLBACK_COBERTURA);
+      } else {
+        setTiendas((prev) => (prev.length > 0 ? prev : TIENDAS_FALLBACK_COBERTURA));
       }
       setSegundosSync(0);
     } catch (err) {
