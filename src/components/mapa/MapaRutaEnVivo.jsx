@@ -127,25 +127,99 @@ const crearIconoUsuario = () => {
   });
 };
 
-export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
+// Icono para tiendas generales en el mapa de cobertura
+const crearIconoTiendaGeneral = () => {
+  return L.divIcon({
+    className: 'custom-tienda-general-icon',
+    html: `
+      <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+        <div style="
+          background-color: #0d9488;
+          color: white;
+          width: 26px;
+          height: 26px;
+          border-radius: 9999px;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+          border: 2px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+            <path d="M2 7h20"/>
+          </svg>
+        </div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16]
+  });
+};
+
+export const MapaRutaEnVivo = ({ 
+  ruta = null, 
+  todasLasRutas = [], 
+  todasLasTiendas = [], 
+  onActualizarRuta 
+}) => {
+  const esModoGeneral = !ruta;
   const paradas = ruta?.paradas || [];
   const placa = ruta?.placaCamion || 'Camión';
 
-  // Coordenadas base de paradas (tiendas)
+  // Coordenadas base de paradas (tiendas de la ruta o todas las tiendas en modo general)
   const puntosTiendas = useMemo(() => {
-    return paradas
-      .filter((p) => p.latitud && p.longitud)
-      .map((p, index) => ({
-        ...p,
+    if (!esModoGeneral) {
+      return paradas
+        .filter((p) => p.latitud && p.longitud)
+        .map((p, index) => ({
+          ...p,
+          orden: index + 1,
+          lat: Number(p.latitud),
+          lng: Number(p.longitud),
+          entregado: p.estado === 'ENTREGADO'
+        }));
+    }
+    // Modo General: graficar todas las tiendas clientes
+    return (todasLasTiendas || [])
+      .filter((t) => t.latitud && t.longitud)
+      .map((t, index) => ({
+        pedidoId: t.id,
+        nombreTienda: t.nombreTienda,
+        direccion: t.direccion,
+        barrio: t.barrio,
+        ciudad: t.ciudad,
+        telefono: t.telefono,
+        lat: Number(t.latitud),
+        lng: Number(t.longitud),
+        totalComprado: t.totalComprado || 0,
         orden: index + 1,
-        lat: Number(p.latitud),
-        lng: Number(p.longitud),
-        entregado: p.estado === 'ENTREGADO'
+        entregado: false
       }));
-  }, [paradas]);
+  }, [esModoGeneral, paradas, todasLasTiendas]);
 
-  // Posición inicial del camión
+  const [miUbicacion, setMiUbicacion] = useState(null);
+  const [obteniendoUbicacion, setObteniendoUbicacion] = useState(false);
+
+  // Auto-intentar geolocalización al abrir el mapa
+  useEffect(() => {
+    if (!miUbicacion && typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setMiUbicacion([pos.coords.latitude, pos.coords.longitude]);
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 6000 }
+      );
+    }
+  }, []);
+
+  // Posición inicial del mapa
   const posInicial = useMemo(() => {
+    if (miUbicacion) return miUbicacion;
     if (ruta?.ubicacionActual?.latitud && ruta?.ubicacionActual?.longitud) {
       return [Number(ruta.ubicacionActual.latitud), Number(ruta.ubicacionActual.longitud)];
     }
@@ -153,29 +227,34 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
       return [puntosTiendas[0].lat, puntosTiendas[0].lng];
     }
     return [4.60971, -74.08175]; // Centro Bogotá
-  }, [ruta, puntosTiendas]);
+  }, [miUbicacion, ruta, puntosTiendas]);
 
   const [posCamion, setPosCamion] = useState(posInicial);
   const [velocidad, setVelocidad] = useState(Number(ruta?.ubicacionActual?.velocidadKmh || 0));
   const [simulando, setSimulando] = useState(false);
   const [pasoSimulacion, setPasoSimulacion] = useState(0);
-  const [miUbicacion, setMiUbicacion] = useState(null);
-  const [obteniendoUbicacion, setObteniendoUbicacion] = useState(false);
 
-  // Línea poligonal para el trayecto entre paradas
+  // Línea poligonal para el trayecto entre paradas (solo en modo ruta con paradas)
   const coordenadasRuta = useMemo(() => {
-    if (puntosTiendas.length === 0) return [posCamion];
+    if (esModoGeneral || puntosTiendas.length === 0) return [];
     return [posCamion, ...puntosTiendas.map((p) => [p.lat, p.lng])];
-  }, [posCamion, puntosTiendas]);
+  }, [esModoGeneral, posCamion, puntosTiendas]);
 
   // Límites para auto-centrar el mapa
   const bounds = useMemo(() => {
-    const todos = [posCamion, ...puntosTiendas.map((p) => [p.lat, p.lng])];
-    if (miUbicacion) {
-      todos.push(miUbicacion);
+    const todos = [];
+    if (miUbicacion) todos.push(miUbicacion);
+    if (!esModoGeneral && posCamion) todos.push(posCamion);
+    puntosTiendas.forEach((p) => todos.push([p.lat, p.lng]));
+    if (esModoGeneral && todasLasRutas.length > 0) {
+      todasLasRutas.forEach((r) => {
+        if (r.ubicacionActual?.latitud && r.ubicacionActual?.longitud) {
+          todos.push([Number(r.ubicacionActual.latitud), Number(r.ubicacionActual.longitud)]);
+        }
+      });
     }
-    return todos;
-  }, [posCamion, puntosTiendas, miUbicacion]);
+    return todos.length > 0 ? todos : [[4.60971, -74.08175]];
+  }, [miUbicacion, esModoGeneral, posCamion, puntosTiendas, todasLasRutas]);
 
   // Generador de trayecto interpolado entre paradas para simulación en vivo
   const pasosInterpolados = useMemo(() => {
@@ -284,38 +363,74 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
     <div className="space-y-4">
       {/* Barra de Controles y Telemetría en Vivo */}
       <div className="bg-slate-900 text-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30">
-            <Truck className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm">{placa}</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                {ruta?.codigoRuta || 'RUTA'}
-              </span>
+        {esModoGeneral ? (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+              <Navigation className="w-5 h-5" />
             </div>
-            <p className="text-xs text-slate-400">
-              Conductor: <strong className="text-slate-200">{ruta?.nombreRepartidor || 'Asignado'}</strong>
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm">Mapa General y Mi Ubicación</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                  RED LOGÍSTICA
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                {puntosTiendas.length} tiendas registradas • {todasLasRutas.length} camiones hoy
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm">{placa}</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
+                  {ruta?.codigoRuta || 'RUTA'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Conductor: <strong className="text-slate-200">{ruta?.nombreRepartidor || 'Asignado'}</strong>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Telemetría GPS */}
-        <div className="flex items-center gap-6 text-xs">
-          <div>
-            <span className="text-slate-400 block text-[10px]">VELOCIDAD GPS</span>
-            <span className="font-mono font-bold text-base text-emerald-400">
-              {velocidad.toFixed(1)} <span className="text-[10px] text-slate-400">km/h</span>
-            </span>
+        {esModoGeneral ? (
+          <div className="flex items-center gap-6 text-xs">
+            <div>
+              <span className="text-slate-400 block text-[10px]">MI DISPOSITIVO</span>
+              <span className={`font-mono font-bold text-sm ${miUbicacion ? 'text-emerald-400' : 'text-amber-400'}`}>
+                {miUbicacion ? 'Ubicación Activa' : 'Sin Ubicación'}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">RED DE CLIENTES</span>
+              <span className="font-bold text-slate-200 text-sm">
+                {puntosTiendas.length} tiendas
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-slate-400 block text-[10px]">PARADAS</span>
-            <span className="font-bold text-slate-200">
-              {ruta?.paradasCompletadas || 0} / {paradas.length}
-            </span>
+        ) : (
+          <div className="flex items-center gap-6 text-xs">
+            <div>
+              <span className="text-slate-400 block text-[10px]">VELOCIDAD GPS</span>
+              <span className="font-mono font-bold text-base text-emerald-400">
+                {velocidad.toFixed(1)} <span className="text-[10px] text-slate-400">km/h</span>
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">PARADAS</span>
+              <span className="font-bold text-slate-200">
+                {ruta?.paradasCompletadas || 0} / {paradas.length}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Botones de Control, Ubicación del Usuario y Simulación */}
         <div className="flex flex-wrap items-center gap-2">
@@ -324,10 +439,10 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
             onClick={obtenerMiUbicacion}
             disabled={obteniendoUbicacion}
             title="Localizar la posición GPS de mi dispositivo actual"
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border ${
               miUbicacion
                 ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-400'
-                : 'bg-slate-800 hover:bg-slate-700 text-blue-300 border-slate-700'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500 animate-pulse'
             }`}
           >
             <Navigation className={`w-3.5 h-3.5 ${obteniendoUbicacion ? 'animate-spin' : ''}`} />
@@ -335,40 +450,44 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
               {obteniendoUbicacion 
                 ? 'Ubicando...' 
                 : miUbicacion 
-                  ? `Mi GPS (${distanciaAlCamionKm ? distanciaAlCamionKm + ' km' : 'Activo'})` 
-                  : 'Ver Mi Ubicación'}
+                  ? (distanciaAlCamionKm ? `Mi GPS (${distanciaAlCamionKm} km al camión)` : 'Mi GPS Activo (Usted está aquí)')
+                  : '📍 Activar Mi Ubicación GPS'}
             </span>
           </button>
 
-          <button
-            type="button"
-            onClick={toggleSimulacion}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer ${
-              simulando
-                ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-            }`}
-          >
-            {simulando ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            <span>{simulando ? 'Pausar Simulación' : 'Simular Avance en Vivo'}</span>
-          </button>
+          {!esModoGeneral && (
+            <>
+              <button
+                type="button"
+                onClick={toggleSimulacion}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer ${
+                  simulando
+                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                }`}
+              >
+                {simulando ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                <span>{simulando ? 'Pausar Simulación' : 'Simular Avance en Vivo'}</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={reiniciarPosicion}
-            title="Reiniciar a punto de partida"
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition border border-slate-700"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+              <button
+                type="button"
+                onClick={reiniciarPosicion}
+                title="Reiniciar a punto de partida"
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition border border-slate-700 cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Visor de Mapa Interactivo Leaflet */}
-      <div className="h-[420px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner relative z-0">
+      <div className="h-[460px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner relative z-0">
         <MapContainer
-          center={posCamion}
-          zoom={14}
+          center={posInicial}
+          zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
@@ -380,31 +499,59 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
 
           <RecenterAuto bounds={bounds} />
 
-          {/* Trazado de ruta conectando las tiendas */}
-          <Polyline
-            positions={coordenadasRuta}
-            color="#0d9488"
-            weight={4}
-            dashArray="6, 8"
-            opacity={0.85}
-          />
+          {/* Trazado de ruta conectando las tiendas (solo modo ruta) */}
+          {!esModoGeneral && coordenadasRuta.length > 1 && (
+            <Polyline
+              positions={coordenadasRuta}
+              color="#0d9488"
+              weight={4}
+              dashArray="6, 8"
+              opacity={0.85}
+            />
+          )}
 
-          {/* Marcador del Camión */}
-          <Marker position={posCamion} icon={crearIconoCamion(placa, simulando)}>
-            <Popup>
-              <div className="p-1 space-y-1 text-xs">
-                <p className="font-bold text-slate-900 flex items-center gap-1">
-                  <Truck className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Camión {placa}</span>
-                </p>
-                <p className="text-slate-600">Conductor: {ruta?.nombreRepartidor}</p>
-                <p className="text-slate-600">Velocidad: {velocidad.toFixed(1)} km/h</p>
-                <p className="text-[10px] text-slate-400 font-mono">
-                  Coord: {posCamion[0].toFixed(5)}, {posCamion[1].toFixed(5)}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
+          {/* Marcador del Camión en modo ruta enfocada */}
+          {!esModoGeneral && posCamion && (
+            <Marker position={posCamion} icon={crearIconoCamion(placa, simulando)}>
+              <Popup>
+                <div className="p-1 space-y-1 text-xs">
+                  <p className="font-bold text-slate-900 flex items-center gap-1">
+                    <Truck className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Camión {placa}</span>
+                  </p>
+                  <p className="text-slate-600">Conductor: {ruta?.nombreRepartidor}</p>
+                  <p className="text-slate-600">Velocidad: {velocidad.toFixed(1)} km/h</p>
+                  <p className="text-[10px] text-slate-400 font-mono">
+                    Coord: {posCamion[0].toFixed(5)}, {posCamion[1].toFixed(5)}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
+          {/* Marcadores de camiones activos en modo general */}
+          {esModoGeneral && todasLasRutas.map((r) => {
+            if (!r.ubicacionActual?.latitud || !r.ubicacionActual?.longitud) return null;
+            return (
+              <Marker
+                key={r.rutaId}
+                position={[Number(r.ubicacionActual.latitud), Number(r.ubicacionActual.longitud)]}
+                icon={crearIconoCamion(r.placaCamion, false)}
+              >
+                <Popup>
+                  <div className="p-1 space-y-1 text-xs">
+                    <p className="font-bold text-slate-900 flex items-center gap-1">
+                      <Truck className="w-3.5 h-3.5 text-teal-600" />
+                      <span>Camión {r.placaCamion}</span>
+                    </p>
+                    <p className="text-slate-600">Conductor: {r.nombreRepartidor}</p>
+                    <p className="text-slate-600">Ruta: {r.codigoRuta} ({r.zonaSector})</p>
+                    <p className="text-slate-600">Paradas: {r.paradasCompletadas}/{r.totalParadas}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
 
           {/* Marcador de Mi Ubicación (Dispositivo del Usuario / Proveedor) */}
           {miUbicacion && (
@@ -415,7 +562,7 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
                     <Navigation className="w-3.5 h-3.5 text-blue-600" />
                     <span>Usted está aquí</span>
                   </p>
-                  <p className="text-slate-600 font-medium">Dispositivo GPS actual</p>
+                  <p className="text-slate-600 font-medium">Dispositivo conectado</p>
                   {distanciaAlCamionKm && (
                     <div className="bg-teal-50 border border-teal-200 text-teal-800 p-1 rounded font-bold text-[11px] mt-1">
                       Distancia al camión: {distanciaAlCamionKm} km
@@ -429,38 +576,51 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
             </Marker>
           )}
 
-          {/* Marcadores de Tiendas (Paradas) */}
+          {/* Marcadores de Tiendas */}
           {puntosTiendas.map((tienda) => (
             <Marker
               key={tienda.pedidoId}
               position={[tienda.lat, tienda.lng]}
-              icon={crearIconoTienda(tienda.orden, tienda.entregado)}
+              icon={esModoGeneral ? crearIconoTiendaGeneral() : crearIconoTienda(tienda.orden, tienda.entregado)}
             >
               <Popup>
                 <div className="p-1.5 space-y-1 text-xs min-w-[180px]">
                   <div className="flex items-center justify-between gap-2 border-b pb-1">
-                    <span className="font-bold text-slate-900">Parada #{tienda.orden}</span>
-                    <span
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                        tienda.entregado
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
-                      {tienda.estado}
+                    <span className="font-bold text-slate-900">
+                      {esModoGeneral ? 'Tienda Cliente' : `Parada #${tienda.orden}`}
                     </span>
+                    {!esModoGeneral && (
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                          tienda.entregado
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}
+                      >
+                        {tienda.estado}
+                      </span>
+                    )}
                   </div>
                   <p className="font-bold text-slate-900 flex items-center gap-1">
                     <Store className="w-3.5 h-3.5 text-teal-600" />
                     <span>{tienda.nombreTienda}</span>
                   </p>
                   <p className="text-slate-600">{tienda.direccion}</p>
+                  {tienda.barrio && (
+                    <p className="text-slate-500 text-[11px]">Barrio: {tienda.barrio}</p>
+                  )}
                   {tienda.telefono && (
                     <p className="text-slate-500 text-[11px]">Tel: {tienda.telefono}</p>
                   )}
-                  <p className="text-slate-700 font-semibold pt-1">
-                    Total Pedido: ${Number(tienda.totalAPagar || 0).toLocaleString('es-CO')}
-                  </p>
+                  {tienda.totalAPagar ? (
+                    <p className="text-slate-700 font-semibold pt-1">
+                      Total Pedido: ${Number(tienda.totalAPagar || 0).toLocaleString('es-CO')}
+                    </p>
+                  ) : tienda.totalComprado ? (
+                    <p className="text-slate-700 font-semibold pt-1">
+                      Total Comprado: ${Number(tienda.totalComprado || 0).toLocaleString('es-CO')}
+                    </p>
+                  ) : null}
                 </div>
               </Popup>
             </Marker>
@@ -470,24 +630,26 @@ export const MapaRutaEnVivo = ({ ruta, onActualizarRuta }) => {
 
       {/* Leyenda y Lista de Paradas */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between text-xs gap-3">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-full bg-teal-600 border border-white inline-block"></span>
             <span className="text-slate-700 font-medium">Camión de Reparto</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-full bg-sky-600 border border-white inline-block"></span>
-            <span className="text-slate-700 font-medium">Tienda Pendiente</span>
+            <span className="text-slate-700 font-medium">{esModoGeneral ? 'Tienda Cliente' : 'Tienda Pendiente'}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 border border-white inline-block"></span>
-            <span className="text-slate-700 font-medium">Tienda Entregada</span>
-          </div>
+          {!esModoGeneral && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 border border-white inline-block"></span>
+              <span className="text-slate-700 font-medium">Tienda Entregada</span>
+            </div>
+          )}
           {miUbicacion && (
             <div className="flex items-center gap-1.5 animate-in fade-in">
               <span className="w-3.5 h-3.5 rounded-full bg-blue-600 border border-white inline-block shadow-sm"></span>
               <span className="text-blue-700 font-bold">
-                Su Ubicación {distanciaAlCamionKm ? `(${distanciaAlCamionKm} km al camión)` : ''}
+                Su Ubicación (Usted) {distanciaAlCamionKm ? `(${distanciaAlCamionKm} km al camión)` : ''}
               </span>
             </div>
           )}

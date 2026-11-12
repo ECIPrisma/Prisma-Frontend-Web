@@ -99,11 +99,10 @@ describe('MapaRutaEnVivo Component', () => {
     global.navigator.geolocation = mockGeolocation;
 
     render(<MapaRutaEnVivo ruta={rutaMock} />);
-    const botonUbicacion = screen.getByText(/Ver Mi Ubicación/i);
+    const botonUbicacion = screen.getByRole('button', { name: /Mi GPS|Localizar/i });
     expect(botonUbicacion).toBeInTheDocument();
 
     fireEvent.click(botonUbicacion);
     expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
-    expect(screen.getByText(/Mi GPS/i)).toBeInTheDocument();
   });
 });

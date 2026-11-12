@@ -8,8 +8,8 @@ import { proveedorService } from '../../services/api';
 vi.mock('../../components/mapa/MapaRutaEnVivo', () => ({
   MapaRutaEnVivo: ({ ruta }) => (
     <div data-testid="mapa-ruta-en-vivo">
-      <span>Mapa Camion {ruta?.placaCamion}</span>
-      <span>Codigo {ruta?.codigoRuta}</span>
+      <span>{!ruta ? 'Mapa General de Cobertura' : `Mapa Camion ${ruta?.placaCamion}`}</span>
+      <span>Codigo {ruta?.codigoRuta || 'GENERAL'}</span>
     </div>
   )
 }));
@@ -19,6 +19,7 @@ vi.mock('../../services/api', () => ({
   proveedorService: {
     getPedidosNuevos: vi.fn(),
     getRutasProgreso: vi.fn(),
+    getTiendasClientes: vi.fn(),
     reportarProblemaPedido: vi.fn(),
     reprogramarPedido: vi.fn(),
     reportarVarado: vi.fn(),
@@ -120,11 +121,33 @@ const mockPedidos = [
   }
 ];
 
+const mockTiendas = [
+  {
+    id: 1,
+    nombre: 'Tienda La Esperanza',
+    nombreTendero: 'Carlos Gómez',
+    direccion: 'Calle 140 #11-20',
+    barrio: 'Cedritos',
+    latitud: 4.7150,
+    longitud: -74.0320
+  },
+  {
+    id: 2,
+    nombre: 'Abarrotes Don Pepe',
+    nombreTendero: 'José Pérez',
+    direccion: 'Carrera 78 #35-10',
+    barrio: 'Kennedy',
+    latitud: 4.6200,
+    longitud: -74.1500
+  }
+];
+
 describe('DespachosPage UI y Monitoreo Satelital GPS', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     proveedorService.getPedidosNuevos.mockResolvedValue(mockPedidos);
     proveedorService.getRutasProgreso.mockResolvedValue(mockRutas);
+    proveedorService.getTiendasClientes.mockResolvedValue(mockTiendas);
   });
 
   it('renderiza la cabecera principal y las 3 pestañas de navegación', async () => {
@@ -138,7 +161,7 @@ describe('DespachosPage UI y Monitoreo Satelital GPS', () => {
     });
   });
 
-  it('permite acceder a la pestaña de Mapa Satelital GPS y muestra selector de flota y mapa', async () => {
+  it('permite acceder a la pestaña de Mapa Satelital GPS y muestra selector de flota y mapa general', async () => {
     render(<DespachosPage />);
 
     await waitFor(() => {
@@ -148,15 +171,17 @@ describe('DespachosPage UI y Monitoreo Satelital GPS', () => {
     const tabMapa = screen.getByText(/Mapa Satelital GPS/i);
     fireEvent.click(tabMapa);
 
-    // Debe mostrar la cabecera de la flota
-    expect(screen.getByText(/Flota de Reparto en Servicio/i)).toBeInTheDocument();
-    expect(screen.getByText('ABC-123')).toBeInTheDocument();
-    expect(screen.getByText('XYZ-789')).toBeInTheDocument();
+    await waitFor(() => {
+      // Debe mostrar la cabecera de la flota y el botón de Mapa General
+      expect(screen.getByText(/Monitoreo de Flota y Red de Distribución/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Mapa General/i).length).toBeGreaterThan(0);
+      expect(screen.getByText('ABC-123')).toBeInTheDocument();
+      expect(screen.getByText('XYZ-789')).toBeInTheDocument();
 
-    // Debe renderizar el contenedor del mapa para el primer camion
-    expect(screen.getByTestId('mapa-ruta-en-vivo')).toBeInTheDocument();
-    expect(screen.getByText('Mapa Camion ABC-123')).toBeInTheDocument();
-    expect(screen.getByText('Monitoreo Satelital: Camión ABC-123')).toBeInTheDocument();
+      // Debe renderizar el mapa (por defecto en Modo General de Cobertura)
+      expect(screen.getByTestId('mapa-ruta-en-vivo')).toBeInTheDocument();
+      expect(screen.getByText('Mapa General de Cobertura')).toBeInTheDocument();
+    });
   });
 
   it('permite alternar entre camiones en el selector de la pestaña de Mapa', async () => {
@@ -168,15 +193,47 @@ describe('DespachosPage UI y Monitoreo Satelital GPS', () => {
 
     fireEvent.click(screen.getByText(/Mapa Satelital GPS/i));
 
-    expect(screen.getByText('Mapa Camion ABC-123')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Monitoreo de Flota y Red de Distribución/i)).toBeInTheDocument();
+    });
+
+    // Seleccionamos el primer camión ABC-123
+    const botonCamionNorte = screen.getByRole('button', { name: /ABC-123/i });
+    fireEvent.click(botonCamionNorte);
+
+    await waitFor(() => {
+      expect(screen.getByText('Mapa Camion ABC-123')).toBeInTheDocument();
+      expect(screen.getByText('Monitoreo Satelital: Camión ABC-123')).toBeInTheDocument();
+    });
 
     // Clic en la tarjeta del segundo camión XYZ-789
     const botonCamionSur = screen.getByRole('button', { name: /XYZ-789/i });
     fireEvent.click(botonCamionSur);
 
-    // El mapa enfoca el segundo camión
-    expect(screen.getByText('Mapa Camion XYZ-789')).toBeInTheDocument();
-    expect(screen.getByText('Monitoreo Satelital: Camión XYZ-789')).toBeInTheDocument();
+    await waitFor(() => {
+      // El mapa enfoca el segundo camión
+      expect(screen.getByText('Mapa Camion XYZ-789')).toBeInTheDocument();
+      expect(screen.getByText('Monitoreo Satelital: Camión XYZ-789')).toBeInTheDocument();
+    });
+  });
+
+  it('muestra el Mapa General incluso cuando no hay camiones despachados hoy (0 camiones)', async () => {
+    proveedorService.getRutasProgreso.mockResolvedValue([]);
+    render(<DespachosPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Despachos y Entregas/i)).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText(/Mapa Satelital GPS/i));
+
+    await waitFor(() => {
+      // Debe mostrar el mapa general de cobertura y las métricas de red
+      expect(screen.getByTestId('mapa-ruta-en-vivo')).toBeInTheDocument();
+      expect(screen.getByText('Mapa General de Cobertura')).toBeInTheDocument();
+      expect(screen.getByText(/Red Logística y Cobertura/i)).toBeInTheDocument();
+      expect(screen.getByText(/Directorio de Tiendas Clientes Georreferenciadas/i)).toBeInTheDocument();
+    });
   });
 
   it('navega a la pestaña de mapa al presionar "Monitorear en Vivo" desde la pestaña de Rutas', async () => {
@@ -194,7 +251,7 @@ describe('DespachosPage UI y Monitoreo Satelital GPS', () => {
     fireEvent.click(botonesMonitorear[0]);
 
     // Debe haber cambiado a la pestaña de mapa satelital
-    expect(screen.getByText(/Flota de Reparto en Servicio/i)).toBeInTheDocument();
+    expect(screen.getByText(/Monitoreo de Flota y Red de Distribución/i)).toBeInTheDocument();
     expect(screen.getByTestId('mapa-ruta-en-vivo')).toBeInTheDocument();
     expect(screen.getByText('Mapa Camion ABC-123')).toBeInTheDocument();
   });
