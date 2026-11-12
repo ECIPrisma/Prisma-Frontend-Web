@@ -190,6 +190,22 @@ export const adminService = {
     return handleResponse(res);
   },
 
+  // HU-19: estado del circuit breaker de la pasarela de pagos
+  getCircuitoPagos: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/pagos/circuito`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  reiniciarCircuitoPagos: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/pagos/circuito/reiniciar`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
   overridePin: async (pedidoId, justificacion) => {
     const res = await fetch(`${API_BASE_URL}/admin/pedidos/${pedidoId}/override-pin`, {
       method: 'POST',
@@ -469,6 +485,14 @@ export const proveedorService = {
 
   getMisPqrs: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/pqrs`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  // HU-14: notificaciones enviadas al proveedor (ej. PAGO_CONFIRMADO -> iniciar despacho)
+  getMisNotificaciones: async () => {
+    const res = await fetch(`${API_BASE_URL}/notificaciones/mis-notificaciones`, {
       headers: getAuthHeaders(),
     });
     return handleResponse(res);
