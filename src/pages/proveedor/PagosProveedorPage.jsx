@@ -306,6 +306,12 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                     <span className="text-[10px] text-emerald-700 uppercase font-semibold">Liberado ({recaudos.cantidadLiberados})</span>
                     <p className="font-bold text-emerald-800">{formatoPesos(recaudos.totalLiberado)}</p>
                   </div>
+                  {recaudos.cantidadReembolsados > 0 && (
+                    <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200">
+                      <span className="text-[10px] text-slate-600 uppercase font-semibold">Reembolsado ({recaudos.cantidadReembolsados})</span>
+                      <p className="font-bold text-slate-700">{formatoPesos(recaudos.totalReembolsado)}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -347,6 +353,9 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                             </td>
                             <td className="p-4">
                               <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${etiqueta.clase}`}>{etiqueta.texto}</span>
+                              {pago.estado === 'REEMBOLSADO' && pago.motivoReembolso && (
+                                <p className="text-[10px] text-gray-400 mt-1 max-w-[180px]">{pago.motivoReembolso}</p>
+                              )}
                             </td>
                           </tr>
                         );

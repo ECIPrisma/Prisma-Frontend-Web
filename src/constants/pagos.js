@@ -19,4 +19,6 @@ export const ETIQUETA_ESTADO_PAGO = {
   EN_GARANTIA: { texto: 'En garantía', clase: 'bg-amber-100 text-amber-800' },
   LIBERADO: { texto: 'Liberado', clase: 'bg-emerald-100 text-emerald-800' },
   RECHAZADO: { texto: 'Rechazado', clase: 'bg-red-100 text-red-800' },
+  // Pedido pagado que se canceló o rechazó antes de la entrega: el dinero volvió al tendero
+  REEMBOLSADO: { texto: 'Reembolsado', clase: 'bg-slate-200 text-slate-700' },
 };

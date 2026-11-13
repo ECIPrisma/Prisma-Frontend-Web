@@ -117,4 +117,23 @@ describe('HU-12 Cuenta de cobro del proveedor (pasarela simulada)', () => {
     expect(screen.getByText('En garantía')).toBeInTheDocument();
     expect(screen.getByText('Nequi ••• 1111')).toBeInTheDocument();
   });
+
+  it('muestra los pagos REEMBOLSADOS (pedido cancelado antes de la entrega) con su total y motivo', async () => {
+    proveedorService.getCuentaCobro.mockResolvedValue(VINCULADA);
+    proveedorService.getRecaudosEnLinea.mockResolvedValue({
+      totalEnGarantia: 0, totalLiberado: 0, cantidadEnGarantia: 0, cantidadLiberados: 0,
+      totalReembolsado: 120625, cantidadReembolsados: 1,
+      pagos: [{
+        id: 2, pedidoId: 11, numeroPedido: 'PED-2026-0050', nombreTienda: 'Tienda La Bendición',
+        referencia: 'PRISMA-PED-2026-0050-ZZ99X', detalleMedio: 'VISA •••• 4242',
+        monto: 125000, comisionPrisma: 4375, montoProveedor: 120625, tarifaPasarela: 4012.5,
+        estado: 'REEMBOLSADO', motivoReembolso: 'Cancelado por soporte PRISMA: Producto agotado',
+      }],
+    });
+    montar();
+
+    expect(await screen.findByText('Reembolsado')).toBeInTheDocument();
+    expect(screen.getByText(/reembolsado \(1\)/i)).toBeInTheDocument();
+    expect(screen.getByText('Cancelado por soporte PRISMA: Producto agotado')).toBeInTheDocument();
+  });
 });
