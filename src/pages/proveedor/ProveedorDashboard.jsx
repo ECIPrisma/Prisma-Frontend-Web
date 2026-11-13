@@ -590,7 +590,7 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL CREAR PRODUCTO (SIMPLIFICADO UI/UX: SIN CONTEO MANUAL DE STOCK) */}
       {modalAbierto && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <div className="flex items-center gap-2">
@@ -769,7 +769,7 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL EDITAR PRODUCTO */}
       {modalEditarAbierto && prodEnEdicion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <div className="flex items-center gap-2">

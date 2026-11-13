@@ -15,6 +15,7 @@ import { AuditoriaPage } from '../pages/admin/AuditoriaPage';
 import { ProveedoresAdminPage } from '../pages/admin/ProveedoresAdminPage';
 import { ConfiguracionPage } from '../pages/admin/ConfiguracionPage';
 import { PedidosSoportePage } from '../pages/admin/PedidosSoportePage';
+import { UsuariosAdminPage } from '../pages/admin/UsuariosAdminPage';
 
 // Páginas de Proveedor Distribuidor
 import { ProveedorDashboard } from '../pages/proveedor/ProveedorDashboard';
@@ -52,6 +53,8 @@ export const AppRoutes = () => {
 
         {/* Rutas exclusivas de Administración */}
         <Route path="/pedidos-soporte" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><PedidosSoportePage /></RoleRoute>} />
+        <Route path="/proveedores" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><ProveedoresAdminPage /></RoleRoute>} />
+        <Route path="/usuarios-soporte" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><UsuariosAdminPage /></RoleRoute>} />
         <Route path="/disputas" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><DisputasPage /></RoleRoute>} />
         <Route path="/auditoria" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><AuditoriaPage /></RoleRoute>} />
         <Route path="/proveedores" element={<RoleRoute allowedRoles={ADMIN_ROLES} userRol={rol}><ProveedoresAdminPage /></RoleRoute>} />

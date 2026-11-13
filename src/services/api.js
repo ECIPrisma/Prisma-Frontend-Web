@@ -294,6 +294,21 @@ export const adminService = {
     });
     return handleResponse(res);
   },
+
+  getUsuariosAdmin: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/usuarios`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  resetTotpUsuario: async (id) => {
+    const res = await fetch(`${API_BASE_URL}/admin/usuarios/${id}/reset-totp`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
 };
 
 export const proveedorService = {
@@ -423,6 +438,15 @@ export const proveedorService = {
   getRutasProgreso: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/rutas/progreso`, {
       headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  simularPosicionGps: async (rutaId, coords) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/rutas/${rutaId}/simular-posicion`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(coords),
     });
     return handleResponse(res);
   },
