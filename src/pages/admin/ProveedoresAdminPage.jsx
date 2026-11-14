@@ -77,8 +77,9 @@ export const ProveedoresAdminPage = () => {
   useEffect(() => {
     cargarDatos();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -282,7 +283,7 @@ export const ProveedoresAdminPage = () => {
 
         {/* Tarjeta Destacada: Cartera de Comisiones de Prisma */}
         <div className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white p-5 rounded-2xl shadow-md flex items-center gap-4">
-          <div className="p-3.5 bg-white/20 text-white rounded-2xl">
+          <div className="p-3.5 bg-teal-700 text-white rounded-2xl">
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
@@ -489,7 +490,7 @@ export const ProveedoresAdminPage = () => {
 
       {/* MODAL: VER TIENDAS ATENDIDAS POR LA EMPRESA (REQUERIMIENTO DEL USUARIO) */}
       {modalTiendas && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-3xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start border-b border-prisma-border pb-4">
               <div className="flex items-center gap-3">
@@ -582,7 +583,7 @@ export const ProveedoresAdminPage = () => {
 
       {/* MODAL: AUXILIO Y ASISTENCIA DE SOPORTE PRISMA (SI EL PRODUCTOR NO PUEDE) */}
       {modalAuxilio && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -664,7 +665,7 @@ export const ProveedoresAdminPage = () => {
 
       {/* Modal Registrar Proveedor */}
       {modalAbierto && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
@@ -814,7 +815,7 @@ export const ProveedoresAdminPage = () => {
 
       {/* Modal Editar Proveedor */}
       {modalEditar && provEnEdicion && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">

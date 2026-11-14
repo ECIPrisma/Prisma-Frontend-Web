@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { proveedorService } from '../../services/api';
+import { saveCatalogToOfflineCache, loadCatalogFromOfflineCache } from '../../utils/offlineCatalog';
 import { 
   Package, 
   Plus, 
@@ -82,13 +83,19 @@ export const ProveedorDashboard = () => {
     if (!silencioso && productos.length === 0) setCargando(true);
     try {
       const data = await proveedorService.getMisProductos();
-      setProductos(Array.isArray(data) ? data : []);
+      const lista = Array.isArray(data) ? data : [];
+      setProductos(lista);
+      saveCatalogToOfflineCache(lista);
       setErrorApi('');
       setUltimaActualizacion(new Date());
       setSegundosDesdeSync(0);
     } catch (err) {
-      if (!silencioso && productos.length === 0) {
-        setErrorApi(err.message || 'No se pudieron cargar los productos del proveedor');
+      const cached = loadCatalogFromOfflineCache();
+      if (cached.hasCache) {
+        setProductos(cached.items);
+        setErrorApi('');
+      } else if (!silencioso && productos.length === 0) {
+        setErrorApi(cached.message || err.message || 'No se pudieron cargar los productos del proveedor');
       }
     } finally {
       if (!silencioso && productos.length === 0) setCargando(false);
@@ -105,8 +112,9 @@ export const ProveedorDashboard = () => {
     if (!autoSyncActivo) return;
 
     const intervalId = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarProductos(true);
-    }, 4000);
+    }, 15000);
 
     const timerSec = setInterval(() => {
       setSegundosDesdeSync(prev => prev + 1);
@@ -582,7 +590,7 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL CREAR PRODUCTO (SIMPLIFICADO UI/UX: SIN CONTEO MANUAL DE STOCK) */}
       {modalAbierto && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <div className="flex items-center gap-2">
@@ -761,7 +769,7 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL EDITAR PRODUCTO */}
       {modalEditarAbierto && prodEnEdicion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <div className="flex items-center gap-2">

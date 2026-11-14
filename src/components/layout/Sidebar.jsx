@@ -1,7 +1,6 @@
 import React from 'react';
-import { formatearComision } from '../config/comision';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, 
   AlertTriangle, 
@@ -15,7 +14,9 @@ import {
   ShoppingBag,
   Store,
   MessageSquareWarning,
-  Receipt
+  Receipt,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -27,6 +28,7 @@ export const Sidebar = () => {
     { to: '/', label: 'Panel Principal', icon: LayoutDashboard },
     { to: '/pedidos-soporte', label: 'Soporte de Pedidos', icon: ShoppingBag },
     { to: '/proveedores', label: 'Empresas y Cartera', icon: Building2 },
+    { to: '/usuarios-soporte', label: 'Usuarios y 2FA', icon: Users },
     { to: '/disputas', label: 'Reclamos y Disputas', icon: AlertTriangle },
     { to: '/auditoria', label: 'Historial de Actividad', icon: FileText },
     { to: '/configuracion', label: 'Configuración del Sistema', icon: Sliders },
@@ -38,8 +40,9 @@ export const Sidebar = () => {
     { to: '/despachos', label: 'Despachos y Rutas', icon: Truck },
     { to: '/flota', label: 'Flota de Camiones', icon: Navigation },
     { to: '/estadisticas', label: 'Estadísticas Económicas', icon: DollarSign },
-    { to: '/liquidaciones', label: `Liquidaciones (${formatearComision()})`, icon: Receipt },
+    { to: '/liquidaciones', label: 'Liquidaciones', icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
+    { to: '/perfil', label: 'Perfil Comercial', icon: Building2 },
   ];
 
   const links = isAdmin ? adminLinks : proveedorLinks;
@@ -70,6 +73,22 @@ export const Sidebar = () => {
           );
         })}
       </nav>
+
+      <div className="pt-4 border-t border-prisma-border">
+        <NavLink
+          to="/seguridad"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              isActive
+                ? 'bg-prisma-teal text-white shadow-sm'
+                : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100'
+            }`
+          }
+        >
+          <ShieldCheck className="w-5 h-5 flex-shrink-0" />
+          <span>Seguridad (2FA)</span>
+        </NavLink>
+      </div>
     </aside>
   );
 };

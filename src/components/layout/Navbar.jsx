@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { adminService, proveedorService } from '../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { adminService, authService, proveedorService } from '../../services/api';
 import { 
   LogOut, 
   Bell, 
@@ -11,7 +11,8 @@ import {
   Truck, 
   ChevronRight, 
   X, 
-  CheckCheck 
+  CheckCheck,
+  Shield
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -136,7 +137,10 @@ export const Navbar = () => {
     };
 
     cargarAlertas();
-    const interval = setInterval(cargarAlertas, 4000);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      cargarAlertas();
+    }, 15000);
     return () => {
       cancelado = true;
       clearInterval(interval);
@@ -145,6 +149,12 @@ export const Navbar = () => {
 
   const noLeidas = notificaciones.filter(n => !leidas.includes(n.id));
   const cantidadNoLeidas = noLeidas.length;
+
+  // HU-03: revoca el refresh token en el servidor además de limpiar la sesión local
+  const handleCerrarSesion = () => {
+    authService.logout().catch(() => {});
+    logout();
+  };
 
   const handleMarcarTodasLeidas = () => {
     const todosIds = notificaciones.map(n => n.id);
@@ -308,7 +318,17 @@ export const Navbar = () => {
         </div>
 
         <button
-          onClick={logout}
+          type="button"
+          onClick={() => navigate('/seguridad')}
+          aria-label="Seguridad de la cuenta"
+          title="Seguridad de la cuenta"
+          className="p-2 text-gray-500 hover:text-prisma-teal hover:bg-prisma-teal/10 rounded-lg transition cursor-pointer"
+        >
+          <Shield className="w-5 h-5" />
+        </button>
+
+        <button
+          onClick={handleCerrarSesion}
           title="Cerrar sesión"
           className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
         >

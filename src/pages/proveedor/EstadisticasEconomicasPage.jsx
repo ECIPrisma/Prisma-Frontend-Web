@@ -37,8 +37,9 @@ export const EstadisticasEconomicasPage = () => {
   useEffect(() => {
     cargarEstadisticas();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarEstadisticas(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

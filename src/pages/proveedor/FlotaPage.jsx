@@ -59,8 +59,9 @@ export const FlotaPage = () => {
   useEffect(() => {
     cargarDatos();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -372,7 +373,7 @@ export const FlotaPage = () => {
 
       {/* MODAL 1: REGISTRAR CAMIÓN */}
       {modalCrear && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">
@@ -492,7 +493,7 @@ export const FlotaPage = () => {
 
       {/* MODAL 2: EDITAR CAMIÓN */}
       {modalEditar && camionEnEdicion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">

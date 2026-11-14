@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { proveedorService } from '../../services/api';
+import { MapaRutaEnVivo } from '../../components/mapa/MapaRutaEnVivo';
 import { 
   Truck, 
   Package, 
@@ -19,13 +20,71 @@ import {
   User,
   ShieldCheck,
   Pause,
-  Play
+  Play,
+  Store
 } from 'lucide-react';
+
+const TIENDAS_FALLBACK_COBERTURA = [
+  {
+    id: 1,
+    nombreTienda: 'Tienda La Bendición - Doña Marta',
+    nombreTendero: 'Marta Cecilia López',
+    direccion: 'Carrera 78K #38-12 Sur',
+    barrio: 'Kennedy Central',
+    ciudad: 'Bogotá',
+    telefono: '3104567890',
+    latitud: 4.61842,
+    longitud: -74.15682,
+    totalComprado: 1250000,
+    totalPedidos: 6
+  },
+  {
+    id: 2,
+    nombreTienda: 'Minimarket El Progreso - Don José',
+    nombreTendero: 'José Vicente Rincón',
+    direccion: 'Calle 42 Sur #79-45',
+    barrio: 'Timiza',
+    ciudad: 'Bogotá',
+    telefono: '3157891234',
+    latitud: 4.61400,
+    longitud: -74.15200,
+    totalComprado: 980000,
+    totalPedidos: 4
+  },
+  {
+    id: 3,
+    nombreTienda: 'Abarrotes y Víveres Don Pepe',
+    nombreTendero: 'Pedro Nel Gómez',
+    direccion: 'Avenida Tintal #10-34',
+    barrio: 'El Tintal',
+    ciudad: 'Bogotá',
+    telefono: '3129876543',
+    latitud: 4.62100,
+    longitud: -74.15900,
+    totalComprado: 840000,
+    totalPedidos: 5
+  },
+  {
+    id: 4,
+    nombreTienda: 'Cigarrería y Granero Los Pinos',
+    nombreTendero: 'Guillermo Restrepo',
+    direccion: 'Calle 140 #11-20',
+    barrio: 'Cedritos',
+    ciudad: 'Bogotá',
+    telefono: '3201122334',
+    latitud: 4.71500,
+    longitud: -74.03200,
+    totalComprado: 650000,
+    totalPedidos: 3
+  }
+];
 
 export const DespachosPage = () => {
   const [pedidos, setPedidos] = useState([]);
   const [rutas, setRutas] = useState([]);
-  const [pestañaActiva, setPestañaActiva] = useState('rutas'); // 'rutas' o 'pedidos'
+  const [tiendas, setTiendas] = useState(TIENDAS_FALLBACK_COBERTURA);
+  const [pestañaActiva, setPestañaActiva] = useState('rutas'); // 'rutas', 'pedidos' o 'mapa'
+  const [rutaSeleccionadaMapa, setRutaSeleccionadaMapa] = useState(null);
   const [filtro, setFiltro] = useState('TODOS');
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -59,16 +118,30 @@ export const DespachosPage = () => {
     try {
       if (!silencioso && pedidos.length === 0 && rutas.length === 0) setCargando(true);
       setError(null);
-      const [pedidosData, rutasData] = await Promise.allSettled([
+      const [pedidosData, rutasData, tiendasData] = await Promise.allSettled([
         proveedorService.getPedidosNuevos(),
-        proveedorService.getRutasProgreso()
+        proveedorService.getRutasProgreso(),
+        proveedorService.getTiendasClientes()
       ]);
 
       if (pedidosData.status === 'fulfilled') {
         setPedidos(Array.isArray(pedidosData.value) ? pedidosData.value : []);
       }
       if (rutasData.status === 'fulfilled') {
-        setRutas(Array.isArray(rutasData.value) ? rutasData.value : []);
+        const arrRutas = Array.isArray(rutasData.value) ? rutasData.value : [];
+        setRutas(arrRutas);
+        setRutaSeleccionadaMapa((prev) => {
+          if (prev && arrRutas.length > 0) {
+            return arrRutas.find((r) => r.rutaId === prev.rutaId) || null;
+          }
+          return prev;
+        });
+      }
+      if (tiendasData.status === 'fulfilled') {
+        const arrTiendas = Array.isArray(tiendasData.value) ? tiendasData.value : [];
+        setTiendas(arrTiendas.length > 0 ? arrTiendas : TIENDAS_FALLBACK_COBERTURA);
+      } else {
+        setTiendas((prev) => (prev.length > 0 ? prev : TIENDAS_FALLBACK_COBERTURA));
       }
       setSegundosSync(0);
     } catch (err) {
@@ -88,8 +161,9 @@ export const DespachosPage = () => {
   useEffect(() => {
     if (!autoSync) return;
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarDatos(true);
-    }, 4000);
+    }, 15000);
 
     const timer = setInterval(() => {
       setSegundosSync(s => s + 1);
@@ -208,22 +282,40 @@ export const DespachosPage = () => {
       </div>
 
       {/* Pestañas de Vista */}
-      <div className="flex border-b border-prisma-border gap-4">
+      <div className="flex border-b border-prisma-border gap-4 overflow-x-auto">
+        <button
+          onClick={() => setPestañaActiva('mapa')}
+          className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition cursor-pointer flex-shrink-0 ${
+            pestañaActiva === 'mapa'
+              ? 'border-prisma-teal text-prisma-teal'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <div className="relative">
+            <Navigation className="w-4 h-4 text-prisma-teal" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          </div>
+          <span>Mapa Satelital GPS</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            En Vivo
+          </span>
+        </button>
+
         <button
           onClick={() => setPestañaActiva('rutas')}
-          className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition cursor-pointer flex-shrink-0 ${
             pestañaActiva === 'rutas'
               ? 'border-prisma-teal text-prisma-teal'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          <Navigation className="w-4 h-4" />
+          <Truck className="w-4 h-4" />
           <span>Rutas de Hoy ({rutas.length})</span>
         </button>
 
         <button
           onClick={() => setPestañaActiva('pedidos')}
-          className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition cursor-pointer flex-shrink-0 ${
             pestañaActiva === 'pedidos'
               ? 'border-prisma-teal text-prisma-teal'
               : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -294,13 +386,24 @@ export const DespachosPage = () => {
                   </div>
 
                   {/* Acciones y Resumen de Recaudo */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setRutaSeleccionadaMapa(ruta);
+                        setPestañaActiva('mapa');
+                      }}
+                      className="px-3.5 py-2 bg-prisma-teal hover:bg-prisma-teal/90 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Navigation className="w-4 h-4" />
+                      <span>Monitorear en Vivo</span>
+                    </button>
+
                     <button
                       onClick={() => setModalUbicacionRuta(ruta)}
-                      className="px-3.5 py-2 bg-prisma-teal/10 hover:bg-prisma-teal/20 text-prisma-teal border border-prisma-teal/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                     >
-                      <MapPin className="w-4 h-4 text-prisma-teal" />
-                      <span>Ver Ubicación en Mapa</span>
+                      <MapPin className="w-4 h-4 text-slate-600" />
+                      <span>Vista Rápida</span>
                     </button>
 
                     {ruta.estado !== 'VARADO_EN_PERCANCE' && ruta.estado !== 'FINALIZADA' && ruta.estado !== 'CANCELADA' && (
@@ -618,9 +721,400 @@ export const DespachosPage = () => {
         </div>
       )}
 
+      {/* 3. PESTAÑA: CENTRO DE MONITOREO SATELITAL GPS EN PANTALLA COMPLETA */}
+      {pestañaActiva === 'mapa' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Barra de Selección: Modo General + Camiones Activos */}
+          <div className="bg-white rounded-3xl border border-prisma-border p-5 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-prisma-teal" />
+                  <span>Monitoreo de Flota y Red de Distribución</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Cambia entre el mapa general con tu ubicación y tiendas, o enfoca cualquier camión de reparto.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Sincronizado {segundosSync === 0 ? 'hace un momento' : `hace ${segundosSync}s`}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => cargarDatos(true)}
+                  className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition cursor-pointer"
+                  title="Refrescar posiciones de flota"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Selector de Modos y Camiones */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              {/* Tarjeta 1: Modo Mapa General y Mi Ubicación */}
+              <button
+                type="button"
+                onClick={() => setRutaSeleccionadaMapa(null)}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative ${
+                  !rutaSeleccionadaMapa
+                    ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/40 shadow-sm'
+                    : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/70'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className={`p-2 rounded-xl ${!rutaSeleccionadaMapa ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}>
+                      <Navigation className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-extrabold text-sm text-slate-900 block">Mapa General</span>
+                      <span className="text-[10px] text-slate-500 font-semibold">Mi Ubicación + Red</span>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                    General
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 truncate">
+                  {tiendas.length} tiendas clientes • {rutas.length} camiones
+                </p>
+                <div className="mt-2 text-[10px] text-blue-700 font-semibold flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Georreferenciación en vivo</span>
+                </div>
+              </button>
+
+              {/* Tarjetas de Cada Camión en Servicio */}
+              {rutas.map((r) => {
+                const esSeleccionado = rutaSeleccionadaMapa?.rutaId === r.rutaId;
+                const esVarado = r.estado === 'VARADO_EN_PERCANCE';
+                const porcentaje = r.totalParadas > 0 ? Math.round((r.paradasCompletadas / r.totalParadas) * 100) : 0;
+
+                return (
+                  <button
+                    key={r.rutaId}
+                    type="button"
+                    onClick={() => setRutaSeleccionadaMapa(r)}
+                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative ${
+                      esSeleccionado
+                        ? 'border-prisma-teal bg-teal-50/50 ring-2 ring-prisma-teal/40 shadow-sm'
+                        : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/70'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-2 rounded-xl ${esSeleccionado ? 'bg-prisma-teal text-white' : 'bg-slate-100 text-slate-700'}`}>
+                          <Truck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="font-extrabold text-sm text-slate-900 block">{r.placaCamion}</span>
+                          <span className="text-[10px] text-slate-500 font-semibold">{r.codigoRuta}</span>
+                        </div>
+                      </div>
+
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        esVarado
+                          ? 'bg-rose-100 text-rose-800 animate-pulse'
+                          : r.estado === 'FINALIZADA'
+                            ? 'bg-slate-100 text-slate-700'
+                            : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {esVarado ? 'Varado' : r.estado || 'En Reparto'}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 mb-2 truncate">
+                      Conductor: <strong>{r.nombreRepartidor}</strong>
+                    </p>
+
+                    {/* Barra de Progreso de Paradas */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-[10px]">
+                        <span className="text-slate-500">Paradas: {r.paradasCompletadas}/{r.totalParadas}</span>
+                        <span className="font-bold text-prisma-teal">{porcentaje}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${esVarado ? 'bg-rose-500' : 'bg-prisma-teal'}`}
+                          style={{ width: `${porcentaje}%` }}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Escenario de Mapa: SIEMPRE VISIBLE */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl border border-prisma-border p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div>
+                  <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                    <Navigation className="w-5 h-5 text-prisma-teal" />
+                    <span>
+                      {rutaSeleccionadaMapa 
+                        ? `Monitoreo Satelital: Camión ${rutaSeleccionadaMapa.placaCamion}`
+                        : 'Mapa General de Cobertura y Mi Ubicación GPS'}
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {rutaSeleccionadaMapa
+                      ? `Ruta ${rutaSeleccionadaMapa.codigoRuta} • Sector ${rutaSeleccionadaMapa.zonaSector} • Conductor: ${rutaSeleccionadaMapa.nombreRepartidor}`
+                      : `Visualización panorámica de tu posición física actual y la red de ${tiendas.length} tiendas clientes atendidas en la ciudad.`}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    {rutaSeleccionadaMapa 
+                      ? `${rutaSeleccionadaMapa.paradas?.length || 0} paradas en ruta` 
+                      : `${tiendas.length} tiendas clientes en mapa`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Componente Leaflet / OSM */}
+              <MapaRutaEnVivo
+                ruta={rutaSeleccionadaMapa}
+                todasLasRutas={rutas}
+                todasLasTiendas={tiendas}
+                onActualizarRuta={() => cargarDatos(true)}
+              />
+            </div>
+
+            {/* Panel de Detalle Inferior */}
+            {rutaSeleccionadaMapa ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Columna Izquierda: Tarjetas de Estado y Rendimiento */}
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl border border-prisma-border p-5 shadow-sm space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-prisma-teal" />
+                      <span>Progreso de Entregas</span>
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase block">Entregadas</span>
+                        <span className="text-xl font-black text-emerald-800">{rutaSeleccionadaMapa.paradasCompletadas}</span>
+                        <span className="text-[10px] text-emerald-600 block">tiendas</span>
+                      </div>
+
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <span className="text-[10px] font-bold text-slate-600 uppercase block">Pendientes</span>
+                        <span className="text-xl font-black text-slate-800">
+                          {Math.max(0, rutaSeleccionadaMapa.totalParadas - rutaSeleccionadaMapa.paradasCompletadas)}
+                        </span>
+                        <span className="text-[10px] text-slate-500 block">tiendas</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-600">Total Recaudo Estimado:</span>
+                        <span className="font-extrabold text-prisma-teal text-sm">
+                          ${Number(rutaSeleccionadaMapa.recaudoEsperado || 0).toLocaleString('es-CO')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-[11px] pt-1 border-t border-slate-200/60">
+                        <span className="text-slate-500">Recaudado hasta el momento:</span>
+                        <span className="font-bold text-emerald-700">
+                          ${Number(rutaSeleccionadaMapa.totalRecaudado || 0).toLocaleString('es-CO')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Acciones de Emergencia si aplica */}
+                  {rutaSeleccionadaMapa.estado !== 'VARADO_EN_PERCANCE' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalVarado(rutaSeleccionadaMapa);
+                        setMotivoVarado('Falla mecánica del motor');
+                        setDetalleVarado('Camión detenido por avería');
+                      }}
+                      className="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-rose-600" />
+                      <span>Reportar Percance / Auxilio Mecánico</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Columna Derecha: Itinerario de la ruta enfocada */}
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-prisma-border p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Store className="w-4 h-4 text-prisma-teal" />
+                      <span>Itinerario Detallado de Paradas ({rutaSeleccionadaMapa.paradas?.length || 0})</span>
+                    </h4>
+                    <span className="text-[11px] text-slate-500">Orden de visita georreferenciado</span>
+                  </div>
+
+                  <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
+                    {rutaSeleccionadaMapa.paradas?.map((parada, idx) => {
+                      const entregado = parada.estado === 'ENTREGADO';
+                      const enProceso = parada.estado === 'EN_RUTA' || parada.estado === 'DESPACHADO';
+
+                      return (
+                        <div
+                          key={parada.pedidoId || idx}
+                          className={`p-3.5 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                            entregado
+                              ? 'bg-emerald-50/30 border-emerald-200'
+                              : enProceso
+                                ? 'bg-purple-50/50 border-purple-300 ring-1 ring-purple-300'
+                                : 'bg-slate-50/50 border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs flex-shrink-0 shadow-sm ${
+                              entregado
+                                ? 'bg-emerald-600 text-white'
+                                : enProceso
+                                  ? 'bg-purple-600 text-white animate-pulse'
+                                  : 'bg-white text-slate-700 border border-slate-300'
+                            }`}>
+                              {entregado ? '✓' : idx + 1}
+                            </div>
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 block">{parada.nombreTienda}</span>
+                              <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                <span>{parada.direccion}</span>
+                              </p>
+                              {parada.latitud && parada.longitud && (
+                                <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                  GPS: {Number(parada.latitud).toFixed(4)}, {Number(parada.longitud).toFixed(4)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              entregado
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : enProceso
+                                  ? 'bg-purple-100 text-purple-800'
+                                  : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              {entregado ? 'Entregado' : enProceso ? 'En Proceso' : 'Pendiente'}
+                            </span>
+                            <span className="font-extrabold text-xs text-slate-900">
+                              ${Number(parada.totalAPagar || 0).toLocaleString('es-CO')}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Panel de Resumen de Cobertura */}
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl border border-prisma-border p-5 shadow-sm space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-blue-600" />
+                      <span>Red Logística y Cobertura</span>
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                        <span className="text-[10px] font-bold text-blue-700 uppercase block">Tiendas Clientes</span>
+                        <span className="text-xl font-black text-blue-800">{tiendas.length}</span>
+                        <span className="text-[10px] text-blue-600 block">registradas</span>
+                      </div>
+
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <span className="text-[10px] font-bold text-slate-600 uppercase block">Camiones Hoy</span>
+                        <span className="text-xl font-black text-slate-800">{rutas.length}</span>
+                        <span className="text-[10px] text-slate-500 block">en servicio</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+                      <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <Navigation className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Monitoreo General Activo</span>
+                      </p>
+                      <p className="text-[11px] text-slate-500">
+                        Visualizando tu posición GPS actual y los puntos de distribución de tus clientes. Cuando se asigne una ruta a un camión, podrás hacerle seguimiento metro a metro.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Directorio de Tiendas Clientes Georreferenciadas */}
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-prisma-border p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Store className="w-4 h-4 text-blue-600" />
+                      <span>Directorio de Tiendas Clientes Georreferenciadas ({tiendas.length})</span>
+                    </h4>
+                    <span className="text-[11px] text-slate-500">Puntos de venta en mapa</span>
+                  </div>
+
+                  <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
+                    {tiendas.length === 0 ? (
+                      <p className="text-xs text-slate-400 text-center py-8">
+                        No hay tiendas registradas para esta distribuidora.
+                      </p>
+                    ) : (
+                      tiendas.map((t, idx) => (
+                        <div
+                          key={t.id || idx}
+                          className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-extrabold text-xs flex-shrink-0 shadow-sm">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 block">{t.nombreTienda}</span>
+                              <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                <span>{t.direccion} {t.barrio ? `• ${t.barrio}` : ''}</span>
+                              </p>
+                              {t.latitud && t.longitud && (
+                                <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                  GPS: {Number(t.latitud).toFixed(4)}, {Number(t.longitud).toFixed(4)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
+                              {t.ciudad || 'Bogotá'}
+                            </span>
+                            <span className="font-extrabold text-xs text-slate-900">
+                              ${Number(t.totalComprado || 0).toLocaleString('es-CO')}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* MODAL SIMPLIFICADO A 1 CLIC: REPORTE DE INCIDENCIA */}
       {modalProblema && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -736,7 +1230,7 @@ export const DespachosPage = () => {
 
       {/* MODAL REPROGRAMAR FECHA */}
       {modalReprogramar && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -802,10 +1296,10 @@ export const DespachosPage = () => {
           </div>
         </div>
       )}
-      {/* MODAL: VER DÓNDE ESTÁ EL CAMIÓN (RUTA PREDEFINIDA PASO A PASO) */}
+      {/* MODAL: VER DÓNDE ESTÁ EL CAMIÓN (MAPA SATELITAL EN VIVO + PASO A PASO) */}
       {modalUbicacionRuta && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in duration-200 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-start border-b border-prisma-border pb-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-prisma-teal/10 text-prisma-teal rounded-2xl">
@@ -813,7 +1307,7 @@ export const DespachosPage = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-prisma-text-primary flex items-center gap-2">
-                    Ubicación GPS en Vivo: {modalUbicacionRuta.placaCamion}
+                    Ubicación GPS Satelital: {modalUbicacionRuta.placaCamion}
                   </h3>
                   <p className="text-xs text-prisma-text-secondary mt-0.5 flex items-center gap-2">
                     <span>{modalUbicacionRuta.codigoRuta}</span>
@@ -872,6 +1366,14 @@ export const DespachosPage = () => {
                 </p>
                 <p className="text-[10px] text-gray-400">tiendas pendientes</p>
               </div>
+            </div>
+
+            {/* MAPA INTERACTIVO LEAFLET + OPENSTREETMAP CON GPS EN VIVO */}
+            <div className="space-y-2">
+              <MapaRutaEnVivo 
+                ruta={modalUbicacionRuta} 
+                onActualizarRuta={() => cargarDatos(true)} 
+              />
             </div>
 
             {/* Timeline Secuencial de la Ruta Predefinida */}
@@ -975,7 +1477,7 @@ export const DespachosPage = () => {
 
       {/* MODAL: REPORTAR CAMIÓN VARADO */}
       {modalVarado && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>

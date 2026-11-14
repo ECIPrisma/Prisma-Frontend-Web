@@ -1,18 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || API_BASE_URL;
 
-const leerUsuarioGuardado = () => {
-  try {
-    return JSON.parse(localStorage.getItem('prisma_user') || '{}') || {};
-  } catch {
-    return {};
-  }
-};
-
-export const EVENTO_SESION_EXPIRADA = 'prisma:sesion-expirada';
-
 const getAuthHeaders = () => {
-  const user = leerUsuarioGuardado();
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem('prisma_user') || '{}');
+  } catch {
+    user = {};
+  }
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -23,13 +18,11 @@ const getAuthHeaders = () => {
   return headers;
 };
 
-const handleResponse = async (response) => {
-  if (response.status === 401 && localStorage.getItem('prisma_user')) {
-    // El token venció o es inválido: se cierra la sesión local y la app vuelve al login.
-    localStorage.removeItem('prisma_user');
-    window.dispatchEvent(new Event(EVENTO_SESION_EXPIRADA));
-  }
+const handleResponse = async (response, { dispatchUnauthorized = true } = {}) => {
   if (!response.ok) {
+    if (dispatchUnauthorized && response.status === 401 && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('prisma:unauthorized'));
+    }
     const errorData = await response.json().catch(() => ({}));
     const message = errorData.mensaje || errorData.error || `Error HTTP ${response.status}`;
     throw new Error(message);
@@ -38,12 +31,50 @@ const handleResponse = async (response) => {
   return result.datos !== undefined ? result.datos : result;
 };
 
+// HU-03: renovación en curso compartida para no disparar varios /auth/refresh a la vez
+let refreshEnCurso = null;
+
 export const authService = {
-  login: async (email, password) => {
+  login: async (email, password, codigoTotp) => {
+    const body = { email, password };
+    if (codigoTotp) body.codigoTotp = codigoTotp;
     const res = await fetch(`${AUTH_API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      credentials: 'include',
+      body: JSON.stringify(body),
+    });
+    return handleResponse(res, { dispatchUnauthorized: false });
+  },
+
+  // El refresh token viaja en una cookie HttpOnly, por eso no se envía Authorization
+  refresh: () => {
+    if (!refreshEnCurso) {
+      refreshEnCurso = fetch(`${AUTH_API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'include',
+      })
+        .then((res) => {
+          if (res.status === 401) {
+            const error = new Error('Sesión expirada. Inicie sesión nuevamente.');
+            error.status = 401;
+            throw error;
+          }
+          return handleResponse(res);
+        })
+        .finally(() => {
+          refreshEnCurso = null;
+        });
+    }
+    return refreshEnCurso;
+  },
+
+  logout: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      credentials: 'include',
     });
     return handleResponse(res);
   },
@@ -71,6 +102,39 @@ export const authService = {
   getMe: async () => {
     const res = await fetch(`${AUTH_API_URL}/auth/me`, {
       headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  getTotpStatus: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/status`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  setupTotp: async () => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/setup`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  enableTotp: async (codigo) => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp/enable`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ codigo }),
+    });
+    return handleResponse(res);
+  },
+
+  disableTotp: async (password, codigo) => {
+    const res = await fetch(`${AUTH_API_URL}/auth/totp`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ password, codigo }),
     });
     return handleResponse(res);
   },
@@ -214,6 +278,21 @@ export const adminService = {
     });
     return handleResponse(res);
   },
+
+  getUsuariosAdmin: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/usuarios`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  resetTotpUsuario: async (id) => {
+    const res = await fetch(`${API_BASE_URL}/admin/usuarios/${id}/reset-totp`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
 };
 
 export const proveedorService = {
@@ -347,6 +426,15 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
+  simularPosicionGps: async (rutaId, coords) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/rutas/${rutaId}/simular-posicion`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(coords),
+    });
+    return handleResponse(res);
+  },
+
   getTiendasClientes: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/tiendas`, {
       headers: getAuthHeaders(),
@@ -424,6 +512,23 @@ export const proveedorService = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ tipoIncidente, descripcion, pedidoId }),
+    });
+    return handleResponse(res);
+  },
+
+  // HU-04: perfil comercial propio (el backend resuelve el proveedor desde el JWT)
+  getPerfil: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/perfil`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  actualizarPerfil: async (datos) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/perfil`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(datos),
     });
     return handleResponse(res);
   },

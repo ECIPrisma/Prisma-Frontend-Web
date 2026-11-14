@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { EVENTO_SESION_EXPIRADA } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -8,13 +7,12 @@ export const AuthProvider = ({ children }) => {
     if (!raw) return null;
     const usuario = raw.usuario || raw;
     return {
+      ...raw,
       token: raw.token || usuario.token,
       id: usuario.id,
       email: usuario.email,
       nombreCompleto: usuario.nombreCompleto,
       telefono: usuario.telefono,
-      ...raw,
-      // Asegurar que rol y proveedorId queden en la raíz
       rol: usuario.rol || raw.rol,
       proveedorId: usuario.proveedorId || raw.proveedorId,
     };
@@ -25,28 +23,44 @@ export const AuthProvider = ({ children }) => {
       const saved = localStorage.getItem('prisma_user');
       return saved ? normalizeUser(JSON.parse(saved)) : null;
     } catch {
-      // Sesión guardada corrupta: se descarta en vez de dejar la app en blanco.
       localStorage.removeItem('prisma_user');
       return null;
     }
   });
 
-  useEffect(() => {
-    const cerrar = () => setUser(null);
-    window.addEventListener(EVENTO_SESION_EXPIRADA, cerrar);
-    return () => window.removeEventListener(EVENTO_SESION_EXPIRADA, cerrar);
-  }, []);
-
   const login = (userData) => {
     const normalized = normalizeUser(userData);
     setUser(normalized);
-    localStorage.setItem('prisma_user', JSON.stringify(normalized));
+    try {
+      localStorage.setItem('prisma_user', JSON.stringify(normalized));
+    } catch {
+      // Ignorar si cookies/storage están restringidas
+    }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('prisma_user');
-  };
+    try {
+      localStorage.removeItem('prisma_user');
+    } catch {
+      // Ignorar
+    }
+  }, []);
+
+  // Escuchar eventos globales de 401 (token expirado o sesión revocada)
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    };
+
+    window.addEventListener('prisma:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('prisma:unauthorized', handleUnauthorized);
+    };
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

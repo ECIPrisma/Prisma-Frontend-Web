@@ -66,8 +66,9 @@ export const PqrsProveedorPage = () => {
   useEffect(() => {
     cargarPqrs();
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       cargarPqrs(true);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -451,7 +452,7 @@ export const PqrsProveedorPage = () => {
 
       {/* MODAL 1: RESPONDER AL TENDERO */}
       {modalResponder && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
@@ -563,7 +564,7 @@ export const PqrsProveedorPage = () => {
 
       {/* MODAL 2: RADICAR RECLAMO / DISPUTA A PRISMA ADMIN (REQUERIMIENTO DEL USUARIO) */}
       {modalRadicarPrisma && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
