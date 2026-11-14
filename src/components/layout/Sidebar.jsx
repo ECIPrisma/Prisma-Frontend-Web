@@ -15,6 +15,7 @@ import {
   Store,
   MessageSquareWarning,
   Receipt,
+  TrendingUp,
   ShieldCheck,
   Users
 } from 'lucide-react';
@@ -40,6 +41,7 @@ export const Sidebar = () => {
     { to: '/despachos', label: 'Despachos y Rutas', icon: Truck },
     { to: '/flota', label: 'Flota de Camiones', icon: Navigation },
     { to: '/estadisticas', label: 'Estadísticas Económicas', icon: DollarSign },
+    { to: '/modo-pro/ranking', label: 'Modo Pro: Ranking', icon: TrendingUp },
     { to: '/liquidaciones', label: 'Liquidaciones', icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
     { to: '/perfil', label: 'Perfil Comercial', icon: Building2 },

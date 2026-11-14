@@ -26,6 +26,7 @@ import { TiendasProveedorPage } from '../pages/proveedor/TiendasProveedorPage';
 import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
 import { PerfilProveedorPage } from '../pages/proveedor/PerfilProveedorPage';
+import { RankingZonaPage } from '../pages/proveedor/RankingZonaPage';
 
 export const AppRoutes = () => {
   const { user } = useAuth();
@@ -65,6 +66,7 @@ export const AppRoutes = () => {
         <Route path="/despachos" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><DespachosPage /></RoleRoute>} />
         <Route path="/flota" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><FlotaPage /></RoleRoute>} />
         <Route path="/estadisticas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><EstadisticasEconomicasPage /></RoleRoute>} />
+        <Route path="/modo-pro/ranking" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><RankingZonaPage /></RoleRoute>} />
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
         <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />

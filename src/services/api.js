@@ -296,6 +296,15 @@ export const adminService = {
 };
 
 export const proveedorService = {
+  // HU-15: ranking de productos por zona (Modo Pro). dias: 1-365, 30 por defecto en el backend.
+  getRankingPorZona: async (dias) => {
+    const query = dias ? `?dias=${encodeURIComponent(dias)}` : '';
+    const res = await fetch(`${API_BASE_URL}/proveedores/modo-pro/ranking${query}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
   getMisProductos: async () => {
     const res = await fetch(`${API_BASE_URL}/proveedores/mis-productos`, {
       headers: getAuthHeaders(),
