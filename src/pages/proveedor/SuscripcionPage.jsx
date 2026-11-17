@@ -131,16 +131,6 @@ export const SuscripcionPage = ({ demoraPasosMs = 700 }) => {
         </p>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-[11px] flex items-start gap-2">
-        <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <span>
-          <strong>Ambiente de pruebas simulado (Wompi sandbox).</strong> No se mueve dinero real. Nequi{' '}
-          <span className="font-mono">{DATOS_PRUEBA.NEQUI.aprueba}</span> aprueba,{' '}
-          <span className="font-mono">{DATOS_PRUEBA.NEQUI.rechaza}</span> rechaza y{' '}
-          <span className="font-mono">{DATOS_PRUEBA.NEQUI.caida}</span> simula la pasarela caída.
-        </span>
-      </div>
-
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs flex items-start gap-2">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -287,11 +277,7 @@ export const SuscripcionPage = ({ demoraPasosMs = 700 }) => {
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <button type="button" onClick={usarDatosPrueba} disabled={procesando}
-                    className="text-xs font-bold text-prisma-orange-dark hover:underline cursor-pointer">
-                    Usar datos de prueba aprobados
-                  </button>
+                <div className="flex flex-wrap items-center justify-end gap-3">
                   <button type="submit" disabled={procesando}
                     className="px-5 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 disabled:opacity-50 cursor-pointer">
                     <ShieldCheck className="w-4 h-4" />
@@ -306,7 +292,7 @@ export const SuscripcionPage = ({ demoraPasosMs = 700 }) => {
                   </p>
                 )}
                 <p className="text-[11px] text-gray-400">
-                  Procesado por Wompi (simulado). PRISMA nunca guarda el número completo de tu tarjeta ni el CVV.
+                  Procesado de forma segura por Wompi. PRISMA nunca guarda el número completo de tu tarjeta ni el CVV.
                 </p>
               </form>
             </div>

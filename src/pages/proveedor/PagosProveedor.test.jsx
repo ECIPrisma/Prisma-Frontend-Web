@@ -41,12 +41,11 @@ describe('HU-12 Cuenta de cobro del proveedor (pasarela simulada)', () => {
     proveedorService.getRecaudosEnLinea.mockResolvedValue(SIN_RECAUDOS);
   });
 
-  it('sin cuenta vinculada muestra el 96,5% y el aviso de ambiente simulado', async () => {
+  it('sin cuenta vinculada muestra el 96,5% y el botón de vincular', async () => {
     proveedorService.getCuentaCobro.mockResolvedValue(SIN_VINCULAR);
     montar();
 
     expect(await screen.findByText('96,5%')).toBeInTheDocument();
-    expect(screen.getByText(/ambiente de pruebas simulado/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /vincular cuenta de cobro/i })).toBeEnabled();
   });
 

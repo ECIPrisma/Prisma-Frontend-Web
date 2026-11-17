@@ -102,14 +102,6 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
         </p>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-[11px] flex items-center gap-2">
-        <FlaskConical className="w-4 h-4 flex-shrink-0" />
-        <span>
-          <strong>Ambiente de pruebas simulado (Wompi sandbox).</strong> No se mueve dinero real. Para simular un rechazo
-          de la pasarela, usa un número de cuenta que termine en <span className="font-mono font-bold">0000</span>.
-        </span>
-      </div>
-
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs flex items-center gap-2">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -161,9 +153,6 @@ export const PagosProveedorPage = ({ demoraVerificacionMs = 700 }) => {
                 <>
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">Vinculada</span>
-                    {!cuenta.modoProduccion && (
-                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800">Modo de prueba</span>
-                    )}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     <div className="p-3 bg-prisma-surface rounded-xl border border-prisma-border/60">
