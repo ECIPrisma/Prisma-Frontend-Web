@@ -1,11 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { proveedorService } from '../../services/api';
-import { DollarSign, FileText, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import { DollarSign, FileText, Clock, AlertCircle, RefreshCw, Download } from 'lucide-react';
 
 export const LiquidacionesPage = () => {
   const [liquidaciones, setLiquidaciones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+
+  const exportarCSV = () => {
+    if (!liquidaciones || liquidaciones.length === 0) return;
+    const encabezados = ['Numero_Liquidacion', 'Periodo_Inicio', 'Periodo_Fin', 'Pedidos_Entregados', 'Ventas_Brutas_COP', 'Comision_PRISMA_3_5_COP', 'Neto_Proveedor_COP', 'Estado'];
+    const filas = liquidaciones.map(l => {
+      const venta = Number(l.totalVentasBrutas || 0);
+      const comision = Number(l.valorComisionPrisma || 0);
+      const neto = venta - comision;
+      return [
+        `"${l.numeroLiquidacion || ''}"`,
+        `"${l.periodoInicio || ''}"`,
+        `"${l.periodoFin || ''}"`,
+        l.totalPedidosEntregados || 0,
+        venta,
+        comision,
+        neto,
+        `"${l.estado || ''}"`
+      ].join(',');
+    });
+    const contenidoCSV = 'data:text/csv;charset=utf-8,\uFEFF' + [encabezados.join(','), ...filas].join('\n');
+    const encodedUri = encodeURI(contenidoCSV);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `liquidaciones_prisma_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const cargarLiquidaciones = async (silencioso = false) => {
     try {
@@ -44,9 +72,17 @@ export const LiquidacionesPage = () => {
             Liquidaciones y Facturación de Ventas
           </h1>
           <p className="text-xs text-prisma-text-secondary mt-1">
-            Cortes de ventas consolidadas en tiendas de barrio y liquidación neta periódica.
+            Cortes de ventas consolidadas en tiendas de barrio y liquidación neta periódica (3.5% PRISMA / 96.5% Proveedor).
           </p>
         </div>
+        <button
+          onClick={exportarCSV}
+          disabled={cargando || liquidaciones.length === 0}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-prisma-teal hover:bg-teal-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"
+        >
+          <Download className="w-4 h-4" />
+          Exportar CSV
+        </button>
       </div>
 
       {error && (

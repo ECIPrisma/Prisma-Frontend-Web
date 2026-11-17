@@ -262,7 +262,7 @@ export const EstadisticasEconomicasPage = () => {
           </div>
 
           {analiticaStatus && (
-            <div className="flex items-center gap-2 bg-black/30 backdrop-blur px-3.5 py-1.5 rounded-xl border border-white/10 text-xs">
+            <div className="flex items-center gap-2 bg-slate-800 px-3.5 py-1.5 rounded-xl border border-slate-700 text-xs">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-gray-300">Aislamiento RAM:</span>
               <span className="font-mono text-emerald-400 font-bold">{analiticaStatus.memory_usage_mb || 94.7} MB / 300 MB</span>
@@ -271,8 +271,8 @@ export const EstadisticasEconomicasPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Tarjeta 1: Elasticidad y Descuentos Óptimos (SCRUM-43) */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4">
+          {/* Tarjeta 1: Elasticidad y Descuentos Óptimos (SCRUM-43) - Fondo sólido sin transparencia */}
+          <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-5 h-5 text-teal-400" />
@@ -280,14 +280,14 @@ export const EstadisticasEconomicasPage = () => {
               </div>
               <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase border ${
                 descuentos?.tipo_demanda === 'Elástica' 
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' 
-                  : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+                  ? 'bg-emerald-900/60 text-emerald-300 border-emerald-500' 
+                  : 'bg-amber-900/60 text-amber-300 border-amber-500'
               }`}>
                 {descuentos?.tipo_demanda || 'Elástica'} (ε = {descuentos?.coeficiente_elasticidad || -5.93})
               </span>
             </div>
 
-            <p className="text-xs text-gray-300 leading-relaxed">
+            <p className="text-xs text-gray-200 leading-relaxed font-normal">
               {descuentos?.recomendacion_estrategica || 'Un descuento por escala aumentará significativamente el volumen e incrementará los ingresos netos.'}
             </p>
 
@@ -301,7 +301,7 @@ export const EstadisticasEconomicasPage = () => {
                   { escala_unidades: '>= 48 uds', descuento_porcentaje: 8.5, precio_unitario_final: 4117 },
                   { escala_unidades: '>= 96 uds', descuento_porcentaje: 11.1, precio_unitario_final: 4002 },
                 ]).map((escala, i) => (
-                  <div key={i} className="bg-black/30 p-2.5 rounded-xl border border-white/5 text-center">
+                  <div key={i} className="bg-slate-900 p-2.5 rounded-xl border border-slate-700 text-center">
                     <p className="text-[11px] font-bold text-teal-300">{escala.escala_unidades}</p>
                     <p className="text-base font-extrabold text-white mt-0.5">-{escala.descuento_porcentaje}%</p>
                     <p className="text-[10px] text-gray-400 mt-0.5">{formatearDinero(escala.precio_unitario_final)}/ud</p>
@@ -310,25 +310,25 @@ export const EstadisticasEconomicasPage = () => {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex justify-between text-[11px] text-gray-300">
+            <div className="pt-2 border-t border-slate-700 flex justify-between text-[11px] text-gray-300">
               <span>Incremento volumen proyectado:</span>
               <span className="font-bold text-emerald-400">+{descuentos?.incremento_volumen_esperado_pct || 69.4}%</span>
             </div>
           </div>
 
-          {/* Tarjeta 2: Empaques y Combos por Minería FP-Growth (SCRUM-44) */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4">
+          {/* Tarjeta 2: Empaques y Combos por Minería FP-Growth (SCRUM-44) - Fondo sólido sin transparencia */}
+          <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-indigo-400" />
                 <h3 className="font-bold text-sm text-white">Formatos de Empaque y Combos (FP-Growth)</h3>
               </div>
-              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-indigo-900/60 text-indigo-300 border border-indigo-500">
                 Reglas de Afinidad
               </span>
             </div>
 
-            <p className="text-xs text-gray-300 leading-relaxed">
+            <p className="text-xs text-gray-200 leading-relaxed font-normal">
               Combinaciones de productos con alta afinidad de compra detectadas en los carritos de los tenderos:
             </p>
 
