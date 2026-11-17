@@ -51,7 +51,7 @@ const fetchWithFailover = async (input, init = {}) => {
     const targetUrl = `${currentNode}${subpath}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
 
     try {
       const response = await globalThis.fetch(targetUrl, {
@@ -81,6 +81,9 @@ const fetchWithFailover = async (input, init = {}) => {
     }
   }
 
+  if (lastError?.name === 'AbortError') {
+    throw new Error('El servidor está despertando del modo reposo. Por favor intenta iniciar sesión nuevamente.');
+  }
   throw lastError || new Error('Todos los servidores del cluster están fuera de servicio temporalmente.');
 };
 
