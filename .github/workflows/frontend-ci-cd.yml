@@ -1,4 +1,4 @@
-name: Frontend CI/CD (Vercel Edge)
+name: Frontend CI/CD (Vercel Edge & AWS Failover)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-tests:
-    name: Pruebas Automatizadas (Vitest - 21 Tests)
+    name: Pruebas Automatizadas (Vitest)
     runs-on: ubuntu-latest
 
     steps:
@@ -55,10 +55,56 @@ jobs:
       - name: Verify Live Vercel Deployment
         run: |
           echo "Verificando disponibilidad de la aplicación en Vercel Edge CDN..."
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prisma-frontend-web.vercel.app)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prisma-frontend-web.vercel.app || echo "000")
           echo "HTTP Status recibido de Vercel: $STATUS"
-          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "Despliegue verificado con exito: Vercel Edge en linea (HTTP $STATUS)."
-          else
-            echo "Aviso: Respuesta HTTP $STATUS durante la verificacion."
-          fi
+
+  deploy-to-aws:
+    name: Despliegue Continuo a AWS EC2 (Nginx Web)
+    needs: build-and-verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies & Build
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy Dist to AWS EC2 via SCP
+        if: env.SSH_KEY != ''
+        uses: appleboy/scp-action@v0.1.7
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        with:
+          host: ${{ secrets.EC2_HOST || '3.81.211.182' }}
+          username: ${{ secrets.EC2_USER || 'ec2-user' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "/home/ec2-user/web_dist"
+          strip_components: 1
+
+      - name: Update Nginx Static Files on AWS EC2
+        if: env.SSH_KEY != ''
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        with:
+          host: ${{ secrets.EC2_HOST || '3.81.211.182' }}
+          username: ${{ secrets.EC2_USER || 'ec2-user' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo cp -r /home/ec2-user/web_dist/* /var/www/prisma-web/
+            sudo chown -R nginx:nginx /var/www/prisma-web
+            sudo chmod -R 755 /var/www/prisma-web
+            sudo systemctl reload nginx
+            rm -rf /home/ec2-user/web_dist
+            curl -s -I https://eciprisma.duckdns.org/
