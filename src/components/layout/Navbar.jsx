@@ -104,6 +104,64 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
             });
           }
 
+          // HU-14: pagos en línea confirmados por la pasarela -> el proveedor puede iniciar el despacho
+          try {
+            const avisos = await proveedorService.getMisNotificaciones();
+            if (Array.isArray(avisos)) {
+              const vistos = new Set();
+              avisos
+                .filter((a) => a.tipo === 'PAGO_CONFIRMADO')
+                .filter((a) => {
+                  const clave = `pago-${a.pedidoId ?? a.id}`;
+                  if (vistos.has(clave)) return false;
+                  vistos.add(clave);
+                  return true;
+                })
+                .forEach((a) => {
+                  items.unshift({
+                    id: `pago-${a.pedidoId ?? a.id}`,
+                    tipo: 'exito',
+                    titulo: a.titulo || `Pago confirmado: pedido #${a.numeroPedido}`,
+                    subtitulo: 'Pago en garantía · Listo para despacho',
+                    descripcion: a.cuerpo,
+                    fecha: a.enviadoEn
+                      ? new Date(a.enviadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : 'Reciente',
+                    estado: 'PAGO_CONFIRMADO',
+                    ruta: '/despachos',
+                    icono: 'pago',
+                  });
+                });
+
+              // MVP: el webhook confirmó el pago de la suscripción Prisma Pro del distribuidor
+              avisos
+                .filter((a) => a.tipo === 'SUSCRIPCION_PAGADA')
+                .filter((a) => {
+                  const clave = `suscripcion-${a.numeroPedido ?? a.id}`;
+                  if (vistos.has(clave)) return false;
+                  vistos.add(clave);
+                  return true;
+                })
+                .forEach((a) => {
+                  items.unshift({
+                    id: `suscripcion-${a.numeroPedido ?? a.id}`,
+                    tipo: 'exito',
+                    titulo: a.titulo || 'Suscripción Prisma Pro activa',
+                    subtitulo: 'Pago confirmado por la pasarela',
+                    descripcion: a.cuerpo,
+                    fecha: a.enviadoEn
+                      ? new Date(a.enviadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : 'Reciente',
+                    estado: 'SUSCRIPCION_PAGADA',
+                    ruta: '/proveedor/suscripcion',
+                    icono: 'pago',
+                  });
+                });
+            }
+          } catch {
+            // Ignorar silencioso: la campana sigue mostrando PQRS y flota
+          }
+
           // Alerta logística de flota: camiones o rutas con percance
           try {
             const camiones = await proveedorService.getCamiones();

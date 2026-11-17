@@ -26,6 +26,8 @@ import { TiendasProveedorPage } from '../pages/proveedor/TiendasProveedorPage';
 import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
 import { PerfilProveedorPage } from '../pages/proveedor/PerfilProveedorPage';
+import { PagosProveedorPage } from '../pages/proveedor/PagosProveedorPage';
+import { SuscripcionPage } from '../pages/proveedor/SuscripcionPage';
 
 export const AppRoutes = () => {
   const { user } = useAuth();
@@ -68,6 +70,10 @@ export const AppRoutes = () => {
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
         <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />
+        {/* Fuera del menú en el MVP (los tenderos no pagan en línea); se conserva la ruta */}
+        <Route path="/proveedor/pagos" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PagosProveedorPage /></RoleRoute>} />
+        {/* MVP: el distribuidor paga su suscripción Prisma Pro */}
+        <Route path="/proveedor/suscripcion" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><SuscripcionPage /></RoleRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

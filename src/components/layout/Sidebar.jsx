@@ -16,6 +16,7 @@ import {
   MessageSquareWarning,
   Receipt,
   ShieldCheck,
+  Wallet,
   Users,
   X
 } from 'lucide-react';
@@ -44,6 +45,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: '/liquidaciones', label: 'Liquidaciones', icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
     { to: '/perfil', label: 'Perfil Comercial', icon: Building2 },
+    { to: '/proveedor/suscripcion', label: 'Suscripción Prisma Pro', icon: Wallet },
   ];
 
   const links = isAdmin ? adminLinks : proveedorLinks;
