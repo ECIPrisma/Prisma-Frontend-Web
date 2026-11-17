@@ -51,7 +51,7 @@ export const ProveedoresAdminPage = () => {
     contactoTelefono: '',
     direccionSede: '',
     ciudad: 'Bogotá',
-    comisionPorcentaje: '2.50'
+    comisionPorcentaje: '3.50'
   });
 
   // Modal Editar Proveedor
@@ -115,7 +115,7 @@ export const ProveedoresAdminPage = () => {
         contactoTelefono: '',
         direccionSede: '',
         ciudad: 'Bogotá',
-        comisionPorcentaje: '2.50'
+        comisionPorcentaje: '3.50'
       });
       await cargarDatos();
     } catch (err) {
@@ -148,7 +148,7 @@ export const ProveedoresAdminPage = () => {
       contactoTelefono: prov.contactoTelefono || '',
       direccionSede: prov.direccionSede || '',
       ciudad: prov.ciudad || 'Bogotá',
-      comisionPorcentaje: (prov.porcentajeComision || prov.comisionPorcentaje || 2.5).toString()
+      comisionPorcentaje: (prov.porcentajeComision || prov.comisionPorcentaje || 3.5).toString()
     });
     setModalEditar(true);
   };
@@ -287,7 +287,7 @@ export const ProveedoresAdminPage = () => {
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wider">Cartera Prisma (2.5%)</p>
+            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wider">Cartera Prisma (3.5%)</p>
             <h3 className="text-2xl font-black mt-0.5">
               ${totalCarteraPrisma.toLocaleString('es-CO')}
             </h3>
@@ -342,7 +342,7 @@ export const ProveedoresAdminPage = () => {
                   <th className="p-4 text-center">Tiendas Atendidas</th>
                   <th className="p-4 text-center">Flota Camiones</th>
                   <th className="p-4 text-right">Ventas Totales</th>
-                  <th className="p-4 text-right bg-amber-50/40 text-amber-900">Deuda a Prisma (2.5%)</th>
+                  <th className="p-4 text-right bg-amber-50/40 text-amber-900">Deuda a Prisma (3.5%)</th>
                   <th className="p-4 text-center">Estado</th>
                   <th className="p-4 text-right">Acciones</th>
                 </tr>
@@ -411,7 +411,7 @@ export const ProveedoresAdminPage = () => {
                             ${deuda.toLocaleString('es-CO')}
                           </p>
                           <p className="text-[10px] text-amber-700 font-medium">
-                            Tarifa: {prov.porcentajeComision || 2.5}%
+                            Tarifa: {prov.porcentajeComision || 3.5}%
                           </p>
                         </div>
                       </td>

@@ -118,7 +118,7 @@ export const AdminDashboard = () => {
         <div className="bg-white p-6 rounded-2xl border border-prisma-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-prisma-text-secondary uppercase">Comisión Pactada</p>
-            <p className="text-2xl font-bold text-prisma-text-primary mt-1">2.50%</p>
+            <p className="text-2xl font-bold text-prisma-text-primary mt-1">3.50%</p>
             <p className="text-xs text-prisma-text-secondary mt-1">Parámetro base quincenal</p>
           </div>
           <div className="p-3.5 rounded-xl bg-amber-50">
