@@ -699,24 +699,51 @@ export const analyticsService = {
       const res = await fetchWithFailover(`/analytics/prescripcion/descuentos?producto_id=${productoId}&zona=${encodeURIComponent(zona)}`);
       return await handleResponse(res);
     } catch (err) {
+      // HU-30: respaldo sin motor analítico. El arroz (13) es de demanda inelástica: descuento bloqueado.
+      if (Number(productoId) === 13) {
+        return {
+          zona,
+          producto_id: productoId,
+          nombre_producto: 'Arroz Blanco 500g',
+          coeficiente_elasticidad: -0.581,
+          tipo_demanda: 'Inelástica',
+          descuento_bloqueado: true,
+          motivo_bloqueo: 'La demanda es inelástica (|ε| = 0.58 ≤ 1): el volumen casi no responde al precio. Una oferta de por la compra de 10 unidades, 1 unidad bonificada cambiaría el margen en -13.5%. Se bloquea el descuento directo para cuidar tu margen.',
+          descuento_optimo_recomendado_pct: 0,
+          precio_base_promedio: 3000.0,
+          precio_con_descuento_sugerido: 3000.0,
+          incremento_volumen_esperado_pct: 0,
+          recomendacion_estrategica: `No apliques descuentos directos a Arroz Blanco 500g en la zona ${zona}. Activa la demanda con exhibidores o paquetes cruzados.`,
+          escalas_prescritas: [],
+          alternativas_prescritas: [
+            { tipo: 'EXHIBIDOR', titulo: 'Exhibidor en punto de venta', descripcion: `Instala un exhibidor o cabecera de góndola de Arroz Blanco 500g en las tiendas de la zona ${zona} para ganar visibilidad y rotación sin bajar el precio.`, productos: ['Arroz Blanco 500g'] },
+            { tipo: 'BUNDLE', titulo: 'Paquete cruzado: Arroz Blanco 500g + Aceite Vegetal 1L', descripcion: `Los tenderos de la zona ${zona} suelen pedir Aceite Vegetal 1L junto con Arroz Blanco 500g. Ofrécelos como paquete manteniendo el precio de Arroz Blanco 500g.`, productos: ['Arroz Blanco 500g', 'Aceite Vegetal 1L'] },
+          ],
+          alcance_datos: 'DEMOSTRACION',
+          datos_simulados: true,
+        };
+      }
       return {
         zona,
-        coeficiente_elasticidad: -5.934,
-        tipo_demanda: "Elástica",
-        descuento_optimo_recomendado_pct: 8.5,
-        precio_base_promedio: 4500.0,
-        precio_con_descuento_sugerido: 4117.5,
-        incremento_volumen_esperado_pct: 69.4,
-        ingreso_actual_proyectado: 108381.64,
-        ingreso_con_descuento_proyectado: 167996.38,
-        margen_ganancia_proyectado: 78235.11,
-        recomendacion_estrategica: "Un descuento por escala aumentará significativamente el volumen e incrementará los ingresos netos.",
-        escalas_prescritas: [
-          { escala_unidades: ">= 24 unidades", descuento_porcentaje: 5.9, precio_unitario_final: 4232.25 },
-          { escala_unidades: ">= 48 unidades", descuento_porcentaje: 8.5, precio_unitario_final: 4117.5 },
-          { escala_unidades: ">= 96 unidades", descuento_porcentaje: 11.1, precio_unitario_final: 4002.75 },
-        ],
         producto_id: productoId,
+        nombre_producto: 'Coca-Cola 1.5L',
+        coeficiente_elasticidad: -6.579,
+        tipo_demanda: "Elástica",
+        descuento_bloqueado: false,
+        motivo_bloqueo: null,
+        descuento_optimo_recomendado_pct: 14.9,
+        precio_base_promedio: 4750.0,
+        precio_con_descuento_sugerido: 4042.55,
+        incremento_volumen_esperado_pct: 188.9,
+        recomendacion_estrategica: `La demanda de Coca-Cola 1.5L en la zona ${zona} es elástica (ε = -6.58): un descuento por escala aumenta el volumen y el margen. Recomendado: Por la compra de 40 unidades, 7 unidades bonificadas.`,
+        escalas_prescritas: [
+          { escala_unidades: ">= 10 unidades", compra_unidades: 10, unidades_bonificadas: 1, descripcion: "Por la compra de 10 unidades, 1 unidad bonificada", descuento_porcentaje: 9.1, precio_unitario_final: 4318.18, incremento_volumen_pct: 87.2, variacion_margen_pct: 53.2, protege_margen: true },
+          { escala_unidades: ">= 20 unidades", compra_unidades: 20, unidades_bonificadas: 3, descripcion: "Por la compra de 20 unidades, 3 unidades bonificadas", descuento_porcentaje: 13.0, precio_unitario_final: 4130.43, incremento_volumen_pct: 150.8, variacion_margen_pct: 85.4, protege_margen: true },
+          { escala_unidades: ">= 40 unidades", compra_unidades: 40, unidades_bonificadas: 7, descripcion: "Por la compra de 40 unidades, 7 unidades bonificadas", descuento_porcentaje: 14.9, precio_unitario_final: 4042.55, incremento_volumen_pct: 188.9, variacion_margen_pct: 102.9, protege_margen: true },
+        ],
+        alternativas_prescritas: [],
+        alcance_datos: 'DEMOSTRACION',
+        datos_simulados: true,
       };
     }
   },
