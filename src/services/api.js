@@ -2,8 +2,8 @@ const IS_TEST = typeof import.meta !== 'undefined' && import.meta.env && import.
 
 // Cluster de nodos backend de contingencia (Failover en Cascada)
 const BACKEND_NODES = [
-  'https://eciprisma.duckdns.org/api/v1',
   'https://prisma-backend-web.onrender.com/api/v1',
+  'https://prisma-aws.tail2474b3.ts.net/api/v1',
   'https://server-sabio.tail2474b3.ts.net:8443/api/v1',
 ];
 
@@ -58,7 +58,8 @@ const fetchWithFailover = async (input, init = {}) => {
       clearTimeout(timeoutId);
 
       // Si el servidor da error de caída/gateway (502, 503, 504), conmutamos al siguiente nodo
-      if ([502, 503, 504].includes(response.status)) {
+      const contentType = response.headers.get('content-type') || '';
+      if ([502, 503, 504].includes(response.status) || (contentType.includes('text/html') && !subpath.includes('html'))) {
         console.warn(`[PRISMA Failover] Nodo ${currentNode} no disponible (HTTP ${response.status}). Conmutando al siguiente nodo...`);
         activeNodeIndex = (activeNodeIndex + 1) % BACKEND_NODES.length;
         attempts++;
