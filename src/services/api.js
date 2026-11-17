@@ -1,7 +1,10 @@
 const IS_TEST = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test';
 
 // Cluster de nodos backend de contingencia (Failover en Cascada)
+// El primer nodo siempre es la ruta relativa del reverse-proxy (/api/v1)
+// para garantizar conexión Same-Origin (cero CORS) a través de Vercel y Vite.
 const BACKEND_NODES = [
+  '/api/v1',
   'https://prisma-backend-web.onrender.com/api/v1',
   'https://prisma-aws.tail2474b3.ts.net/api/v1',
   'https://server-sabio.tail2474b3.ts.net:8443/api/v1',
