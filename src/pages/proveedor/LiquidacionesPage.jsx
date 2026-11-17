@@ -36,7 +36,7 @@ export const LiquidacionesPage = () => {
   const totalNeto = totalVentas - totalComisiones;
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-prisma-text-primary flex items-center gap-2">
@@ -57,7 +57,7 @@ export const LiquidacionesPage = () => {
       )}
 
       {/* KPI Cards de Finanzas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-prisma-border shadow-sm">
           <p className="text-xs text-prisma-text-secondary font-medium">Ventas Brutas Acumuladas</p>
           <p className="text-2xl font-bold text-prisma-text-primary mt-1">

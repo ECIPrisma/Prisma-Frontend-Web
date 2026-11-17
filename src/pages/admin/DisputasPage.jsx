@@ -99,7 +99,7 @@ export const DisputasPage = () => {
   };
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-prisma-text-primary flex items-center gap-2">
@@ -247,8 +247,8 @@ export const DisputasPage = () => {
 
       {/* Modal Resolver Disputa / Responder Caso Admin */}
       {modalResolucion && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4 sm:p-6 z-50 min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200 my-auto max-h-[90vh] overflow-y-auto border border-gray-100">
             <div className="flex justify-between items-center pb-3 border-b border-prisma-border">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-prisma-teal" />
@@ -334,8 +334,8 @@ export const DisputasPage = () => {
 
       {/* Modal de Justificación Obligatoria para Override PIN */}
       {selectedCase && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4 sm:p-6 z-50 min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200 my-auto max-h-[90vh] overflow-y-auto border border-gray-100">
             <div className="flex justify-between items-center pb-3 border-b border-prisma-border">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />

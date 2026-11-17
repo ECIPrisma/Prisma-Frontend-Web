@@ -148,7 +148,7 @@ export const PedidosSoportePage = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -299,8 +299,8 @@ export const PedidosSoportePage = () => {
 
       {/* Modal Cancelar Pedido */}
       {modalCancelar && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-sm text-red-600 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
@@ -355,8 +355,8 @@ export const PedidosSoportePage = () => {
 
       {/* Modal Reprogramar Pedido */}
       {modalReprogramar && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-sm text-blue-600 flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -414,8 +414,8 @@ export const PedidosSoportePage = () => {
 
       {/* Modal PIN Override */}
       {modalPinOverride && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-md w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-sm text-amber-600 flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5" />

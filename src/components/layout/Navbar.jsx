@@ -12,10 +12,11 @@ import {
   ChevronRight, 
   X, 
   CheckCheck,
-  Shield
+  Shield,
+  Menu
 } from 'lucide-react';
 
-export const Navbar = () => {
+export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const rol = user?.rol || user?.usuario?.rol;
@@ -174,18 +175,28 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="bg-white border-b border-prisma-border h-16 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
-      <div className="flex items-center gap-3">
+    <header className="bg-white border-b border-prisma-border h-16 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shadow-sm">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Botón Hamburger para móviles y tablets pequeñas */}
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label={isSidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
+          className="md:hidden p-2 -ml-1 text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100 rounded-xl transition cursor-pointer"
+        >
+          {isSidebarOpen ? <X className="w-5 h-5 text-prisma-teal" /> : <Menu className="w-5 h-5" />}
+        </button>
+
         <img 
           src="/logo_icono_tienda.png" 
           alt="PRISMA Logo" 
-          className="h-10 w-10 object-contain rounded-lg p-1 bg-prisma-teal/10"
+          className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded-lg p-1 bg-prisma-teal/10"
         />
         <div>
-          <span className="text-xl font-bold tracking-tight text-prisma-text-primary">
+          <span className="text-lg sm:text-xl font-bold tracking-tight text-prisma-text-primary">
             PRISMA
           </span>
-          <span className="text-xs ml-2 px-2.5 py-0.5 rounded-full bg-prisma-orange/20 text-prisma-orange-dark font-semibold">
+          <span className="text-[10px] sm:text-xs ml-1.5 sm:ml-2 px-2 py-0.5 rounded-full bg-prisma-orange/20 text-prisma-orange-dark font-semibold">
             {isPlatformAdmin ? 'Administrador' : 'Distribuidor'}
           </span>
         </div>

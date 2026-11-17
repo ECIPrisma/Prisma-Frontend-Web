@@ -155,7 +155,7 @@ export const FlotaPage = () => {
   };
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -185,7 +185,7 @@ export const FlotaPage = () => {
       )}
 
       {/* Resumen Operativo */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-prisma-border shadow-sm flex items-center gap-4">
           <div className="p-3 bg-prisma-teal/10 text-prisma-teal rounded-xl">
             <Truck className="w-6 h-6" />
@@ -373,8 +373,8 @@ export const FlotaPage = () => {
 
       {/* MODAL 1: REGISTRAR CAMIÓN */}
       {modalCrear && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-teal-50 rounded-xl text-prisma-teal">
@@ -493,8 +493,8 @@ export const FlotaPage = () => {
 
       {/* MODAL 2: EDITAR CAMIÓN */}
       {modalEditar && camionEnEdicion && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-teal-50 rounded-xl text-prisma-teal">

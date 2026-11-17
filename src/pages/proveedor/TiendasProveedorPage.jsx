@@ -197,7 +197,7 @@ export const TiendasProveedorPage = () => {
   const tiendasConPedidos = tiendas.filter(t => (t.totalPedidos || 0) > 0).length;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
       {/* Encabezado Principal */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -228,7 +228,7 @@ export const TiendasProveedorPage = () => {
       </div>
 
       {/* Tarjetas KPI */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-prisma-border shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-prisma-text-secondary uppercase tracking-wider">Tiendas en Cartera</span>
@@ -453,8 +453,8 @@ export const TiendasProveedorPage = () => {
 
       {/* Modal: Registrar Nueva Tienda */}
       {modalCrear && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-teal-50 rounded-xl text-prisma-teal">
@@ -617,8 +617,8 @@ export const TiendasProveedorPage = () => {
 
       {/* Modal: Editar Tienda */}
       {modalEditar && tiendaEnEdicion && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-prisma-border animate-in fade-in zoom-in-95 duration-150 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-prisma-border mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-teal-50 rounded-xl text-prisma-teal">
@@ -775,8 +775,8 @@ export const TiendasProveedorPage = () => {
 
       {/* Modal / Drawer: Análisis de Ventas de la Tienda */}
       {tiendaSeleccionada && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl border border-prisma-border">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl border border-prisma-border my-auto">
             {/* Encabezado Drawer */}
             <div className="flex items-start justify-between pb-4 border-b border-prisma-border mb-6">
               <div className="flex items-center gap-3">
@@ -941,7 +941,7 @@ export const TiendasProveedorPage = () => {
                       No hay pedidos registrados para esta tienda.
                     </div>
                   ) : (
-                    <div className="border border-prisma-border rounded-2xl overflow-hidden shadow-sm">
+                    <div className="border border-prisma-border rounded-2xl overflow-x-auto shadow-sm">
                       <table className="w-full text-left text-xs">
                         <thead className="bg-gray-50 border-b border-prisma-border text-prisma-text-secondary font-semibold">
                           <tr>

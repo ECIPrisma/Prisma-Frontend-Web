@@ -58,7 +58,7 @@ export const AdminDashboard = () => {
   const disputasAbiertas = disputas.filter(d => d.estado === 'ABIERTO').length;
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Encabezado Profesional */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-200">
         <div>

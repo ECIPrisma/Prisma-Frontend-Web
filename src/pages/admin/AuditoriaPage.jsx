@@ -40,7 +40,7 @@ export const AuditoriaPage = () => {
   );
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-prisma-text-primary">Historial de Actividad y Auditoría</h1>
@@ -135,8 +135,8 @@ export const AuditoriaPage = () => {
 
       {/* Modal Inspector */}
       {selectedLog && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4 sm:p-6 z-50 min-h-screen">
+          <div className="relative bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-auto max-h-[90vh] overflow-y-auto border border-gray-100">
             <div className="flex justify-between items-center pb-3 border-b border-prisma-border">
               <div>
                 <h3 className="font-bold text-lg text-prisma-text-primary">Detalle de Auditoría Forense</h3>

@@ -84,7 +84,7 @@ export const EstadisticasEconomicasPage = () => {
   const topTiendas = stats?.topTiendas || [];
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -111,7 +111,7 @@ export const EstadisticasEconomicasPage = () => {
       )}
 
       {/* Tarjetas Principales de Rendimiento */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-prisma-border shadow-sm flex items-center gap-4">
           <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-xl">
             <DollarSign className="w-6 h-6" />
@@ -242,7 +242,7 @@ export const EstadisticasEconomicasPage = () => {
       </div>
 
       {/* SECCIÓN MODO PRO: INTELIGENCIA PRESCRIPTIVA DE PRECIOS Y EMPAQUES (SPRINT 3) */}
-      <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-teal-950 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-indigo-500/20 space-y-6">
+      <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-teal-950 text-white rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl border border-indigo-500/20 space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-5">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-indigo-500/20 rounded-2xl border border-indigo-400/30 text-indigo-300">
@@ -295,7 +295,7 @@ export const EstadisticasEconomicasPage = () => {
               <span className="text-[11px] font-semibold text-gray-400 block uppercase tracking-wider">
                 Escalas de Descuento Óptimas Prescritas:
               </span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {(descuentos?.escalas_prescritas || [
                   { escala_unidades: '>= 24 uds', descuento_porcentaje: 5.9, precio_unitario_final: 4232 },
                   { escala_unidades: '>= 48 uds', descuento_porcentaje: 8.5, precio_unitario_final: 4117 },
