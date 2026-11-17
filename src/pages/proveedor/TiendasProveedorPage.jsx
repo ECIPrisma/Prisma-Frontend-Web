@@ -58,16 +58,16 @@ export const TiendasProveedorPage = () => {
 
   const cargarTiendas = async (silencioso = false) => {
     try {
-      if (!silencioso && tiendas.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await proveedorService.getTiendasClientes();
       setTiendas(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && tiendas.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'No fue posible cargar las tiendas clientes');
       }
     } finally {
-      if (!silencioso && tiendas.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

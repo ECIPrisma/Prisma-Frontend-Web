@@ -43,16 +43,16 @@ export const FlotaPage = () => {
 
   const cargarDatos = async (silencioso = false) => {
     try {
-      if (!silencioso && camiones.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await proveedorService.getCamiones();
       setCamiones(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && camiones.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar la flota de camiones');
       }
     } finally {
-      if (!silencioso && camiones.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

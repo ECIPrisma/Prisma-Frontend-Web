@@ -3,11 +3,11 @@ const IS_TEST = typeof import.meta !== 'undefined' && import.meta.env && import.
 // Cluster de nodos backend de contingencia (Failover en Cascada)
 // El primer nodo siempre es la ruta relativa del reverse-proxy (/api/v1)
 // para garantizar conexión Same-Origin (cero CORS) a través de Vercel y Vite.
+// NOTA CRÍTICA: En navegadores públicos solo deben usarse endpoints públicos con SSL.
+// Los hostnames privados (.ts.net) provocan 'NetworkError' en navegadores estándar.
 const BACKEND_NODES = [
   '/api/v1',
   'https://prisma-backend-web.onrender.com/api/v1',
-  'https://prisma-aws.tail2474b3.ts.net/api/v1',
-  'https://server-sabio.tail2474b3.ts.net:8443/api/v1',
 ];
 
 if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
@@ -51,7 +51,7 @@ const fetchWithFailover = async (input, init = {}) => {
     const targetUrl = `${currentNode}${subpath}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     try {
       const response = await globalThis.fetch(targetUrl, {
@@ -69,6 +69,8 @@ const fetchWithFailover = async (input, init = {}) => {
         continue;
       }
 
+      // Restablecer al nodo principal en caso de éxito
+      activeNodeIndex = 0;
       return response;
     } catch (err) {
       clearTimeout(timeoutId);

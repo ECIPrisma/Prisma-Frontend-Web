@@ -9,16 +9,16 @@ export const LiquidacionesPage = () => {
 
   const cargarLiquidaciones = async (silencioso = false) => {
     try {
-      if (!silencioso && liquidaciones.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await proveedorService.getLiquidaciones();
       setLiquidaciones(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && liquidaciones.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar las liquidaciones de ventas');
       }
     } finally {
-      if (!silencioso && liquidaciones.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

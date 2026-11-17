@@ -28,7 +28,7 @@ export const EstadisticasEconomicasPage = () => {
 
   const cargarEstadisticas = async (silencioso = false) => {
     try {
-      if (!silencioso && !stats) setCargando(true);
+      if (!silencioso) setCargando(true);
       const [data, dataDesc, dataEmp, health] = await Promise.all([
         proveedorService.getEstadisticasEconomicas(),
         analyticsService.getPrescripcionDescuentos(10, 'Norte').catch(() => null),
@@ -41,11 +41,11 @@ export const EstadisticasEconomicasPage = () => {
       setAnaliticaStatus(health);
       setError(null);
     } catch (err) {
-      if (!silencioso && !stats) {
+      if (!silencioso) {
         setError(err.message || 'Error al cargar estadísticas económicas');
       }
     } finally {
-      if (!silencioso && !stats) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

@@ -32,17 +32,17 @@ export const DisputasPage = () => {
   const [guardandoResolucion, setGuardandoResolucion] = useState(false);
 
   const cargarDisputas = async (silencioso = false) => {
-    if (!silencioso && disputas.length === 0) setCargando(true);
+    if (!silencioso) setCargando(true);
     try {
       const data = await adminService.getDisputas();
       setDisputas(Array.isArray(data) ? data : []);
       setErrorApi('');
     } catch (err) {
-      if (!silencioso && disputas.length === 0) {
+      if (!silencioso) {
         setErrorApi(err.message || 'No se pudo conectar con el servicio');
       }
     } finally {
-      if (!silencioso && disputas.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

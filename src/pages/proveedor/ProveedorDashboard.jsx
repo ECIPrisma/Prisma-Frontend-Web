@@ -79,8 +79,12 @@ export const ProveedorDashboard = () => {
     categoriaId: 1
   });
 
+  const isFetchingRef = useRef(false);
+
   const cargarProductos = async (silencioso = false) => {
-    if (!silencioso && productos.length === 0) setCargando(true);
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    if (!silencioso) setCargando(true);
     try {
       const data = await proveedorService.getMisProductos();
       const lista = Array.isArray(data) ? data : [];
@@ -94,11 +98,12 @@ export const ProveedorDashboard = () => {
       if (cached.hasCache) {
         setProductos(cached.items);
         setErrorApi('');
-      } else if (!silencioso && productos.length === 0) {
+      } else {
         setErrorApi(cached.message || err.message || 'No se pudieron cargar los productos del proveedor');
       }
     } finally {
-      if (!silencioso && productos.length === 0) setCargando(false);
+      setCargando(false);
+      isFetchingRef.current = false;
     }
   };
 

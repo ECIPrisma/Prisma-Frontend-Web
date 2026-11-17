@@ -61,16 +61,16 @@ export const ProveedoresAdminPage = () => {
 
   const cargarDatos = async (silencioso = false) => {
     try {
-      if (!silencioso && carteraEmpresas.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await adminService.getCarteraEmpresas();
       setCarteraEmpresas(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && carteraEmpresas.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar la cartera de empresas');
       }
     } finally {
-      if (!silencioso && carteraEmpresas.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

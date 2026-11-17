@@ -116,7 +116,7 @@ export const DespachosPage = () => {
 
   const cargarDatos = async (silencioso = false) => {
     try {
-      if (!silencioso && pedidos.length === 0 && rutas.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       setError(null);
       const [pedidosData, rutasData, tiendasData] = await Promise.allSettled([
         proveedorService.getPedidosNuevos(),
@@ -145,11 +145,11 @@ export const DespachosPage = () => {
       }
       setSegundosSync(0);
     } catch (err) {
-      if (!silencioso && pedidos.length === 0 && rutas.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al conectar con el servicio de despachos y rutas');
       }
     } finally {
-      if (!silencioso && pedidos.length === 0 && rutas.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

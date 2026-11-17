@@ -10,17 +10,17 @@ export const AuditoriaPage = () => {
   const [filtro, setFiltro] = useState('');
 
   const cargarLogs = async (silencioso = false) => {
-    if (!silencioso && logs.length === 0) setCargando(true);
+    if (!silencioso) setCargando(true);
     try {
       const data = await adminService.getAuditoria(0, 50);
       setLogs(data?.content || data || []);
       setErrorApi('');
     } catch (err) {
-      if (!silencioso && logs.length === 0) {
+      if (!silencioso) {
         setErrorApi(err.message || 'No se pudo cargar el historial de actividad');
       }
     } finally {
-      if (!silencioso && logs.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

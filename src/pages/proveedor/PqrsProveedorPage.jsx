@@ -49,16 +49,16 @@ export const PqrsProveedorPage = () => {
 
   const cargarPqrs = async (silencioso = false) => {
     try {
-      if (!silencioso && pqrs.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await proveedorService.getMisPqrs();
       setPqrs(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && pqrs.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar las PQRS y reclamos');
       }
     } finally {
-      if (!silencioso && pqrs.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 

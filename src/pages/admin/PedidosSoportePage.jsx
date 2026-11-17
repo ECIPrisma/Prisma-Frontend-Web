@@ -42,17 +42,17 @@ export const PedidosSoportePage = () => {
 
   const cargarPedidos = async (silencioso = false) => {
     try {
-      if (!silencioso && pedidos.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await adminService.getPedidos();
       setPedidos(Array.isArray(data) ? data : []);
       setError(null);
       setSegundosSync(0);
     } catch (err) {
-      if (!silencioso && pedidos.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar los pedidos de la red');
       }
     } finally {
-      if (!silencioso && pedidos.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 
