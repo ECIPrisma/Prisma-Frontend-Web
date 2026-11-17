@@ -59,7 +59,7 @@ export const AdminDashboard = () => {
   const disputasAbiertas = disputas.filter(d => d.estado === 'ABIERTO').length;
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Encabezado Profesional */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -119,7 +119,7 @@ export const AdminDashboard = () => {
         <div className="bg-white p-6 rounded-2xl border border-prisma-border shadow-sm flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-prisma-text-secondary uppercase">Comisión Pactada</p>
-            <p className="text-2xl font-bold text-prisma-text-primary mt-1">2.50%</p>
+            <p className="text-2xl font-bold text-prisma-text-primary mt-1">3.50%</p>
             <p className="text-xs text-prisma-text-secondary mt-1">Parámetro base quincenal</p>
           </div>
           <div className="p-3.5 rounded-xl bg-amber-50">

@@ -79,8 +79,12 @@ export const ProveedorDashboard = () => {
     categoriaId: 1
   });
 
+  const isFetchingRef = useRef(false);
+
   const cargarProductos = async (silencioso = false) => {
-    if (!silencioso && productos.length === 0) setCargando(true);
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    if (!silencioso) setCargando(true);
     try {
       const data = await proveedorService.getMisProductos();
       const lista = Array.isArray(data) ? data : [];
@@ -94,11 +98,12 @@ export const ProveedorDashboard = () => {
       if (cached.hasCache) {
         setProductos(cached.items);
         setErrorApi('');
-      } else if (!silencioso && productos.length === 0) {
+      } else {
         setErrorApi(cached.message || err.message || 'No se pudieron cargar los productos del proveedor');
       }
     } finally {
-      if (!silencioso && productos.length === 0) setCargando(false);
+      setCargando(false);
+      isFetchingRef.current = false;
     }
   };
 
@@ -264,7 +269,7 @@ export const ProveedorDashboard = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Header con Auto-Sync Indicator */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -590,173 +595,179 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL CREAR PRODUCTO (SIMPLIFICADO UI/UX: SIN CONTEO MANUAL DE STOCK) */}
       {modalAbierto && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center border-b border-prisma-border pb-3">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-xl w-full my-auto shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-prisma-teal" />
                 <h3 className="font-bold text-base text-prisma-text-primary">Registrar Producto en Catálogo</h3>
               </div>
-              <button onClick={() => setModalAbierto(false)} className="text-gray-400 hover:text-gray-600 p-1">
+              <button 
+                type="button"
+                onClick={() => setModalAbierto(false)} 
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCrearProducto} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Nombre Comercial</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej: Coca-Cola Original 400ml"
-                    value={nuevoProd.nombre}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, nombre: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">SKU / Referencia</label>
-                  <input
-                    type="text"
-                    placeholder="KO-PET-400"
-                    value={nuevoProd.sku}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, sku: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">Presentación / Empaque</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Paquete x 12 Unidades, Caja x 24 Botellas"
-                  value={nuevoProd.presentacion}
-                  onChange={(e) => setNuevoProd({ ...nuevoProd, presentacion: e.target.value })}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Precio Mayorista ($ COP)</label>
-                  <input
-                    type="number"
-                    required
-                    min="100"
-                    placeholder="28500"
-                    value={nuevoProd.precioUnitario}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, precioUnitario: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Precio Sugerido Venta Tendero ($ COP)</label>
-                  <input
-                    type="number"
-                    min="100"
-                    placeholder="36000"
-                    value={nuevoProd.precioSugeridoPublico}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, precioSugeridoPublico: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-              </div>
-
-              {/* SELECCIÓN DE IMAGEN CON PRESETS */}
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto</label>
-                <div className="flex gap-3 items-center mb-2">
-                  <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
-                    <img
-                      src={nuevoProd.imagenUrl || PRESET_IMAGENES[0].url}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
+            <form onSubmit={handleCrearProducto} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Nombre Comercial</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej: Coca-Cola Original 400ml"
+                      value={nuevoProd.nombre}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, nombre: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                     />
                   </div>
-                  <input
-                    type="url"
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    value={nuevoProd.imagenUrl}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, imagenUrl: e.target.value })}
-                    className="flex-1 p-2 border border-prisma-border rounded-xl text-xs"
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[10px] text-gray-400 self-center">Opciones rápidas:</span>
-                  {PRESET_IMAGENES.map((img, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setNuevoProd({ ...nuevoProd, imagenUrl: img.url })}
-                      className="text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
-                    >
-                      {img.nombre}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* DISPONIBILIDAD Y CAMPAÑA (REEMPLAZO REALISTA DEL STOCK NUMÉRICO) */}
-              <div className="p-3 bg-prisma-surface rounded-2xl border border-prisma-border space-y-3">
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Disponibilidad en Planta / Bodega:</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setNuevoProd({ ...nuevoProd, disponibilidad: 'DISPONIBLE' })}
-                      className={`p-2 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 ${
-                        nuevoProd.disponibilidad === 'DISPONIBLE'
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                          : 'border-prisma-border bg-white text-gray-600'
-                      }`}
-                    >
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Disponible (Producción Continua)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNuevoProd({ ...nuevoProd, disponibilidad: 'AGOTADO' })}
-                      className={`p-2 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 ${
-                        nuevoProd.disponibilidad === 'AGOTADO'
-                          ? 'border-red-500 bg-red-50 text-red-800'
-                          : 'border-prisma-border bg-white text-gray-600'
-                      }`}
-                    >
-                      <X className="w-3.5 h-3.5 text-red-600" />
-                      <span>Agotado Temporalmente</span>
-                    </button>
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">SKU / Referencia</label>
+                    <input
+                      type="text"
+                      placeholder="KO-PET-400"
+                      value={nuevoProd.sku}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, sku: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-mono"
+                    />
                   </div>
                 </div>
 
-                <label className="flex items-center gap-2 cursor-pointer pt-1">
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Presentación / Empaque</label>
                   <input
-                    type="checkbox"
-                    checked={nuevoProd.esPromocion}
-                    onChange={(e) => setNuevoProd({ ...nuevoProd, esPromocion: e.target.checked })}
-                    className="w-4 h-4 text-amber-500 rounded focus:ring-amber-400"
+                    type="text"
+                    required
+                    placeholder="Ej: Paquete x 12 Unidades, Caja x 24 Botellas"
+                    value={nuevoProd.presentacion}
+                    onChange={(e) => setNuevoProd({ ...nuevoProd, presentacion: e.target.value })}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                   />
-                  <span className="font-semibold text-prisma-text-primary">
-                    Destacar en sección de Promociones y Nuevos Lanzamientos
-                  </span>
-                </label>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Precio Mayorista ($ COP)</label>
+                    <input
+                      type="number"
+                      required
+                      min="100"
+                      placeholder="28500"
+                      value={nuevoProd.precioUnitario}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, precioUnitario: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Precio Sugerido Venta Tendero ($ COP)</label>
+                    <input
+                      type="number"
+                      min="100"
+                      placeholder="36000"
+                      value={nuevoProd.precioSugeridoPublico}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, precioSugeridoPublico: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
+                    />
+                  </div>
+                </div>
+
+                {/* SELECCIÓN DE IMAGEN CON PRESETS */}
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto</label>
+                  <div className="flex gap-3 items-center mb-2">
+                    <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                      <img
+                        src={nuevoProd.imagenUrl || PRESET_IMAGENES[0].url}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <input
+                      type="url"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      value={nuevoProd.imagenUrl}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, imagenUrl: e.target.value })}
+                      className="flex-1 p-2 border border-prisma-border rounded-xl text-xs"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="text-[10px] text-gray-400 self-center">Opciones rápidas:</span>
+                    {PRESET_IMAGENES.map((img, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setNuevoProd({ ...nuevoProd, imagenUrl: img.url })}
+                        className="text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
+                      >
+                        {img.nombre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* DISPONIBILIDAD Y CAMPAÑA (REEMPLAZO REALISTA DEL STOCK NUMÉRICO) */}
+                <div className="p-3 bg-prisma-surface rounded-2xl border border-prisma-border space-y-3">
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Disponibilidad en Planta / Bodega:</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setNuevoProd({ ...nuevoProd, disponibilidad: 'DISPONIBLE' })}
+                        className={`p-2 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 ${
+                          nuevoProd.disponibilidad === 'DISPONIBLE'
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                            : 'border-prisma-border bg-white text-gray-600'
+                        }`}
+                      >
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Disponible (Producción Continua)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNuevoProd({ ...nuevoProd, disponibilidad: 'AGOTADO' })}
+                        className={`p-2 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 ${
+                          nuevoProd.disponibilidad === 'AGOTADO'
+                            ? 'border-red-500 bg-red-50 text-red-800'
+                            : 'border-prisma-border bg-white text-gray-600'
+                        }`}
+                      >
+                        <X className="w-3.5 h-3.5 text-red-600" />
+                        <span>Agotado Temporalmente</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={nuevoProd.esPromocion}
+                      onChange={(e) => setNuevoProd({ ...nuevoProd, esPromocion: e.target.checked })}
+                      className="w-4 h-4 text-amber-500 rounded focus:ring-amber-400"
+                    />
+                    <span className="font-semibold text-prisma-text-primary">
+                      Destacar en sección de Promociones y Nuevos Lanzamientos
+                    </span>
+                  </label>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-prisma-border">
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setModalAbierto(false)}
-                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-50"
+                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-100 text-gray-700 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="px-5 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                  className="px-5 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                 >
                   {guardando ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   <span>Guardar y Publicar</span>
@@ -769,125 +780,128 @@ export const ProveedorDashboard = () => {
 
       {/* MODAL EDITAR PRODUCTO */}
       {modalEditarAbierto && prodEnEdicion && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center border-b border-prisma-border pb-3">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-xl w-full my-auto shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
               <div className="flex items-center gap-2">
                 <Edit2 className="w-5 h-5 text-prisma-teal" />
                 <h3 className="font-bold text-base text-prisma-text-primary">Editar Información del Producto</h3>
               </div>
               <button 
+                type="button"
                 onClick={() => { setModalEditarAbierto(false); setProdEnEdicion(null); }} 
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleGuardarEdicion} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Nombre Comercial</label>
-                  <input
-                    type="text"
-                    required
-                    value={prodEnEdicion.nombre}
-                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, nombre: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">SKU / Referencia</label>
-                  <input
-                    type="text"
-                    value={prodEnEdicion.sku}
-                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, sku: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">Presentación / Empaque</label>
-                <input
-                  type="text"
-                  required
-                  value={prodEnEdicion.presentacion}
-                  onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, presentacion: e.target.value })}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Precio Mayorista ($ COP)</label>
-                  <input
-                    type="number"
-                    required
-                    min="100"
-                    value={prodEnEdicion.precioUnitario}
-                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioUnitario: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Precio Sugerido Venta Tendero ($ COP)</label>
-                  <input
-                    type="number"
-                    min="100"
-                    value={prodEnEdicion.precioSugeridoPublico}
-                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioSugeridoPublico: e.target.value })}
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto (URL)</label>
-                <div className="flex gap-3 items-center mb-2">
-                  <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
-                    <img
-                      src={prodEnEdicion.imagenUrl || PRESET_IMAGENES[0].url}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
+            <form onSubmit={handleGuardarEdicion} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Nombre Comercial</label>
+                    <input
+                      type="text"
+                      required
+                      value={prodEnEdicion.nombre}
+                      onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, nombre: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                     />
                   </div>
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">SKU / Referencia</label>
+                    <input
+                      type="text"
+                      value={prodEnEdicion.sku}
+                      onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, sku: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Presentación / Empaque</label>
                   <input
-                    type="url"
-                    value={prodEnEdicion.imagenUrl}
-                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, imagenUrl: e.target.value })}
-                    placeholder="https://..."
-                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal text-xs"
+                    type="text"
+                    required
+                    value={prodEnEdicion.presentacion}
+                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, presentacion: e.target.value })}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Precio Mayorista ($ COP)</label>
+                    <input
+                      type="number"
+                      required
+                      min="100"
+                      value={prodEnEdicion.precioUnitario}
+                      onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioUnitario: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-prisma-text-primary mb-1">Precio Sugerido Venta Tendero ($ COP)</label>
+                    <input
+                      type="number"
+                      min="100"
+                      value={prodEnEdicion.precioSugeridoPublico}
+                      onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioSugeridoPublico: e.target.value })}
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto (URL)</label>
+                  <div className="flex gap-3 items-center mb-2">
+                    <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                      <img
+                        src={prodEnEdicion.imagenUrl || PRESET_IMAGENES[0].url}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <input
+                      type="url"
+                      value={prodEnEdicion.imagenUrl}
+                      onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, imagenUrl: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Estado de Oferta</label>
+                  <select
+                    value={prodEnEdicion.estado}
+                    onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, estado: e.target.value })}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-semibold text-xs bg-white"
+                  >
+                    <option value="ACTIVO">Activo y Disponible</option>
+                    <option value="PROMOCION">En Promoción Especial</option>
+                    <option value="NUEVO_LANZAMIENTO">Nuevo Lanzamiento</option>
+                    <option value="AGOTADO">Agotado Temporalmente</option>
+                  </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">Estado de Oferta</label>
-                <select
-                  value={prodEnEdicion.estado}
-                  onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, estado: e.target.value })}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal font-semibold text-xs bg-white"
-                >
-                  <option value="ACTIVO">Activo y Disponible</option>
-                  <option value="PROMOCION">En Promoción Especial</option>
-                  <option value="NUEVO_LANZAMIENTO">Nuevo Lanzamiento</option>
-                  <option value="AGOTADO">Agotado Temporalmente</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-prisma-border">
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => { setModalEditarAbierto(false); setProdEnEdicion(null); }}
-                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-50"
+                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-100 text-gray-700 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={guardandoEdicion}
-                  className="px-5 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                  className="px-5 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                 >
                   {guardandoEdicion ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   <span>Actualizar Producto</span>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { authService } from './api';
+import { authService, analyticsService } from './api';
 
 const response = (status, body) => ({
   ok: status >= 200 && status < 300,
@@ -78,5 +78,43 @@ describe('authService TOTP', () => {
     expect(fetch).toHaveBeenCalledWith('/api/v1/auth/login', expect.objectContaining({
       body: JSON.stringify({ email: 'usuario@example.com', password: 'clave', codigoTotp: '123456' }),
     }));
+  });
+});
+
+describe('analyticsService (Modo Pro e IA Prescriptiva)', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('retorna mock fallback si el microservicio de analitica no responde', async () => {
+    fetch.mockRejectedValueOnce(new Error('Network error'));
+
+    const health = await analyticsService.getHealth();
+    expect(health.status).toBe('UP');
+    expect(health.within_memory_budget).toBe(true);
+    expect(health.memory_limit_mb).toBe(300.0);
+  });
+
+  it('retorna prescripcion de descuentos con elasticidad en mock fallback', async () => {
+    fetch.mockRejectedValueOnce(new Error('Network error'));
+
+    const prescripcion = await analyticsService.getPrescripcionDescuentos(10, 'Norte');
+    expect(prescripcion.zona).toBe('Norte');
+    expect(prescripcion.coeficiente_elasticidad).toBeLessThan(0);
+    expect(prescripcion.tipo_demanda).toBe('Elástica');
+    expect(prescripcion.escalas_prescritas.length).toBeGreaterThan(0);
+  });
+
+  it('retorna prescripcion de empaques sugeridos por mineria FP-Growth en mock fallback', async () => {
+    fetch.mockRejectedValueOnce(new Error('Network error'));
+
+    const empaques = await analyticsService.getPrescripcionEmpaques(1);
+    expect(empaques.proveedor_id).toBe(1);
+    expect(empaques.formatos_empaque_prescritos.length).toBeGreaterThan(0);
+    expect(empaques.formatos_empaque_prescritos[0].afinidad_lift).toBeGreaterThan(1.0);
   });
 });

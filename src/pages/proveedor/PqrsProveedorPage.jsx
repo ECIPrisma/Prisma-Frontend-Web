@@ -49,16 +49,16 @@ export const PqrsProveedorPage = () => {
 
   const cargarPqrs = async (silencioso = false) => {
     try {
-      if (!silencioso && pqrs.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await proveedorService.getMisPqrs();
       setPqrs(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && pqrs.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar las PQRS y reclamos');
       }
     } finally {
-      if (!silencioso && pqrs.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 
@@ -127,13 +127,13 @@ export const PqrsProveedorPage = () => {
       case 'TIENDA_CERRADA':
         return { label: 'Tienda Cerrada en Entrega', color: 'bg-blue-100 text-blue-800 border-blue-200' };
       case 'DINERO_INCOMPLETO':
-        return { label: 'Diferencia en Cobro / Efectivo', color: 'bg-purple-100 text-purple-800 border-purple-200' };
+        return { label: 'Diferencia en Cobro / Efectivo', color: 'bg-teal-100 text-teal-800 border-teal-200' };
       case 'CAMION_VARADO_ACCIDENTE':
         return { label: 'Demora por Percance en Vía', color: 'bg-orange-100 text-orange-800 border-orange-200' };
       case 'DISPUTA_COMISION_PRISMA':
-        return { label: 'Discrepancia en Comisiones Prisma', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
+        return { label: 'Discrepancia en Comisiones Prisma', color: 'bg-teal-100 text-teal-800 border-teal-200' };
       case 'SOPORTE_TECNICO_PLATAFORMA':
-        return { label: 'Soporte Técnico / Falla Plataforma', color: 'bg-teal-100 text-teal-800 border-teal-200' };
+        return { label: 'Soporte Técnico / Falla Plataforma', color: 'bg-cyan-100 text-cyan-800 border-cyan-200' };
       case 'RECLAMO_TENDERO_IRREGULAR':
         return { label: 'Reporte de Tienda Irregular', color: 'bg-red-100 text-red-800 border-red-200' };
       case 'SOLICITUD_AJUSTE_RUTA':
@@ -160,7 +160,7 @@ export const PqrsProveedorPage = () => {
   });
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -176,7 +176,7 @@ export const PqrsProveedorPage = () => {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setModalRadicarPrisma(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-md transition"
+            className="flex items-center gap-2 px-4 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
             <span>Radicar Reclamo a Prisma Admin</span>
@@ -209,7 +209,7 @@ export const PqrsProveedorPage = () => {
           onClick={() => { setSeccionActiva('A_PRISMA'); setFiltroEstado('TODAS'); }}
           className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
             seccionActiva === 'A_PRISMA'
-              ? 'bg-indigo-600 text-white shadow-sm'
+              ? 'bg-prisma-teal text-white shadow-sm'
               : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-50'
           }`}
         >
@@ -275,7 +275,7 @@ export const PqrsProveedorPage = () => {
             onClick={() => setFiltroEstado(f)}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
               filtroEstado === f
-                ? seccionActiva === 'TENDEROS' ? 'bg-prisma-teal text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-prisma-teal text-white shadow-sm'
                 : 'bg-white border border-prisma-border text-prisma-text-secondary hover:bg-gray-50'
             }`}
           >
@@ -320,7 +320,7 @@ export const PqrsProveedorPage = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-gray-100 pb-3">
                   <div className="flex items-center gap-3">
                     <span className={`font-mono font-bold text-xs px-3 py-1 rounded-xl ${
-                      esMioHaciaPrisma ? 'bg-indigo-100 text-indigo-800' : 'bg-prisma-teal/10 text-prisma-teal'
+                      esMioHaciaPrisma ? 'bg-teal-100 text-teal-800' : 'bg-prisma-teal/10 text-prisma-teal'
                     }`}>
                       #{ticket.ticketNumero}
                     </span>
@@ -385,13 +385,13 @@ export const PqrsProveedorPage = () => {
                   </div>
                 ) : (
                   /* Si es radicado a Prisma */
-                  <div className="p-3.5 bg-indigo-50/50 rounded-xl border border-indigo-100 text-xs flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-indigo-900 font-bold">
-                      <Building2 className="w-4 h-4 text-indigo-600" />
+                  <div className="p-3.5 bg-teal-50/50 rounded-xl border border-teal-100 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-teal-950 font-bold">
+                      <Building2 className="w-4 h-4 text-prisma-teal" />
                       <span>Destinatario: Mesa de Resolución y Soporte de Plataforma Prisma</span>
                     </div>
                     {ticket.pedidoId && (
-                      <span className="font-mono text-indigo-700 bg-white px-2 py-0.5 rounded-lg border border-indigo-200">
+                      <span className="font-mono text-teal-800 bg-white px-2 py-0.5 rounded-lg border border-teal-200">
                         Pedido #{ticket.numeroPedido || ticket.pedidoId}
                       </span>
                     )}
@@ -451,106 +451,119 @@ export const PqrsProveedorPage = () => {
 
       {/* MODAL 1: RESPONDER AL TENDERO */}
       {modalResponder && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-start border-b border-prisma-border pb-3">
-              <div>
-                <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-prisma-teal" />
-                  Atender Reclamo #{modalResponder.ticketNumero}
-                </h3>
-                <p className="text-xs text-prisma-text-secondary mt-0.5">
-                  Tienda: <strong>{modalResponder.nombreTienda}</strong>
-                </p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full my-auto shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header fijo */}
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-prisma-teal shrink-0">
+                  <MessageCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-prisma-text-primary">
+                    Atender Reclamo #{modalResponder.ticketNumero}
+                  </h3>
+                  <p className="text-xs text-prisma-text-secondary mt-0.5">
+                    Tienda: <strong>{modalResponder.nombreTienda}</strong>
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setModalResponder(null)} className="text-gray-400 hover:text-gray-600 p-1">
+              <button
+                type="button"
+                onClick={() => setModalResponder(null)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleGuardarRespuesta} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-2">
-                  Selecciona una Solución Rápida con 1 Clic:
-                </label>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    'Se enviará reposición de producto en el próximo viaje de reparto.',
-                    'Se emite saldo a favor para descontar en la siguiente factura.',
-                    'Novedad aclarada con el conductor. Entrega completada a conformidad.',
-                    'Ajuste en horario de reparto programado a primera hora.',
-                  ].map((preset) => (
+            <form onSubmit={handleGuardarRespuesta} className="flex flex-col flex-1 overflow-hidden">
+              {/* Cuerpo con scroll interno si la pantalla es reducida */}
+              <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-2">
+                    Selecciona una Solución Rápida con 1 Clic:
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      'Se enviará reposición de producto en el próximo viaje de reparto.',
+                      'Se emite saldo a favor para descontar en la siguiente factura.',
+                      'Novedad aclarada con el conductor. Entrega completada a conformidad.',
+                      'Ajuste en horario de reparto programado a primera hora.',
+                    ].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setResolucionTexto(preset)}
+                        className={`p-2.5 rounded-xl border text-left transition ${
+                          resolucionTexto === preset
+                            ? 'border-prisma-teal bg-teal-50 text-teal-900 font-bold'
+                            : 'border-prisma-border bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">
+                    Respuesta o Justificación para el Tendero:
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={resolucionTexto}
+                    onChange={(e) => setResolucionTexto(e.target.value)}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">
+                    Estado tras la atención:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      key={preset}
                       type="button"
-                      onClick={() => setResolucionTexto(preset)}
-                      className={`p-2.5 rounded-xl border text-left transition ${
-                        resolucionTexto === preset
-                          ? 'border-prisma-teal bg-teal-50 text-teal-900 font-bold'
-                          : 'border-prisma-border bg-white text-gray-700 hover:bg-gray-50'
+                      onClick={() => setNuevoEstado('RESUELTO')}
+                      className={`p-2 rounded-xl border font-bold text-center transition ${
+                        nuevoEstado === 'RESUELTO'
+                          ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                          : 'border-prisma-border bg-white text-gray-600'
                       }`}
                     >
-                      {preset}
+                      Marcar como Resuelto
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setNuevoEstado('EN_GESTION')}
+                      className={`p-2 rounded-xl border font-bold text-center transition ${
+                        nuevoEstado === 'EN_GESTION'
+                          ? 'border-sky-600 bg-sky-50 text-sky-800'
+                          : 'border-prisma-border bg-white text-gray-600'
+                      }`}
+                    >
+                      Dejar En Gestión
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">
-                  Respuesta o Justificación para el Tendero:
-                </label>
-                <textarea
-                  rows={3}
-                  value={resolucionTexto}
-                  onChange={(e) => setResolucionTexto(e.target.value)}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal focus:outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">
-                  Estado tras la atención:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setNuevoEstado('RESUELTO')}
-                    className={`p-2 rounded-xl border font-bold text-center transition ${
-                      nuevoEstado === 'RESUELTO'
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                        : 'border-prisma-border bg-white text-gray-600'
-                    }`}
-                  >
-                    Marcar como Resuelto
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setNuevoEstado('EN_GESTION')}
-                    className={`p-2 rounded-xl border font-bold text-center transition ${
-                      nuevoEstado === 'EN_GESTION'
-                        ? 'border-sky-600 bg-sky-50 text-sky-800'
-                        : 'border-prisma-border bg-white text-gray-600'
-                    }`}
-                  >
-                    Dejar En Gestión
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-prisma-border">
+              {/* Footer fijo */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setModalResponder(null)}
-                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-50"
+                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-100 text-gray-700 transition text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="px-5 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                  className="px-5 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold flex items-center gap-1.5 shadow-sm disabled:opacity-50 transition active:scale-[0.98] text-xs"
                 >
                   {guardando ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   <span>Guardar y Notificar Solución</span>
@@ -561,94 +574,119 @@ export const PqrsProveedorPage = () => {
         </div>
       )}
 
-      {/* MODAL 2: RADICAR RECLAMO / DISPUTA A PRISMA ADMIN (REQUERIMIENTO DEL USUARIO) */}
+      {/* MODAL 2: RADICAR RECLAMO / DISPUTA A PRISMA ADMIN (DISEÑO ALINEADO A PALETA PRISMA Y RESISTENTE A OVERFLOW) */}
       {modalRadicarPrisma && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-start border-b border-prisma-border pb-3">
-              <div>
-                <h3 className="font-bold text-base text-indigo-900 flex items-center gap-2">
-                  <SendHorizontal className="w-5 h-5 text-indigo-600" />
-                  Radicar Reclamo / Disputa a Prisma Admin
-                </h3>
-                <p className="text-xs text-prisma-text-secondary mt-0.5">
-                  Abre un ticket formal ante el equipo directivo y de soporte de Prisma.
-                </p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full my-auto shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header fijo visible siempre */}
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-prisma-teal shrink-0">
+                  <SendHorizontal className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-prisma-text-primary">
+                    Radicar Reclamo a Prisma Admin
+                  </h3>
+                  <p className="text-xs text-prisma-text-secondary mt-0.5">
+                    Abre un ticket formal ante el equipo de operaciones y soporte
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setModalRadicarPrisma(false)} className="text-gray-400 hover:text-gray-600 p-1">
+              <button
+                type="button"
+                onClick={() => setModalRadicarPrisma(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleRadicarAPrisma} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-2">
-                  Tipo de Reclamo o Disputa:
-                </label>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    { id: 'DISPUTA_COMISION_PRISMA', label: 'Discrepancia en Comisiones o Cartera (2.5%)', desc: 'Revisión del valor facturado o saldo de comisiones' },
-                    { id: 'SOPORTE_TECNICO_PLATAFORMA', label: 'Falla Técnica en la Plataforma', desc: 'Error en la sincronización, catálogo o app móvil' },
-                    { id: 'RECLAMO_TENDERO_IRREGULAR', label: 'Reporte de Tienda Irregular o Cartera Vencida', desc: 'Tendero con comportamiento indebido o fraude' },
-                    { id: 'SOLICITUD_AJUSTE_RUTA', label: 'Solicitud de Asistencia o Ajuste Logístico', desc: 'Reasignación de despachos o auxilio en ruta' },
-                    { id: 'OTRO_INCIDENTE', label: 'Otra Petición Administrativa', desc: 'Consulta legal, contractual o comercial' },
-                  ].map((opcion) => (
-                    <button
-                      key={opcion.id}
-                      type="button"
-                      onClick={() => setTipoIncidentePrisma(opcion.id)}
-                      className={`p-3 rounded-xl border text-left transition ${
-                        tipoIncidentePrisma === opcion.id
-                          ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 font-bold'
-                          : 'border-prisma-border bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <p className="text-xs font-bold">{opcion.label}</p>
-                      <p className="text-[10px] text-gray-500 font-normal mt-0.5">{opcion.desc}</p>
-                    </button>
-                  ))}
+            <form onSubmit={handleRadicarAPrisma} className="flex flex-col flex-1 overflow-hidden">
+              {/* Cuerpo con scroll interno */}
+              <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-2">
+                    Tipo de Reclamo o Petición:
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { id: 'DISPUTA_COMISION_PRISMA', label: 'Discrepancia en Comisiones o Cartera (3.5%)', desc: 'Revisión del valor facturado o saldo de comisiones' },
+                      { id: 'SOPORTE_TECNICO_PLATAFORMA', label: 'Falla Técnica en la Plataforma', desc: 'Error en la sincronización, catálogo o app móvil' },
+                      { id: 'RECLAMO_TENDERO_IRREGULAR', label: 'Reporte de Tienda Irregular o Cartera Vencida', desc: 'Tendero con comportamiento indebido o fraude' },
+                      { id: 'SOLICITUD_AJUSTE_RUTA', label: 'Solicitud de Asistencia o Ajuste Logístico', desc: 'Reasignación de despachos o auxilio en ruta' },
+                      { id: 'OTRO_INCIDENTE', label: 'Otra Petición Administrativa', desc: 'Consulta legal, contractual o comercial' },
+                    ].map((opcion) => {
+                      const isSelected = tipoIncidentePrisma === opcion.id;
+                      return (
+                        <button
+                          key={opcion.id}
+                          type="button"
+                          onClick={() => setTipoIncidentePrisma(opcion.id)}
+                          className={`p-3 rounded-2xl border text-left transition flex items-start gap-3 ${
+                            isSelected
+                              ? 'border-prisma-teal bg-teal-50/70 text-teal-950 ring-1 ring-prisma-teal shadow-xs'
+                              : 'border-prisma-border bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50/70'
+                          }`}
+                        >
+                          <div className={`w-4 h-4 rounded-full mt-0.5 border flex items-center justify-center shrink-0 ${
+                            isSelected
+                              ? 'border-prisma-teal bg-prisma-teal text-white'
+                              : 'border-gray-300 bg-white'
+                          }`}>
+                            {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                          </div>
+                          <div>
+                            <p className={`text-xs font-bold ${isSelected ? 'text-teal-950' : 'text-prisma-text-primary'}`}>{opcion.label}</p>
+                            <p className="text-[11px] text-gray-500 font-normal mt-0.5">{opcion.desc}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">
+                    ID de Pedido Afectado (Opcional):
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: 1 o PED-101 (dejar vacío si es reclamo general)"
+                    value={pedidoIdPrisma}
+                    onChange={(e) => setPedidoIdPrisma(e.target.value)}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal/30 focus:border-prisma-teal focus:outline-none transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-prisma-text-primary mb-1">
+                    Explicación Detallada del Reclamo *:
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Describe con claridad los hechos, fechas y el ajuste o solución requerida por parte de Prisma..."
+                    value={descripcionPrisma}
+                    onChange={(e) => setDescripcionPrisma(e.target.value)}
+                    className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal/30 focus:border-prisma-teal focus:outline-none transition"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">
-                  ID de Pedido Afectado (Opcional):
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej: 1 o PED-101 (dejar vacío si es reclamo general)"
-                  value={pedidoIdPrisma}
-                  onChange={(e) => setPedidoIdPrisma(e.target.value)}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-prisma-text-primary mb-1">
-                  Explicación Detallada del Reclamo *:
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Describe con claridad los hechos, fechas y el ajuste o solución requerida por parte de Prisma..."
-                  value={descripcionPrisma}
-                  onChange={(e) => setDescripcionPrisma(e.target.value)}
-                  className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-prisma-border">
+              {/* Footer fijo visible siempre */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setModalRadicarPrisma(false)}
-                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-50"
+                  className="px-4 py-2 border border-prisma-border rounded-xl font-semibold hover:bg-gray-100 text-gray-700 transition text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={radicando}
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-md disabled:opacity-50 transition"
+                  className="px-5 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl font-bold flex items-center gap-2 shadow-sm disabled:opacity-50 transition active:scale-[0.98] text-xs"
                 >
                   {radicando ? <RefreshCw className="w-4 h-4 animate-spin" /> : <SendHorizontal className="w-4 h-4" />}
                   <span>Radicar Ticket a Prisma</span>

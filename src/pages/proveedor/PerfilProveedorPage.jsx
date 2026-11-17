@@ -72,7 +72,7 @@ export const PerfilProveedorPage = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-prisma-text-primary flex items-center gap-2">
           <Building2 className="w-7 h-7 text-prisma-teal" />

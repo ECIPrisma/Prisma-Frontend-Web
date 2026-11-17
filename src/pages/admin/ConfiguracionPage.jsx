@@ -14,16 +14,16 @@ export const ConfiguracionPage = () => {
 
   const cargarConfiguraciones = async (silencioso = false) => {
     try {
-      if (!silencioso && configuraciones.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await adminService.getConfiguraciones();
       setConfiguraciones(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && configuraciones.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar parámetros del sistema');
       }
     } finally {
-      if (!silencioso && configuraciones.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 
@@ -57,7 +57,7 @@ export const ConfiguracionPage = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-prisma-text-primary flex items-center gap-2">

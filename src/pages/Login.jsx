@@ -49,7 +49,7 @@ export const Login = () => {
       {/* Overlay con contraste nítido y balanceado */}
       <div className="absolute inset-0 bg-slate-950/40"></div>
 
-      <div className="relative z-10 max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-2xl p-8 space-y-6">
+      <div className="relative z-10 max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6">
         <div className="text-center space-y-2">
           <img 
             src="/logo_icono_tienda.png" 

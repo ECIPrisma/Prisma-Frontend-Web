@@ -51,7 +51,7 @@ export const ProveedoresAdminPage = () => {
     contactoTelefono: '',
     direccionSede: '',
     ciudad: 'Bogotá',
-    comisionPorcentaje: '2.50'
+    comisionPorcentaje: '3.50'
   });
 
   // Modal Editar Proveedor
@@ -61,16 +61,16 @@ export const ProveedoresAdminPage = () => {
 
   const cargarDatos = async (silencioso = false) => {
     try {
-      if (!silencioso && carteraEmpresas.length === 0) setCargando(true);
+      if (!silencioso) setCargando(true);
       const data = await adminService.getCarteraEmpresas();
       setCarteraEmpresas(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      if (!silencioso && carteraEmpresas.length === 0) {
+      if (!silencioso) {
         setError(err.message || 'Error al consultar la cartera de empresas');
       }
     } finally {
-      if (!silencioso && carteraEmpresas.length === 0) setCargando(false);
+      if (!silencioso) setCargando(false);
     }
   };
 
@@ -115,7 +115,7 @@ export const ProveedoresAdminPage = () => {
         contactoTelefono: '',
         direccionSede: '',
         ciudad: 'Bogotá',
-        comisionPorcentaje: '2.50'
+        comisionPorcentaje: '3.50'
       });
       await cargarDatos();
     } catch (err) {
@@ -148,7 +148,7 @@ export const ProveedoresAdminPage = () => {
       contactoTelefono: prov.contactoTelefono || '',
       direccionSede: prov.direccionSede || '',
       ciudad: prov.ciudad || 'Bogotá',
-      comisionPorcentaje: (prov.porcentajeComision || prov.comisionPorcentaje || 2.5).toString()
+      comisionPorcentaje: (prov.porcentajeComision || prov.comisionPorcentaje || 3.5).toString()
     });
     setModalEditar(true);
   };
@@ -214,7 +214,7 @@ export const ProveedoresAdminPage = () => {
   const totalRutasVaradas = carteraEmpresas.reduce((acc, e) => acc + (Number(e.rutasVaradas) || 0), 0);
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Cabecera Principal */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -287,7 +287,7 @@ export const ProveedoresAdminPage = () => {
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wider">Cartera Prisma (2.5%)</p>
+            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wider">Cartera Prisma (3.5%)</p>
             <h3 className="text-2xl font-black mt-0.5">
               ${totalCarteraPrisma.toLocaleString('es-CO')}
             </h3>
@@ -342,7 +342,7 @@ export const ProveedoresAdminPage = () => {
                   <th className="p-4 text-center">Tiendas Atendidas</th>
                   <th className="p-4 text-center">Flota Camiones</th>
                   <th className="p-4 text-right">Ventas Totales</th>
-                  <th className="p-4 text-right bg-amber-50/40 text-amber-900">Deuda a Prisma (2.5%)</th>
+                  <th className="p-4 text-right bg-amber-50/40 text-amber-900">Deuda a Prisma (3.5%)</th>
                   <th className="p-4 text-center">Estado</th>
                   <th className="p-4 text-right">Acciones</th>
                 </tr>
@@ -411,7 +411,7 @@ export const ProveedoresAdminPage = () => {
                             ${deuda.toLocaleString('es-CO')}
                           </p>
                           <p className="text-[10px] text-amber-700 font-medium">
-                            Tarifa: {prov.porcentajeComision || 2.5}%
+                            Tarifa: {prov.porcentajeComision || 3.5}%
                           </p>
                         </div>
                       </td>
@@ -490,8 +490,8 @@ export const ProveedoresAdminPage = () => {
 
       {/* MODAL: VER TIENDAS ATENDIDAS POR LA EMPRESA (REQUERIMIENTO DEL USUARIO) */}
       {modalTiendas && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-3xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200 max-h-[90vh] overflow-y-auto my-auto border border-gray-100">
             <div className="flex justify-between items-start border-b border-prisma-border pb-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-blue-50 text-blue-700 rounded-2xl">
@@ -583,8 +583,8 @@ export const ProveedoresAdminPage = () => {
 
       {/* MODAL: AUXILIO Y ASISTENCIA DE SOPORTE PRISMA (SI EL PRODUCTOR NO PUEDE) */}
       {modalAuxilio && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in duration-200 my-auto max-h-[90vh] overflow-y-auto border border-gray-100">
             <div className="flex justify-between items-start border-b border-prisma-border pb-3">
               <div>
                 <h3 className="font-bold text-base text-amber-700 flex items-center gap-2">
@@ -665,8 +665,8 @@ export const ProveedoresAdminPage = () => {
 
       {/* Modal Registrar Proveedor */}
       {modalAbierto && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-prisma-teal" />
@@ -815,8 +815,8 @@ export const ProveedoresAdminPage = () => {
 
       {/* Modal Editar Proveedor */}
       {modalEditar && provEnEdicion && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-screen">
+          <div className="relative bg-white rounded-3xl border border-prisma-border shadow-2xl max-w-lg w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-prisma-border pb-3">
               <h3 className="font-bold text-base text-prisma-text-primary flex items-center gap-2">
                 <Edit2 className="w-5 h-5 text-prisma-teal" />
