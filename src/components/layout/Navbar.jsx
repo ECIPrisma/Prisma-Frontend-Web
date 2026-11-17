@@ -132,6 +132,31 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
                     icono: 'pago',
                   });
                 });
+
+              // MVP: el webhook confirmó el pago de la suscripción Prisma Pro del distribuidor
+              avisos
+                .filter((a) => a.tipo === 'SUSCRIPCION_PAGADA')
+                .filter((a) => {
+                  const clave = `suscripcion-${a.numeroPedido ?? a.id}`;
+                  if (vistos.has(clave)) return false;
+                  vistos.add(clave);
+                  return true;
+                })
+                .forEach((a) => {
+                  items.unshift({
+                    id: `suscripcion-${a.numeroPedido ?? a.id}`,
+                    tipo: 'exito',
+                    titulo: a.titulo || 'Suscripción Prisma Pro activa',
+                    subtitulo: 'Pago confirmado por la pasarela',
+                    descripcion: a.cuerpo,
+                    fecha: a.enviadoEn
+                      ? new Date(a.enviadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : 'Reciente',
+                    estado: 'SUSCRIPCION_PAGADA',
+                    ruta: '/proveedor/suscripcion',
+                    icono: 'pago',
+                  });
+                });
             }
           } catch {
             // Ignorar silencioso: la campana sigue mostrando PQRS y flota

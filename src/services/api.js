@@ -611,6 +611,23 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
+  // MVP: suscripción mensual Prisma Pro que el distribuidor paga a PRISMA (pasarela simulada)
+  getSuscripcion: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/suscripcion`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  pagarSuscripcion: async (datosPago) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/suscripcion/pago`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(datosPago),
+    });
+    return handleResponse(res);
+  },
+
   responderPqrs: async (disputaId, resolucion, nuevoEstado = 'RESUELTO') => {
     const res = await fetch(`${API_BASE_URL}/proveedores/pqrs/${disputaId}/responder`, {
       method: 'POST',
