@@ -1,5 +1,88 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
-const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || API_BASE_URL;
+const IS_TEST = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test';
+
+// Cluster de nodos backend de contingencia (Failover en Cascada)
+const BACKEND_NODES = [
+  'https://eciprisma.duckdns.org/api/v1',
+  'https://prisma-backend-web.onrender.com/api/v1',
+  'https://server-sabio.tail2474b3.ts.net:8443/api/v1',
+];
+
+if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!BACKEND_NODES.includes(envUrl)) {
+    BACKEND_NODES.unshift(envUrl);
+  }
+}
+
+let activeNodeIndex = 0;
+
+// Wrapper de fetch con tolerancia a fallos y conmutación automática entre nodos
+const fetchWithFailover = async (input, init = {}) => {
+  if (IS_TEST) {
+    return globalThis.fetch(input, init);
+  }
+
+  const rawUrl = typeof input === 'string' ? input : input.url;
+
+  // Extraer el subpath relativo (ej: /auth/login o /pedidos)
+  let subpath = rawUrl;
+  for (const node of BACKEND_NODES) {
+    if (subpath.startsWith(node)) {
+      subpath = subpath.slice(node.length);
+      break;
+    }
+  }
+  if (subpath.startsWith('/api/v1')) {
+    subpath = subpath.slice('/api/v1'.length);
+  }
+  if (!subpath.startsWith('/')) {
+    subpath = `/${subpath}`;
+  }
+
+  let attempts = 0;
+  const maxAttempts = BACKEND_NODES.length;
+  let lastError = null;
+
+  while (attempts < maxAttempts) {
+    const currentNode = BACKEND_NODES[activeNodeIndex];
+    const targetUrl = `${currentNode}${subpath}`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    try {
+      const response = await globalThis.fetch(targetUrl, {
+        ...init,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      // Si el servidor da error de caída/gateway (502, 503, 504), conmutamos al siguiente nodo
+      if ([502, 503, 504].includes(response.status)) {
+        console.warn(`[PRISMA Failover] Nodo ${currentNode} no disponible (HTTP ${response.status}). Conmutando al siguiente nodo...`);
+        activeNodeIndex = (activeNodeIndex + 1) % BACKEND_NODES.length;
+        attempts++;
+        continue;
+      }
+
+      return response;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.warn(`[PRISMA Failover] Falla de conexión con ${currentNode} (${err.name || err.message}). Conmutando al siguiente nodo...`);
+      lastError = err;
+      activeNodeIndex = (activeNodeIndex + 1) % BACKEND_NODES.length;
+      attempts++;
+    }
+  }
+
+  throw lastError || new Error('Todos los servidores del cluster están fuera de servicio temporalmente.');
+};
+
+// Sombreado de fetch dentro del módulo api.js para que todas las llamadas usen failover transparente
+const fetch = fetchWithFailover;
+
+const API_BASE_URL = IS_TEST ? (import.meta.env.VITE_API_URL || '/api/v1') : BACKEND_NODES[0];
+const AUTH_API_URL = API_BASE_URL;
 
 const getAuthHeaders = () => {
   let user = {};
