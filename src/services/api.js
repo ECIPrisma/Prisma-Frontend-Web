@@ -51,7 +51,7 @@ const fetchWithFailover = async (input, init = {}) => {
     const targetUrl = `${currentNode}${subpath}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
 
     try {
       const response = await globalThis.fetch(targetUrl, {
@@ -81,6 +81,9 @@ const fetchWithFailover = async (input, init = {}) => {
     }
   }
 
+  if (lastError?.name === 'AbortError') {
+    throw new Error('El servidor está despertando del modo reposo. Por favor intenta iniciar sesión nuevamente.');
+  }
   throw lastError || new Error('Todos los servidores del cluster están fuera de servicio temporalmente.');
 };
 
@@ -274,6 +277,22 @@ export const adminService = {
 
   getDisputas: async () => {
     const res = await fetch(`${API_BASE_URL}/admin/disputas`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  // HU-19: estado del circuit breaker de la pasarela de pagos
+  getCircuitoPagos: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/pagos/circuito`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  reiniciarCircuitoPagos: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/pagos/circuito/reiniciar`, {
+      method: 'POST',
       headers: getAuthHeaders(),
     });
     return handleResponse(res);
@@ -587,6 +606,31 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
+  // HU-14: notificaciones enviadas al proveedor (ej. PAGO_CONFIRMADO -> iniciar despacho)
+  getMisNotificaciones: async () => {
+    const res = await fetch(`${API_BASE_URL}/notificaciones/mis-notificaciones`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  // MVP: suscripción mensual Prisma Pro que el distribuidor paga a PRISMA (pasarela simulada)
+  getSuscripcion: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/suscripcion`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  pagarSuscripcion: async (datosPago) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/suscripcion/pago`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(datosPago),
+    });
+    return handleResponse(res);
+  },
+
   responderPqrs: async (disputaId, resolucion, nuevoEstado = 'RESUELTO') => {
     const res = await fetch(`${API_BASE_URL}/proveedores/pqrs/${disputaId}/responder`, {
       method: 'POST',
@@ -618,6 +662,39 @@ export const proveedorService = {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(datos),
+    });
+    return handleResponse(res);
+  },
+
+  // HU-12: cuenta de cobro del proveedor en la pasarela de pagos (vinculación SIMULADA, sandbox tipo Wompi)
+  getCuentaCobro: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  vincularCuentaCobro: async ({ banco, tipoCuenta, numeroCuenta, titular }) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ banco, tipoCuenta, numeroCuenta, titular }),
+    });
+    return handleResponse(res);
+  },
+
+  // N-08: pagos en línea de los tenderos (en garantía hasta la entrega / liberados)
+  getRecaudosEnLinea: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/recaudos`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  desvincularCuentaCobro: async () => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/pagos/cuenta`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return handleResponse(res);
   },

@@ -260,7 +260,7 @@ export const EstadisticasEconomicasPage = () => {
           </div>
 
           {analiticaStatus && (
-            <div className="flex items-center gap-2 bg-black/30 backdrop-blur px-3.5 py-1.5 rounded-xl border border-white/10 text-xs">
+            <div className="flex items-center gap-2 bg-slate-800 px-3.5 py-1.5 rounded-xl border border-slate-700 text-xs">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-gray-300">Aislamiento RAM:</span>
               <span className="font-mono text-emerald-400 font-bold">{analiticaStatus.memory_usage_mb || 94.7} MB / 300 MB</span>
@@ -272,19 +272,19 @@ export const EstadisticasEconomicasPage = () => {
           {/* Tarjeta 1: Elasticidad precio-demanda por producto y zona (HU-30 / SCRUM-43) */}
           <ElasticidadCard />
 
-          {/* Tarjeta 2: Empaques y Combos por Minería FP-Growth (SCRUM-44) */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4">
+          {/* Tarjeta 2: Empaques y Combos por Minería FP-Growth (SCRUM-44) - Fondo sólido sin transparencia */}
+          <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-indigo-400" />
                 <h3 className="font-bold text-sm text-white">Formatos de Empaque y Combos (FP-Growth)</h3>
               </div>
-              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-indigo-900/60 text-indigo-300 border border-indigo-500">
                 Reglas de Afinidad
               </span>
             </div>
 
-            <p className="text-xs text-gray-300 leading-relaxed">
+            <p className="text-xs text-gray-200 leading-relaxed font-normal">
               Combinaciones de productos con alta afinidad de compra detectadas en los carritos de los tenderos:
             </p>
 
