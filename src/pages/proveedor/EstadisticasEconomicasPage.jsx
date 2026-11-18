@@ -14,13 +14,12 @@ import {
   Calendar,
   Sparkles,
   Package,
-  Layers,
   Zap
 } from 'lucide-react';
+import { ElasticidadCard } from './ElasticidadCard';
 
 export const EstadisticasEconomicasPage = () => {
   const [stats, setStats] = useState(null);
-  const [descuentos, setDescuentos] = useState(null);
   const [empaques, setEmpaques] = useState(null);
   const [analiticaStatus, setAnaliticaStatus] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -29,14 +28,13 @@ export const EstadisticasEconomicasPage = () => {
   const cargarEstadisticas = async (silencioso = false) => {
     try {
       if (!silencioso) setCargando(true);
-      const [data, dataDesc, dataEmp, health] = await Promise.all([
+      // La elasticidad (HU-30) la consulta ElasticidadCard según el producto y la zona elegidos
+      const [data, dataEmp, health] = await Promise.all([
         proveedorService.getEstadisticasEconomicas(),
-        analyticsService.getPrescripcionDescuentos(10, 'Norte').catch(() => null),
         analyticsService.getPrescripcionEmpaques(1).catch(() => null),
         analyticsService.getHealth().catch(() => null),
       ]);
       setStats(data || {});
-      setDescuentos(dataDesc);
       setEmpaques(dataEmp);
       setAnaliticaStatus(health);
       setError(null);
@@ -271,50 +269,8 @@ export const EstadisticasEconomicasPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Tarjeta 1: Elasticidad y Descuentos Óptimos (SCRUM-43) - Fondo sólido sin transparencia */}
-          <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="w-5 h-5 text-teal-400" />
-                <h3 className="font-bold text-sm text-white">Elasticidad Precio-Demanda (Zona {descuentos?.zona || 'Norte'})</h3>
-              </div>
-              <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase border ${
-                descuentos?.tipo_demanda === 'Elástica' 
-                  ? 'bg-emerald-900/60 text-emerald-300 border-emerald-500' 
-                  : 'bg-amber-900/60 text-amber-300 border-amber-500'
-              }`}>
-                {descuentos?.tipo_demanda || 'Elástica'} (ε = {descuentos?.coeficiente_elasticidad || -5.93})
-              </span>
-            </div>
-
-            <p className="text-xs text-gray-200 leading-relaxed font-normal">
-              {descuentos?.recomendacion_estrategica || 'Un descuento por escala aumentará significativamente el volumen e incrementará los ingresos netos.'}
-            </p>
-
-            <div className="space-y-2">
-              <span className="text-[11px] font-semibold text-gray-400 block uppercase tracking-wider">
-                Escalas de Descuento Óptimas Prescritas:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {(descuentos?.escalas_prescritas || [
-                  { escala_unidades: '>= 24 uds', descuento_porcentaje: 5.9, precio_unitario_final: 4232 },
-                  { escala_unidades: '>= 48 uds', descuento_porcentaje: 8.5, precio_unitario_final: 4117 },
-                  { escala_unidades: '>= 96 uds', descuento_porcentaje: 11.1, precio_unitario_final: 4002 },
-                ]).map((escala, i) => (
-                  <div key={i} className="bg-slate-900 p-2.5 rounded-xl border border-slate-700 text-center">
-                    <p className="text-[11px] font-bold text-teal-300">{escala.escala_unidades}</p>
-                    <p className="text-base font-extrabold text-white mt-0.5">-{escala.descuento_porcentaje}%</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{formatearDinero(escala.precio_unitario_final)}/ud</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-700 flex justify-between text-[11px] text-gray-300">
-              <span>Incremento volumen proyectado:</span>
-              <span className="font-bold text-emerald-400">+{descuentos?.incremento_volumen_esperado_pct || 69.4}%</span>
-            </div>
-          </div>
+          {/* Tarjeta 1: Elasticidad precio-demanda por producto y zona (HU-30 / SCRUM-43) */}
+          <ElasticidadCard />
 
           {/* Tarjeta 2: Empaques y Combos por Minería FP-Growth (SCRUM-44) - Fondo sólido sin transparencia */}
           <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
