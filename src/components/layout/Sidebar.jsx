@@ -42,6 +42,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: '/despachos', label: 'Despachos y Rutas', icon: Truck },
     { to: '/flota', label: 'Flota de Camiones', icon: Navigation },
     { to: '/estadisticas', label: 'Estadísticas Económicas', icon: DollarSign },
+    // N-11: Modo Pro (íconos ya importados en este archivo)
+    { to: '/modo-pro/ranking', label: 'Modo Pro · Ranking', icon: ShoppingBag },
+    { to: '/modo-pro/alertas', label: 'Modo Pro · Alertas', icon: AlertTriangle },
+    { to: '/modo-pro/recomendaciones', label: 'Modo Pro · Recomendaciones', icon: FileText },
+    { to: '/modo-pro/empaques', label: 'Modo Pro · Empaques', icon: Package },
     { to: '/liquidaciones', label: 'Liquidaciones', icon: Receipt },
     { to: '/pqrs', label: 'Reclamos y PQRS', icon: MessageSquareWarning },
     { to: '/perfil', label: 'Perfil Comercial', icon: Building2 },
