@@ -25,6 +25,7 @@ import { EstadisticasEconomicasPage } from '../pages/proveedor/EstadisticasEcono
 import { ModoProRankingPage } from '../pages/proveedor/modopro/ModoProRankingPage';
 import { ModoProAlertasPage } from '../pages/proveedor/modopro/ModoProAlertasPage';
 import { ModoProRecomendacionesPage } from '../pages/proveedor/modopro/ModoProRecomendacionesPage';
+import { ModoProEmpaquesPage } from '../pages/proveedor/modopro/ModoProEmpaquesPage';
 import { TiendasProveedorPage } from '../pages/proveedor/TiendasProveedorPage';
 import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
@@ -72,6 +73,7 @@ export const AppRoutes = () => {
         <Route path="/modo-pro/ranking" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProRankingPage /></RoleRoute>} />
         <Route path="/modo-pro/alertas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProAlertasPage /></RoleRoute>} />
         <Route path="/modo-pro/recomendaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProRecomendacionesPage /></RoleRoute>} />
+        <Route path="/modo-pro/empaques" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProEmpaquesPage /></RoleRoute>} />
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
         <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />

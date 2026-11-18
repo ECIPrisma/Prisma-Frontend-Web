@@ -798,6 +798,17 @@ export const analyticsService = {
       return { ...DEMO_MODO_PRO.recomendaciones, demostracion: true };
     }
   },
+
+  // HU-31: minería de canasta (FP-Growth) -> formatos de empaque más accesibles
+  getModoProFormatosEmpaque: async (proveedorId = 1, zona = '') => {
+    try {
+      const filtroZona = zona ? `&zona=${encodeURIComponent(zona)}` : '';
+      const res = await fetchWithFailover(`/analytics/modo-pro/formatos-empaque?proveedor_id=${proveedorId}${filtroZona}`);
+      return await handleResponse(res);
+    } catch {
+      return { ...DEMO_FORMATOS_EMPAQUE, zona: zona || null, demostracion: true };
+    }
+  },
 };
 
 // N-11: datos de demostración (mismos resultados que produce el motor con su semilla OLAP)
@@ -836,3 +847,33 @@ export const DEMO_MODO_PRO = {
   },
 };
 
+
+// HU-31: respaldo de demostración (mismo resultado que el motor con la semilla de Postobón)
+export const DEMO_FORMATOS_EMPAQUE = {
+  algoritmo: 'FP-Growth',
+  suficientes_datos: true,
+  total_transacciones: 11,
+  mensaje: null,
+  prescripciones: [
+    {
+      referencia: 'Postobón Manzana',
+      zona: 'Sur',
+      pedidos_zona: 5,
+      pedidos_con_demanda: 5,
+      presentacion_aceptada: { nombre: 'Postobón Manzana 400ml', precio_promedio: 2000 },
+      presentacion_rechazada: { nombre: 'Postobón Manzana 2.5L', precio_promedio: 7450, zonas_donde_si_se_vende: ['Occidente'] },
+      regla_aceptacion: { antecedente: 'REF::Postobón Manzana', consecuente: 'Postobón Manzana 400ml', soporte: 1, confianza: 1, lift: 1 },
+      confianza_presentacion_grande: 0,
+      formatos_sugeridos: [
+        { tipo: 'EMPAQUE_FRACCIONADO', nombre: 'Postobón Manzana 1.25L', precio_estimado: 3720, ticket_vs_presentacion_grande_pct: 49.9,
+          descripcion: 'Desarrollar una presentación intermedia de 1.25L: conserva el precio por ml de la presentación grande pero con un desembolso menor para el tendero.' },
+        { tipo: 'FORMATO_INSTITUCIONAL', nombre: 'Caja institucional 6 x Postobón Manzana 400ml', unidades: 6, precio_estimado: 7150, precio_por_unidad: 1190, ticket_vs_presentacion_grande_pct: 96.0,
+          descripcion: 'Despachar 6 unidades de Postobón Manzana 400ml como un solo formato, al precio por ml de la presentación grande: cada unidad le sale al tendero más barata que suelta y puede venderlas por separado, rotándolas más rápido que una unidad de alto valor.' },
+      ],
+      mensaje: 'En la zona Sur los tenderos piden Postobón Manzana en el 100% de sus pedidos y lo compran como Postobón Manzana 400ml el 100% de las veces, pero rechazan Postobón Manzana 2.5L ($7.450), que sí se vende en otras zonas. Desarrolla y despacha un formato más accesible.',
+    },
+  ],
+  referencias_sin_patron: [
+    { referencia: 'Agua Cristal', zona: 'Centro', motivo: 'No hay una regla con confianza suficiente hacia Agua Cristal 600ml (mínimo 80%)', pedidos_con_demanda: 4, pedidos_zona: 4 },
+  ],
+};
