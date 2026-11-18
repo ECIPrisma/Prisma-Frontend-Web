@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { analyticsService } from '../../services/api';
 import { Layers, RefreshCw, AlertTriangle, Store, Package, CheckCircle } from 'lucide-react';
-
-// Productos y zonas con historial en el motor analítico (semilla OLAP)
-export const PRODUCTOS_ANALIZADOS = [
-  { id: 10, nombre: 'Coca-Cola 1.5L' },
-  { id: 11, nombre: 'Papas Fritas 150g' },
-  { id: 12, nombre: 'Galletas Chocolate' },
-  { id: 13, nombre: 'Arroz Blanco 500g' },
-];
-export const ZONAS = ['Norte', 'Centro', 'Sur', 'Occidente'];
+import { PRODUCTOS_ANALIZADOS, ZONAS } from '../../constants/analitica';
 
 const formatoPesos = (valor) => `$${Number(valor ?? 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`;
 
 const selectClass =
-  'bg-black/30 border border-white/10 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-teal-400 cursor-pointer';
+  'bg-slate-900 border border-slate-600 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-teal-400 cursor-pointer';
 
 /**
  * HU-30 (SCRUM-43) – Elasticidad precio-demanda por producto y zona.
@@ -27,9 +19,12 @@ export const ElasticidadCard = () => {
   const [resultado, setResultado] = useState(null);
   const [cargando, setCargando] = useState(true);
 
+  // El indicador de carga se activa al cambiar la selección (no dentro del efecto)
+  const cambiarProducto = (e) => { setCargando(true); setProductoId(Number(e.target.value)); };
+  const cambiarZona = (e) => { setCargando(true); setZona(e.target.value); };
+
   useEffect(() => {
     let cancelado = false;
-    setCargando(true);
     analyticsService
       .getPrescripcionDescuentos(productoId, zona)
       .then((datos) => { if (!cancelado) setResultado(datos); })
@@ -42,7 +37,7 @@ export const ElasticidadCard = () => {
   const elastica = resultado?.tipo_demanda === 'Elástica';
 
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4">
+    <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-sm space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Layers className="w-5 h-5 text-teal-400" />
@@ -61,11 +56,11 @@ export const ElasticidadCard = () => {
 
       <div className="flex flex-wrap gap-2">
         <label className="sr-only" htmlFor="elasticidad-producto">Producto</label>
-        <select id="elasticidad-producto" value={productoId} onChange={(e) => setProductoId(Number(e.target.value))} className={selectClass}>
+        <select id="elasticidad-producto" value={productoId} onChange={cambiarProducto} className={selectClass}>
           {PRODUCTOS_ANALIZADOS.map((p) => <option key={p.id} value={p.id} className="text-black">{p.nombre}</option>)}
         </select>
         <label className="sr-only" htmlFor="elasticidad-zona">Zona</label>
-        <select id="elasticidad-zona" value={zona} onChange={(e) => setZona(e.target.value)} className={selectClass}>
+        <select id="elasticidad-zona" value={zona} onChange={cambiarZona} className={selectClass}>
           {ZONAS.map((z) => <option key={z} value={z} className="text-black">Zona {z}</option>)}
         </select>
       </div>
@@ -83,7 +78,7 @@ export const ElasticidadCard = () => {
 
           {bloqueado ? (
             <>
-              <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-3 text-xs space-y-1">
+              <div className="bg-red-950 border border-red-700 rounded-xl p-3 text-xs space-y-1">
                 <p className="font-bold text-red-300 flex items-center gap-1.5">
                   <AlertTriangle className="w-4 h-4" />
                   Descuento directo bloqueado
@@ -96,7 +91,7 @@ export const ElasticidadCard = () => {
                   Activaciones recomendadas (sin tocar el precio):
                 </span>
                 {(resultado.alternativas_prescritas || []).map((alt) => (
-                  <div key={alt.titulo} className="bg-black/30 p-3 rounded-xl border border-white/5 flex gap-2.5">
+                  <div key={alt.titulo} className="bg-slate-900 p-3 rounded-xl border border-slate-700 flex gap-2.5">
                     {alt.tipo === 'EXHIBIDOR'
                       ? <Store className="w-4 h-4 text-teal-300 flex-shrink-0 mt-0.5" />
                       : <Package className="w-4 h-4 text-indigo-300 flex-shrink-0 mt-0.5" />}
@@ -115,7 +110,7 @@ export const ElasticidadCard = () => {
                   Descuentos por escala prescritos:
                 </span>
                 {(resultado.escalas_prescritas || []).map((escala) => (
-                  <div key={escala.escala_unidades} className="bg-black/30 p-3 rounded-xl border border-white/5">
+                  <div key={escala.escala_unidades} className="bg-slate-900 p-3 rounded-xl border border-slate-700">
                     <p className="text-xs font-bold text-white flex items-center gap-1.5">
                       <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                       {escala.descripcion || escala.escala_unidades}
@@ -129,7 +124,7 @@ export const ElasticidadCard = () => {
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-white/10 flex justify-between text-[11px] text-gray-300">
+              <div className="pt-2 border-t border-slate-700 flex justify-between text-[11px] text-gray-300">
                 <span>Incremento de volumen con la mejor escala:</span>
                 <span className="font-bold text-emerald-400">+{resultado.incremento_volumen_esperado_pct}%</span>
               </div>
