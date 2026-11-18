@@ -8,6 +8,11 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Motor analítico (FastAPI, puerto 8000). Debe ir antes de '/api' para que no lo capture Java.
+      '/api/v1/analytics': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
