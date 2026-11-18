@@ -6,6 +6,7 @@ import { ModoProRankingPage } from './ModoProRankingPage';
 import { ModoProAlertasPage } from './ModoProAlertasPage';
 import { ModoProRecomendacionesPage } from './ModoProRecomendacionesPage';
 import { analyticsService } from '../../../services/api';
+import * as AuthContextModule from '../../../context/AuthContext';
 
 vi.mock('../../../services/api', () => ({
   analyticsService: {
@@ -125,5 +126,26 @@ describe('N-11 + HU-17 /modo-pro/recomendaciones', () => {
     analyticsService.getModoProRecomendaciones.mockResolvedValue({ ...VACIO, recomendaciones: [] });
     render(<ModoProRecomendacionesPage />);
     expect(await screen.findByText('Aún no hay suficientes datos')).toBeInTheDocument();
+  });
+});
+
+describe('HU-04 aislamiento: Modo Pro consulta solo los datos del proveedor autenticado', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({ user: { rol: 'ROLE_PROVEEDOR', proveedorId: 2 } });
+    analyticsService.getModoProRanking.mockResolvedValue({ ...VACIO, productos: [] });
+    analyticsService.getModoProAlertas.mockResolvedValue({ ...VACIO, alertas: [] });
+    analyticsService.getModoProRecomendaciones.mockResolvedValue({ ...VACIO, recomendaciones: [] });
+  });
+
+  it('ranking, alertas y recomendaciones piden los datos del proveedor 2, no los del 1', async () => {
+    render(<ModoProRankingPage />);
+    render(<ModoProAlertasPage />);
+    render(<ModoProRecomendacionesPage />);
+
+    await waitFor(() => expect(analyticsService.getModoProRanking).toHaveBeenCalledWith(2, ''));
+    expect(analyticsService.getModoProAlertas).toHaveBeenCalledWith(2);
+    expect(analyticsService.getModoProRecomendaciones).toHaveBeenCalledWith(2);
+    expect(analyticsService.getModoProRanking).not.toHaveBeenCalledWith(1, expect.anything());
   });
 });

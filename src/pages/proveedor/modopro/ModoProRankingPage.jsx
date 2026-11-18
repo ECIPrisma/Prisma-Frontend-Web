@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { analyticsService } from '../../../services/api';
 import { Award } from 'lucide-react';
-import { EncabezadoModoPro, Cargando, EstadoVacio, formatoPesos } from './ModoProComun';
+import { EncabezadoModoPro, Cargando, EstadoVacio } from './ModoProComun';
+import { useProveedorId } from '../../../hooks/useProveedorId';
+import { formatCOP } from '../../../utils/formatters';
 
 const ZONAS = ['Norte', 'Centro', 'Sur', 'Occidente'];
 
@@ -12,16 +14,19 @@ export const ModoProRankingPage = () => {
   const [zona, setZona] = useState('');
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const proveedorId = useProveedorId();
+
+  // El indicador de carga se activa al cambiar la zona (no dentro del efecto)
+  const cambiarZona = (e) => { setCargando(true); setZona(e.target.value); };
 
   useEffect(() => {
     let cancelado = false;
-    setCargando(true);
     analyticsService
-      .getModoProRanking(1, zona)
+      .getModoProRanking(proveedorId, zona)
       .then((r) => { if (!cancelado) setDatos(r); })
       .finally(() => { if (!cancelado) setCargando(false); });
     return () => { cancelado = true; };
-  }, [zona]);
+  }, [proveedorId, zona]);
 
   const productos = datos?.productos || [];
 
@@ -36,7 +41,7 @@ export const ModoProRankingPage = () => {
 
       <div className="flex items-center gap-2">
         <label htmlFor="ranking-zona" className="text-xs font-bold text-prisma-text-primary">Zona</label>
-        <select id="ranking-zona" value={zona} onChange={(e) => setZona(e.target.value)}
+        <select id="ranking-zona" value={zona} onChange={cambiarZona}
           className="text-xs p-2 border border-prisma-border rounded-xl bg-white focus:ring-2 focus:ring-prisma-teal focus:outline-none">
           <option value="">Todas las zonas</option>
           {ZONAS.map((z) => <option key={z} value={z}>{z}</option>)}
@@ -52,7 +57,7 @@ export const ModoProRankingPage = () => {
         <div className="bg-white rounded-2xl border border-prisma-border shadow-sm overflow-hidden">
           <div className="p-5 flex justify-between items-center">
             <h2 className="text-sm font-bold text-prisma-text-primary">{zona ? `Zona ${zona}` : 'Todas las zonas'}</h2>
-            <span className="text-xs text-prisma-text-secondary">Ingresos totales: <strong>{formatoPesos(datos.total_ingresos)}</strong></span>
+            <span className="text-xs text-prisma-text-secondary">Ingresos totales: <strong>{formatCOP(datos.total_ingresos)}</strong></span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -75,7 +80,7 @@ export const ModoProRankingPage = () => {
                       <p className="text-[10px] text-gray-400">{p.categoria}</p>
                     </td>
                     <td className="p-4 text-prisma-text-primary">{Number(p.unidades).toLocaleString('es-CO')}</td>
-                    <td className="p-4 font-bold text-prisma-text-primary">{formatoPesos(p.ingresos)}</td>
+                    <td className="p-4 font-bold text-prisma-text-primary">{formatCOP(p.ingresos)}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <div className="w-24 h-2 bg-prisma-surface rounded-full overflow-hidden">

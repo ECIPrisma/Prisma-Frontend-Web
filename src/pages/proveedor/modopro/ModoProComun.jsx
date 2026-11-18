@@ -3,8 +3,6 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 
 // N-11: piezas comunes de las pantallas Modo Pro
 
-export const formatoPesos = (valor) => `$${Number(valor ?? 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`;
-
 export const EncabezadoModoPro = ({ icono: Icono, titulo, descripcion, demostracion }) => (
   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
     <div>

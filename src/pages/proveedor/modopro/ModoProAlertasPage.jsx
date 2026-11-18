@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { analyticsService } from '../../../services/api';
 import { AlertTriangle, ArrowUpRight } from 'lucide-react';
 import { EncabezadoModoPro, Cargando, EstadoVacio } from './ModoProComun';
+import { useProveedorId } from '../../../hooks/useProveedorId';
 
 /**
  * N-11 + HU-16 – /modo-pro/alertas: brechas de penetración territorial ("desabastecimiento artificial").
@@ -9,10 +10,11 @@ import { EncabezadoModoPro, Cargando, EstadoVacio } from './ModoProComun';
 export const ModoProAlertasPage = () => {
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const proveedorId = useProveedorId();
 
   useEffect(() => {
-    analyticsService.getModoProAlertas(1).then(setDatos).finally(() => setCargando(false));
-  }, []);
+    analyticsService.getModoProAlertas(proveedorId).then(setDatos).finally(() => setCargando(false));
+  }, [proveedorId]);
 
   const alertas = datos?.alertas || [];
 

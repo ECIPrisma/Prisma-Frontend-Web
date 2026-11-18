@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { analyticsService } from '../../../services/api';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { EncabezadoModoPro, Cargando, EstadoVacio } from './ModoProComun';
+import { useProveedorId } from '../../../hooks/useProveedorId';
 
 // Nombres legibles de la matriz numérica (diagnóstico crudo)
 const ETIQUETAS_MATRIZ = {
@@ -31,10 +32,11 @@ const valorCrudo = (v) => {
 export const ModoProRecomendacionesPage = () => {
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const proveedorId = useProveedorId();
 
   useEffect(() => {
-    analyticsService.getModoProRecomendaciones(1).then(setDatos).finally(() => setCargando(false));
-  }, []);
+    analyticsService.getModoProRecomendaciones(proveedorId).then(setDatos).finally(() => setCargando(false));
+  }, [proveedorId]);
 
   const recomendaciones = datos?.recomendaciones || [];
 
