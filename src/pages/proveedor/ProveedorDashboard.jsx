@@ -26,24 +26,36 @@ import { useAuth } from '../../context/AuthContext';
 
 const PRESET_IMAGENES = [
   {
-    nombre: 'Coca-Cola 400ml PET',
-    url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=80',
+    nombre: 'Coca-Cola 1.5L',
+    url: '/products/real_coca_15l.jpg',
   },
   {
-    nombre: 'Coca-Cola Zero Lata 330ml',
-    url: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=500&auto=format&fit=crop&q=80',
+    nombre: 'Coca-Cola Vidrio 350ml',
+    url: '/products/real_coca_vidrio.jpg',
   },
   {
-    nombre: 'Coca-Cola Familiar 1.5L',
-    url: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=500&auto=format&fit=crop&q=80',
+    nombre: 'Coca-Cola 3 Litros PET',
+    url: '/products/real_coca_3l.jpg',
   },
   {
-    nombre: 'Jugo Del Valle Citrus 1.5L',
-    url: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=500&auto=format&fit=crop&q=80',
+    nombre: 'Manzana Postobón 400ml',
+    url: '/products/real_postobon_manzana.jpg',
   },
   {
-    nombre: 'Agua Manantial 600ml',
-    url: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500&auto=format&fit=crop&q=80',
+    nombre: 'Colombiana 400ml',
+    url: '/products/real_colombiana.jpg',
+  },
+  {
+    nombre: 'Sprite 400ml',
+    url: '/products/real_sprite.jpg',
+  },
+  {
+    nombre: 'Monster Energy 473ml',
+    url: '/products/real_monster.jpg',
+  },
+  {
+    nombre: 'Agua Brisa 600ml',
+    url: '/products/real_agua_brisa.jpg',
   },
 ];
 
