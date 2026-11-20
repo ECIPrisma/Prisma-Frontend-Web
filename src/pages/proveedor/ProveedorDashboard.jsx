@@ -499,9 +499,21 @@ export const ProveedorDashboard = () => {
                         <button
                           onClick={() => handleAbrirEditar(prod)}
                           className="p-1 rounded text-gray-500 hover:text-prisma-teal hover:bg-gray-100 transition"
-                          title="Editar producto"
+                          title="Editar precio y producto"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleCambiarEstadoRapido(prod.id, prod.estado === 'PROMOCION' ? 'ACTIVO' : 'PROMOCION')}
+                          className={`px-2 py-1 rounded text-[10px] font-bold transition flex items-center gap-0.5 ${
+                            prod.estado === 'PROMOCION'
+                              ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-sm'
+                              : 'bg-gray-100 text-gray-600 hover:bg-amber-50 hover:text-amber-800'
+                          }`}
+                          title={prod.estado === 'PROMOCION' ? 'Quitar de promociones' : 'Poner en promoción rápida'}
+                        >
+                          <Tag className="w-3 h-3" />
+                          <span>{prod.estado === 'PROMOCION' ? 'Promo' : '+Promo'}</span>
                         </button>
                         <button
                           onClick={() => handleEliminarProducto(prod.id, prod.nombre)}
@@ -577,9 +589,21 @@ export const ProveedorDashboard = () => {
                           <button
                             onClick={() => handleAbrirEditar(prod)}
                             className="p-1.5 text-gray-500 hover:text-prisma-teal hover:bg-gray-100 rounded-lg transition"
-                            title="Editar producto"
+                            title="Editar precio y producto"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleCambiarEstadoRapido(prod.id, prod.estado === 'PROMOCION' ? 'ACTIVO' : 'PROMOCION')}
+                            className={`px-2 py-1 rounded text-[10px] font-bold transition flex items-center gap-0.5 ${
+                              prod.estado === 'PROMOCION'
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'bg-gray-100 text-gray-600 hover:bg-amber-50 hover:text-amber-800'
+                            }`}
+                            title={prod.estado === 'PROMOCION' ? 'Quitar de promociones' : 'Poner en promoción'}
+                          >
+                            <Tag className="w-3 h-3" />
+                            <span>{prod.estado === 'PROMOCION' ? 'Promo' : '+Promo'}</span>
                           </button>
                           <button
                             onClick={() => handleEliminarProducto(prod.id, prod.nombre)}
@@ -854,6 +878,28 @@ export const ProveedorDashboard = () => {
                       onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioUnitario: e.target.value })}
                       className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                     />
+                    <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                      <span className="text-[10px] text-gray-400 font-semibold">Descuento oferta:</span>
+                      {[5, 10, 15, 20].map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => {
+                            const base = parseFloat(prodEnEdicion.precioUnitario) || 0;
+                            const descontado = Math.round(base * (1 - pct / 100));
+                            setProdEnEdicion({
+                              ...prodEnEdicion,
+                              precioUnitario: descontado,
+                              estado: 'PROMOCION'
+                            });
+                          }}
+                          className="text-[10px] px-1.5 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded font-bold transition"
+                          title={`Aplicar ${pct}% de descuento y activar en Promociones`}
+                        >
+                          -{pct}%
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="block font-bold text-prisma-text-primary mb-1">Precio Sugerido Venta Tendero ($ COP)</label>
