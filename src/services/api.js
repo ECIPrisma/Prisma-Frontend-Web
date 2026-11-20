@@ -853,5 +853,72 @@ export const analyticsService = {
       };
     }
   },
+
+  // N-11: pantallas Modo Pro. Si el motor no responde se usan datos de demostración (demostracion: true).
+  getModoProRanking: async (proveedorId = 1, zona = '') => {
+    try {
+      const filtroZona = zona ? `&zona=${encodeURIComponent(zona)}` : '';
+      const res = await fetchWithFailover(`/analytics/modo-pro/ranking?proveedor_id=${proveedorId}${filtroZona}`);
+      return await handleResponse(res);
+    } catch (err) {
+      return { ...DEMO_MODO_PRO.ranking, zona: zona || null, demostracion: true };
+    }
+  },
+
+  // HU-16: alertas de brecha de penetración territorial
+  getModoProAlertas: async (proveedorId = 1) => {
+    try {
+      const res = await fetchWithFailover(`/analytics/modo-pro/alertas?proveedor_id=${proveedorId}`);
+      return await handleResponse(res);
+    } catch (err) {
+      return { ...DEMO_MODO_PRO.alertas, demostracion: true };
+    }
+  },
+
+  // HU-17: recomendaciones narrativas publicadas por el proceso nocturno
+  getModoProRecomendaciones: async (proveedorId = 1) => {
+    try {
+      const res = await fetchWithFailover(`/analytics/modo-pro/recomendaciones?proveedor_id=${proveedorId}`);
+      return await handleResponse(res);
+    } catch (err) {
+      return { ...DEMO_MODO_PRO.recomendaciones, demostracion: true };
+    }
+  },
+};
+
+// N-11: datos de demostración (mismos resultados que produce el motor con su semilla OLAP)
+export const DEMO_MODO_PRO = {
+  ranking: {
+    total_ingresos: 966600,
+    suficientes_datos: true,
+    mensaje: null,
+    productos: [
+      { posicion: 1, producto_id: 10, nombre_producto: 'Coca-Cola 1.5L', categoria: 'Bebidas', unidades: 138, ingresos: 597600, participacion_pct: 61.82, zonas_con_ventas: ['Centro', 'Norte', 'Occidente', 'Sur'], pedidos: 5 },
+      { posicion: 2, producto_id: 11, nombre_producto: 'Papas Fritas 150g', categoria: 'Snacks', unidades: 120, ingresos: 286000, participacion_pct: 29.59, zonas_con_ventas: ['Norte', 'Occidente', 'Sur'], pedidos: 3 },
+      { posicion: 3, producto_id: 12, nombre_producto: 'Galletas Chocolate', categoria: 'Snacks', unidades: 45, ingresos: 83000, participacion_pct: 8.59, zonas_con_ventas: ['Centro', 'Norte'], pedidos: 2 },
+    ],
+  },
+  alertas: {
+    suficientes_datos: true,
+    mensaje: null,
+    clusters: [['Centro', 'Norte', 'Occidente', 'Sur']],
+    alertas: [
+      { tipo: 'DESABASTECIMIENTO_ARTIFICIAL', producto_id: 11, nombre_producto: 'Papas Fritas 150g', zona_lider: 'Occidente', unidades_zona_lider: 50, zona_rezagada: 'Centro', unidades_zona_rezagada: 0, percentil_15_zona_rezagada: 5.4, similitud_zonas: 0.99, mensaje: 'Papas Fritas 150g es superventas en la zona Occidente (50 uds) pero en la zona Centro, de comportamiento similar, vende 0 uds (por debajo del percentil 15). Posible desabastecimiento artificial.', prescripcion: 'Evalúa una promoción de introducción de Papas Fritas 150g en la zona Centro y verifica que tus rutas lo estén ofreciendo a esas tiendas.' },
+      { tipo: 'DESABASTECIMIENTO_ARTIFICIAL', producto_id: 12, nombre_producto: 'Galletas Chocolate', zona_lider: 'Centro', unidades_zona_lider: 25, zona_rezagada: 'Occidente', unidades_zona_rezagada: 0, percentil_15_zona_rezagada: 14.4, similitud_zonas: 0.99, mensaje: 'Galletas Chocolate es superventas en la zona Centro (25 uds) pero en la zona Occidente, de comportamiento similar, vende 0 uds (por debajo del percentil 15). Posible desabastecimiento artificial.', prescripcion: 'Evalúa una promoción de introducción de Galletas Chocolate en la zona Occidente y verifica que tus rutas lo estén ofreciendo a esas tiendas.' },
+    ],
+  },
+  recomendaciones: {
+    suficientes_datos: true,
+    mensaje: null,
+    generado_en: null,
+    recomendaciones: [
+      {
+        categoria: 'Bebidas', zona: 'Norte', estado: 'NARRATIVA_NO_DISPONIBLE', fuente: 'PLANTILLA', narrativa: null,
+        mensaje: 'Recomendación narrativa no disponible temporalmente',
+        resumen_plantilla: 'En la zona Norte, los tenderos son sensibles al precio de Bebidas: si el precio baja un 1%, compran cerca de 6.6% más. Te recomendamos una promoción por volumen: Por la compra de 10 unidades, 1 unidad bonificada.',
+        matriz: { categoria: 'Bebidas', zona: 'Norte', coeficiente_elasticidad: -6.579, tipo_demanda: 'Elástica', descuento_bloqueado: false, escala_recomendada: 'Por la compra de 10 unidades, 1 unidad bonificada', descuento_optimo_recomendado_pct: 14.9, incremento_volumen_esperado_pct: 188.9, precio_base_promedio: 4750, alternativas_sin_descuento: [] },
+      },
+    ],
+  },
 };
 

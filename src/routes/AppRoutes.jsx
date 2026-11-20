@@ -22,6 +22,9 @@ import { ProveedorDashboard } from '../pages/proveedor/ProveedorDashboard';
 import { DespachosPage } from '../pages/proveedor/DespachosPage';
 import { FlotaPage } from '../pages/proveedor/FlotaPage';
 import { EstadisticasEconomicasPage } from '../pages/proveedor/EstadisticasEconomicasPage';
+import { ModoProRankingPage } from '../pages/proveedor/modopro/ModoProRankingPage';
+import { ModoProAlertasPage } from '../pages/proveedor/modopro/ModoProAlertasPage';
+import { ModoProRecomendacionesPage } from '../pages/proveedor/modopro/ModoProRecomendacionesPage';
 import { TiendasProveedorPage } from '../pages/proveedor/TiendasProveedorPage';
 import { PqrsProveedorPage } from '../pages/proveedor/PqrsProveedorPage';
 import { LiquidacionesPage } from '../pages/proveedor/LiquidacionesPage';
@@ -68,7 +71,10 @@ export const AppRoutes = () => {
         <Route path="/despachos" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><DespachosPage /></RoleRoute>} />
         <Route path="/flota" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><FlotaPage /></RoleRoute>} />
         <Route path="/estadisticas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><EstadisticasEconomicasPage /></RoleRoute>} />
+        {/* N-11: pantallas Modo Pro */}
         <Route path="/modo-pro/ranking" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><RankingZonaPage /></RoleRoute>} />
+        <Route path="/modo-pro/alertas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProAlertasPage /></RoleRoute>} />
+        <Route path="/modo-pro/recomendaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProRecomendacionesPage /></RoleRoute>} />
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />
         <Route path="/pqrs" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PqrsProveedorPage /></RoleRoute>} />
         <Route path="/perfil" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><PerfilProveedorPage /></RoleRoute>} />
