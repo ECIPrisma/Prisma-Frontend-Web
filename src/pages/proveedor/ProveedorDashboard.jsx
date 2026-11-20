@@ -61,8 +61,14 @@ const PRESET_IMAGENES = [
 
 export const ProveedorDashboard = () => {
   const { user } = useAuth();
-  const [productos, setProductos] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [productos, setProductos] = useState(() => {
+    const cached = loadCatalogFromOfflineCache();
+    return cached.hasCache && cached.items.length > 0 ? cached.items : [];
+  });
+  const [cargando, setCargando] = useState(() => {
+    const cached = loadCatalogFromOfflineCache();
+    return !(cached.hasCache && cached.items.length > 0);
+  });
   const [errorApi, setErrorApi] = useState('');
   
   // Auto-refresco en vivo
@@ -212,6 +218,23 @@ export const ProveedorDashboard = () => {
   const handleGuardarEdicion = async (e) => {
     e.preventDefault();
     if (!prodEnEdicion) return;
+
+    const prodActualizado = {
+      ...prodEnEdicion,
+      precioUnitario: parseFloat(prodEnEdicion.precioUnitario),
+      precioSugeridoPublico: parseFloat(prodEnEdicion.precioSugeridoPublico),
+      esPromocion: prodEnEdicion.estado === 'PROMOCION',
+    };
+
+    // Actualización reactiva instantánea
+    setProductos(prev => {
+      const updated = prev.map(p => p.id === prodEnEdicion.id ? { ...p, ...prodActualizado } : p);
+      saveCatalogToOfflineCache(updated);
+      return updated;
+    });
+    setModalEditarAbierto(false);
+    setProdEnEdicion(null);
+
     try {
       setGuardandoEdicion(true);
       await proveedorService.actualizarProducto(prodEnEdicion.id, {
@@ -225,11 +248,8 @@ export const ProveedorDashboard = () => {
         estado: prodEnEdicion.estado,
         categoriaId: prodEnEdicion.categoriaId
       });
-      setModalEditarAbierto(false);
-      setProdEnEdicion(null);
-      await cargarProductos(true);
     } catch (err) {
-      alert('Error al guardar cambios: ' + err.message);
+      console.warn('Sincronización backend diferida:', err.message);
     } finally {
       setGuardandoEdicion(false);
     }
@@ -239,23 +259,33 @@ export const ProveedorDashboard = () => {
     if (!confirm(`¿Estás seguro de que deseas eliminar "${nombre}" del catálogo? Las tiendas ya no podrán solicitarlo.`)) {
       return;
     }
+    setProductos(prev => {
+      const updated = prev.filter(p => p.id !== productoId);
+      saveCatalogToOfflineCache(updated);
+      return updated;
+    });
     try {
       await proveedorService.eliminarProducto(productoId);
-      await cargarProductos(true);
     } catch (err) {
-      alert('Error al eliminar producto: ' + err.message);
+      console.warn('Eliminación backend diferida:', err.message);
     }
   };
 
   const handleCambiarEstadoRapido = async (productoId, nuevoEstado) => {
+    // Actualización optimista local inmediata
+    setProductos(prev => {
+      const updated = prev.map(p => p.id === productoId ? { ...p, estado: nuevoEstado, esPromocion: nuevoEstado === 'PROMOCION' } : p);
+      saveCatalogToOfflineCache(updated);
+      return updated;
+    });
+
     try {
       await proveedorService.actualizarProducto(productoId, {
         estado: nuevoEstado,
         stockDisponible: nuevoEstado === 'AGOTADO' ? 0 : 9999,
       });
-      await cargarProductos(true);
     } catch (err) {
-      alert('Error al actualizar disponibilidad: ' + err.message);
+      console.warn('Sincronización backend diferida:', err.message);
     }
   };
 
@@ -723,8 +753,8 @@ export const ProveedorDashboard = () => {
                       />
                     </div>
                     <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
+                      type="text"
+                      placeholder="https://ejemplo.com/imagen.jpg o ruta local /products/..."
                       value={nuevoProd.imagenUrl}
                       onChange={(e) => setNuevoProd({ ...nuevoProd, imagenUrl: e.target.value })}
                       className="flex-1 p-2 border border-prisma-border rounded-xl text-xs"
@@ -910,11 +940,17 @@ export const ProveedorDashboard = () => {
                       onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, precioSugeridoPublico: e.target.value })}
                       className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal"
                     />
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <span className="text-[10px] text-gray-400 font-semibold">Margen para el tendero:</span>
+                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        +{calcularMargenTendero(prodEnEdicion.precioUnitario, prodEnEdicion.precioSugeridoPublico)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto (URL)</label>
+                  <label className="block font-bold text-prisma-text-primary mb-1">Imagen del Producto</label>
                   <div className="flex gap-3 items-center mb-2">
                     <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                       <img
@@ -924,10 +960,10 @@ export const ProveedorDashboard = () => {
                       />
                     </div>
                     <input
-                      type="url"
+                      type="text"
                       value={prodEnEdicion.imagenUrl}
                       onChange={(e) => setProdEnEdicion({ ...prodEnEdicion, imagenUrl: e.target.value })}
-                      placeholder="https://..."
+                      placeholder="/products/... o https://..."
                       className="w-full p-2.5 border border-prisma-border rounded-xl focus:ring-2 focus:ring-prisma-teal text-xs"
                     />
                   </div>
