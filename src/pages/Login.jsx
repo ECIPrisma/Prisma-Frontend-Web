@@ -38,7 +38,7 @@ export const Login = () => {
           id: 1,
           email: email || 'distribuidora@prisma.com',
           nombreCompleto: 'Distribuidora Central Bogotá',
-          rol: 'PROVEEDOR',
+          rol: 'ROLE_PROVEEDOR',
           token: 'demo-jwt-token'
         });
         return;
@@ -157,7 +157,7 @@ export const Login = () => {
                 id: 1,
                 email: 'distribuidora@prisma.com',
                 nombreCompleto: 'Distribuidora Central Bogotá',
-                rol: 'PROVEEDOR',
+                rol: 'ROLE_PROVEEDOR',
                 token: 'demo-jwt-token'
               });
             }}

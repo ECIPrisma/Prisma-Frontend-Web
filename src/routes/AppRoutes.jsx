@@ -72,7 +72,7 @@ export const AppRoutes = () => {
         <Route path="/flota" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><FlotaPage /></RoleRoute>} />
         <Route path="/estadisticas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><EstadisticasEconomicasPage /></RoleRoute>} />
         {/* N-11: pantallas Modo Pro */}
-        <Route path="/modo-pro/ranking" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><RankingZonaPage /></RoleRoute>} />
+        <Route path="/modo-pro/ranking" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProRankingPage /></RoleRoute>} />
         <Route path="/modo-pro/alertas" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProAlertasPage /></RoleRoute>} />
         <Route path="/modo-pro/recomendaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><ModoProRecomendacionesPage /></RoleRoute>} />
         <Route path="/liquidaciones" element={<RoleRoute allowedRoles={PROVEEDOR_ROLES} userRol={rol}><LiquidacionesPage /></RoleRoute>} />

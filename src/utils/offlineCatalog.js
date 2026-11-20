@@ -42,7 +42,7 @@ export const DEFAULT_OFFLINE_PRODUCTS = [
     disponibilidad: 'DISPONIBLE',
     estado: 'ACTIVO',
     esPromocion: false,
-    imagenUrl: '/products/real_sprite.jpg',
+    imagenUrl: '/products/real_quatro.jpg',
     categoriaNombre: 'Gaseosas',
     stock: 82
   },

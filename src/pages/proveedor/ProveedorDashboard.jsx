@@ -46,6 +46,10 @@ const PRESET_IMAGENES = [
     url: '/products/real_colombiana.jpg',
   },
   {
+    nombre: 'Quatro Toronja 400ml',
+    url: '/products/real_quatro.jpg',
+  },
+  {
     nombre: 'Sprite 400ml',
     url: '/products/real_sprite.jpg',
   },
