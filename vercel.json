@@ -18,6 +18,38 @@
       "destination": "https://prisma-backend-web.onrender.com/api/$1"
     },
     {
+      "source": "/pitch",
+      "destination": "/pitch/index.html"
+    },
+    {
+      "source": "/promo",
+      "destination": "/pitch/index.html"
+    },
+    {
+      "source": "/presentacion",
+      "destination": "/pitch/index.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "eciprisma-promo.duckdns.org"
+        }
+      ],
+      "destination": "/pitch/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "eciprisma-promo.duckdns.org"
+        }
+      ],
+      "destination": "/pitch/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
