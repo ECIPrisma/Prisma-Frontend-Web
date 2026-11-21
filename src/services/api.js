@@ -7,6 +7,7 @@ const IS_TEST = typeof import.meta !== 'undefined' && import.meta.env && import.
 // Los hostnames privados (.ts.net) provocan 'NetworkError' en navegadores estándar.
 const BACKEND_NODES = [
   '/api/v1',
+  'https://eciprisma.duckdns.org/api/v1',
   'https://prisma-backend-web.onrender.com/api/v1',
 ];
 
