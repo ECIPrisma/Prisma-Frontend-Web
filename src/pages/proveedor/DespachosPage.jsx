@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { proveedorService } from '../../services/api';
 import { MapaRutaEnVivo } from '../../components/mapa/MapaRutaEnVivo';
+import { exportToCsv } from '../../utils/exportUtils';
+import { playOrderNotificationSound } from '../../utils/audioUtils';
 import { 
   Truck, 
   Package, 
@@ -21,7 +23,8 @@ import {
   ShieldCheck,
   Pause,
   Play,
-  Store
+  Store,
+  Download
 } from 'lucide-react';
 
 const TIENDAS_FALLBACK_COBERTURA = [
@@ -93,6 +96,20 @@ export const DespachosPage = () => {
   // Auto-refresco en vivo
   const [autoSync, setAutoSync] = useState(true);
   const [segundosSync, setSegundosSync] = useState(0);
+  const prevCountRef = useRef(0);
+
+  const handleExportarPedidos = () => {
+    const headers = [
+      { key: 'numeroPedido', label: 'Numero_Pedido' },
+      { key: 'tienda', label: 'Tienda', accessor: (p) => p.tienda?.nombreTienda || p.nombreTienda || 'Tienda' },
+      { key: 'totalAPagar', label: 'Total_COP' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'medioPagoUtilizado', label: 'Medio_Pago' },
+      { key: 'cantidadEnvasesDevueltos', label: 'Envases_Retornables' },
+      { key: 'fechaEstimadaEntrega', label: 'Fecha_Entrega' }
+    ];
+    exportToCsv('Despachos_Pedidos_PRISMA', headers, pedidos);
+  };
 
   // Estados de Modales de Incidencia / Reprogramación
   const [modalProblema, setModalProblema] = useState(null); // pedido
@@ -125,7 +142,12 @@ export const DespachosPage = () => {
       ]);
 
       if (pedidosData.status === 'fulfilled') {
-        setPedidos(Array.isArray(pedidosData.value) ? pedidosData.value : []);
+        const nuevos = Array.isArray(pedidosData.value) ? pedidosData.value : [];
+        if (prevCountRef.current > 0 && nuevos.length > prevCountRef.current) {
+          playOrderNotificationSound();
+        }
+        prevCountRef.current = nuevos.length;
+        setPedidos(nuevos);
       }
       if (rutasData.status === 'fulfilled') {
         const arrRutas = Array.isArray(rutasData.value) ? rutasData.value : [];
@@ -278,6 +300,23 @@ export const DespachosPage = () => {
           <p className="text-xs text-prisma-text-secondary mt-1">
             Sigue las rutas de los camiones y el estado de entrega en las tiendas de barrio.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportarPedidos}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-prisma-border hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
+            title="Exportar pedidos en formato CSV para ERP"
+          >
+            <Download className="w-3.5 h-3.5 text-gray-500" />
+            <span>Exportar Pedidos</span>
+          </button>
+          <button
+            onClick={() => cargarDatos()}
+            className="flex items-center gap-1.5 px-3 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${cargando ? 'animate-spin' : ''}`} />
+            <span>Refrescar</span>
+          </button>
         </div>
       </div>
 

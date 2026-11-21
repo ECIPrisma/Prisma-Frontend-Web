@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ModoProRankingPage } from './ModoProRankingPage';
@@ -7,6 +8,8 @@ import { ModoProAlertasPage } from './ModoProAlertasPage';
 import { ModoProRecomendacionesPage } from './ModoProRecomendacionesPage';
 import { analyticsService } from '../../../services/api';
 import * as AuthContextModule from '../../../context/AuthContext';
+
+const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 vi.mock('../../../services/api', () => ({
   analyticsService: {
@@ -30,7 +33,7 @@ describe('N-11 /modo-pro/ranking', () => {
         { posicion: 2, producto_id: 11, nombre_producto: 'Papas Fritas 150g', categoria: 'Snacks', unidades: 120, ingresos: 286000, participacion_pct: 29.59, zonas_con_ventas: ['Norte'] },
       ],
     });
-    render(<ModoProRankingPage />);
+    renderWithRouter(<ModoProRankingPage />);
 
     expect(await screen.findByText('Coca-Cola 1.5L')).toBeInTheDocument();
     expect(screen.getByText('Papas Fritas 150g')).toBeInTheDocument();
@@ -42,13 +45,13 @@ describe('N-11 /modo-pro/ranking', () => {
 
   it('estado vacío: "Aún no hay suficientes datos"', async () => {
     analyticsService.getModoProRanking.mockResolvedValue({ ...VACIO, productos: [] });
-    render(<ModoProRankingPage />);
+    renderWithRouter(<ModoProRankingPage />);
     expect(await screen.findByText('Aún no hay suficientes datos')).toBeInTheDocument();
   });
 
   it('marca cuando se muestran datos de demostración', async () => {
     analyticsService.getModoProRanking.mockResolvedValue({ ...VACIO, productos: [], demostracion: true });
-    render(<ModoProRankingPage />);
+    renderWithRouter(<ModoProRankingPage />);
     expect(await screen.findByText('Datos de demostración')).toBeInTheDocument();
   });
 });
@@ -65,7 +68,7 @@ describe('N-11 + HU-16 /modo-pro/alertas', () => {
         mensaje: 'Papas Fritas 150g es superventas en la zona Occidente.', prescripcion: 'Evalúa una promoción de introducción en Centro.',
       }],
     });
-    render(<ModoProAlertasPage />);
+    renderWithRouter(<ModoProAlertasPage />);
 
     expect(await screen.findByText('Papas Fritas 150g')).toBeInTheDocument();
     expect(screen.getByText('Desabastecimiento artificial')).toBeInTheDocument();
@@ -76,14 +79,14 @@ describe('N-11 + HU-16 /modo-pro/alertas', () => {
 
   it('criterio 2: sin brechas no muestra alertas', async () => {
     analyticsService.getModoProAlertas.mockResolvedValue({ suficientes_datos: true, alertas: [], mensaje: null });
-    render(<ModoProAlertasPage />);
+    renderWithRouter(<ModoProAlertasPage />);
     expect(await screen.findByText('Sin brechas de penetración')).toBeInTheDocument();
     expect(screen.queryByText('Desabastecimiento artificial')).not.toBeInTheDocument();
   });
 
   it('estado vacío cuando no hay datos suficientes', async () => {
     analyticsService.getModoProAlertas.mockResolvedValue({ ...VACIO, alertas: [] });
-    render(<ModoProAlertasPage />);
+    renderWithRouter(<ModoProAlertasPage />);
     expect(await screen.findByText('Aún no hay suficientes datos')).toBeInTheDocument();
   });
 });
@@ -98,7 +101,7 @@ describe('N-11 + HU-17 /modo-pro/recomendaciones', () => {
       suficientes_datos: true, generado_en: '2026-11-17T07:00:00Z',
       recomendaciones: [{ categoria: 'Bebidas', zona: 'Norte', estado: 'GENERADA', fuente: 'IA_GENERATIVA', narrativa: 'Lanza una promoción 10+1 en Norte.', matriz: MATRIZ }],
     });
-    render(<ModoProRecomendacionesPage />);
+    renderWithRouter(<ModoProRecomendacionesPage />);
 
     expect(await screen.findByText('Lanza una promoción 10+1 en Norte.')).toBeInTheDocument();
     expect(screen.getByText('Generada con IA')).toBeInTheDocument();
@@ -113,7 +116,7 @@ describe('N-11 + HU-17 /modo-pro/recomendaciones', () => {
         mensaje: 'Recomendación narrativa no disponible temporalmente', resumen_plantilla: 'Resumen por plantilla.', matriz: MATRIZ,
       }],
     });
-    render(<ModoProRecomendacionesPage />);
+    renderWithRouter(<ModoProRecomendacionesPage />);
 
     expect(await screen.findByText('Recomendación narrativa no disponible temporalmente')).toBeInTheDocument();
     expect(screen.getByText('Datos crudos')).toBeInTheDocument();
@@ -124,7 +127,7 @@ describe('N-11 + HU-17 /modo-pro/recomendaciones', () => {
 
   it('estado vacío cuando aún no hay recomendaciones', async () => {
     analyticsService.getModoProRecomendaciones.mockResolvedValue({ ...VACIO, recomendaciones: [] });
-    render(<ModoProRecomendacionesPage />);
+    renderWithRouter(<ModoProRecomendacionesPage />);
     expect(await screen.findByText('Aún no hay suficientes datos')).toBeInTheDocument();
   });
 });
@@ -139,9 +142,9 @@ describe('HU-04 aislamiento: Modo Pro consulta solo los datos del proveedor aute
   });
 
   it('ranking, alertas y recomendaciones piden los datos del proveedor 2, no los del 1', async () => {
-    render(<ModoProRankingPage />);
-    render(<ModoProAlertasPage />);
-    render(<ModoProRecomendacionesPage />);
+    renderWithRouter(<ModoProRankingPage />);
+    renderWithRouter(<ModoProAlertasPage />);
+    renderWithRouter(<ModoProRecomendacionesPage />);
 
     await waitFor(() => expect(analyticsService.getModoProRanking).toHaveBeenCalledWith(2, ''));
     expect(analyticsService.getModoProAlertas).toHaveBeenCalledWith(2);

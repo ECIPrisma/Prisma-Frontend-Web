@@ -5,7 +5,7 @@ import { EncabezadoModoPro, Cargando, EstadoVacio } from './ModoProComun';
 import { useProveedorId } from '../../../hooks/useProveedorId';
 import { formatCOP } from '../../../utils/formatters';
 
-const ZONAS = ['Kennedy Central', 'Bosa', 'Chapinero', 'Suba', 'Engativá', 'Usaquén'];
+const ZONAS = ['Sur', 'Kennedy Central', 'Bosa', 'Chapinero', 'Suba', 'Engativá', 'Usaquén'];
 
 const IMAGENES_PRODUCTOS = {
   'Coca-Cola 1.5L Retornable': '/products/real_coca_15l.jpg',
@@ -104,8 +104,8 @@ export const ModoProRankingPage = () => {
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <label htmlFor="ranking-zona" className="text-xs font-bold text-prisma-text-primary">Filtrar por Zona:</label>
-          <select id="ranking-zona" value={zona} onChange={cambiarZona}
+          <label htmlFor="ranking-zona" className="text-xs font-bold text-prisma-text-primary">Zona</label>
+          <select id="ranking-zona" aria-label="Zona" value={zona} onChange={cambiarZona}
             className="text-xs p-2 border border-prisma-border rounded-xl bg-white focus:ring-2 focus:ring-prisma-teal focus:outline-none font-semibold text-gray-700">
             <option value="">Todas las zonas de Bogotá</option>
             {ZONAS.map((z) => <option key={z} value={z}>{z}</option>)}

@@ -1,4 +1,4 @@
-const CATALOG_CACHE_KEY = 'prisma_offline_catalog_v1';
+const CATALOG_CACHE_KEY = 'prisma_offline_catalog_v2';
 const OFFLINE_QUEUE_KEY = 'prisma_offline_orders_queue_v1';
 
 export const OFFLINE_EMPTY_MESSAGE = 'No hay datos disponibles sin conexión, intenta cuando recuperes señal';
@@ -108,17 +108,30 @@ export const DEFAULT_OFFLINE_PRODUCTS = [
   }
 ];
 
-export function loadCatalogFromOfflineCache() {
+export function loadCatalogFromOfflineCache(allowDefaults = false) {
   try {
     const raw = localStorage.getItem(CATALOG_CACHE_KEY);
     if (!raw) {
-      return { items: DEFAULT_OFFLINE_PRODUCTS, hasCache: true, message: null };
+      if (allowDefaults) {
+        return { items: DEFAULT_OFFLINE_PRODUCTS, hasCache: true, message: null };
+      }
+      return { items: [], hasCache: false, message: OFFLINE_EMPTY_MESSAGE };
     }
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.items) || parsed.items.length === 0) {
-      return { items: DEFAULT_OFFLINE_PRODUCTS, hasCache: true, message: null };
+      if (allowDefaults) {
+        return { items: DEFAULT_OFFLINE_PRODUCTS, hasCache: true, message: null };
+      }
+      return { items: [], hasCache: false, message: OFFLINE_EMPTY_MESSAGE };
     }
-    return { items: parsed.items, hasCache: true, message: null };
+    // Sanitizar imagenes para asegurar que Quatro siempre use real_quatro.jpg
+    const sanitizedItems = parsed.items.map(item => {
+      if ((item.nombre && item.nombre.toLowerCase().includes('quatro')) || item.sku === 'BEV-QT-400') {
+        return { ...item, imagenUrl: '/products/real_quatro.jpg' };
+      }
+      return item;
+    });
+    return { items: sanitizedItems, hasCache: true, message: null };
   } catch {
     return { items: DEFAULT_OFFLINE_PRODUCTS, hasCache: true, message: null };
   }

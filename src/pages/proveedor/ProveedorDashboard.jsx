@@ -20,9 +20,13 @@ import {
   Pause,
   Play,
   Trash2,
-  Edit2
+  Edit2,
+  FileSpreadsheet,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { CargaMasivaModal } from '../../components/proveedor/CargaMasivaModal';
+import { exportToCsv } from '../../utils/exportUtils';
 
 const PRESET_IMAGENES = [
   {
@@ -63,6 +67,40 @@ const PRESET_IMAGENES = [
   },
 ];
 
+export const resolveProductImage = (prod) => {
+  if (!prod) return PRESET_IMAGENES[0].url;
+  const name = (prod.nombre || '').toLowerCase();
+  const sku = (prod.sku || '').toUpperCase();
+  if (name.includes('quatro') || sku.includes('BEV-QT-400')) {
+    return '/products/real_quatro.jpg';
+  }
+  if (name.includes('sprite')) {
+    return '/products/real_sprite.jpg';
+  }
+  if (name.includes('monster')) {
+    return '/products/real_monster.jpg';
+  }
+  if (name.includes('brisa') || name.includes('agua')) {
+    return '/products/real_agua_brisa.jpg';
+  }
+  if (name.includes('manzana') || name.includes('postob')) {
+    return '/products/real_postobon_manzana.jpg';
+  }
+  if (name.includes('colombiana')) {
+    return '/products/real_colombiana.jpg';
+  }
+  if (name.includes('3') && name.includes('coca')) {
+    return '/products/real_coca_3l.jpg';
+  }
+  if (name.includes('vidrio')) {
+    return '/products/real_coca_vidrio.jpg';
+  }
+  if (name.includes('coca')) {
+    return '/products/real_coca_15l.jpg';
+  }
+  return prod.imagenUrl || PRESET_IMAGENES[0].url;
+};
+
 export const ProveedorDashboard = () => {
   const { user } = useAuth();
   const [productos, setProductos] = useState(() => {
@@ -87,7 +125,22 @@ export const ProveedorDashboard = () => {
 
   // Modal Crear / Editar Producto
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
   const [guardando, setGuardando] = useState(false);
+
+  const handleExportarCatalogo = () => {
+    const headers = [
+      { key: 'sku', label: 'SKU' },
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'presentacion', label: 'Presentacion' },
+      { key: 'precioUnitario', label: 'Precio_Unitario_COP' },
+      { key: 'precioSugeridoPublico', label: 'Precio_Sugerido_COP' },
+      { key: 'stockDisponible', label: 'Stock_Disponible' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'esRetornable', label: 'Retornable' }
+    ];
+    exportToCsv('Catalogo_Productos_PRISMA', headers, productos);
+  };
   const [nuevoProd, setNuevoProd] = useState({
     sku: '',
     nombre: '',
@@ -328,7 +381,23 @@ export const ProveedorDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportarCatalogo}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-prisma-border hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
+            title="Exportar a CSV para Excel"
+          >
+            <Download className="w-3.5 h-3.5 text-gray-500" />
+            <span>Exportar CSV</span>
+          </button>
+          <button
+            onClick={() => setModalCargaMasiva(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+            title="Importar productos por lote"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-blue-600" />
+            <span>Carga Masiva</span>
+          </button>
           <button
             onClick={() => setModalAbierto(true)}
             className="flex items-center gap-2 px-4 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
@@ -380,7 +449,7 @@ export const ProveedorDashboard = () => {
                   <div className="flex gap-4 items-center">
                     <div className="w-24 h-24 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200 shadow-inner">
                       <img
-                        src={prod.imagenUrl || PRESET_IMAGENES[0].url}
+                        src={resolveProductImage(prod)}
                         alt={prod.nombre}
                         className="w-full h-full object-cover hover:scale-105 transition duration-300"
                         onError={(e) => { e.target.src = '/logo_icono_tienda.png'; }}
@@ -494,7 +563,7 @@ export const ProveedorDashboard = () => {
                   <div>
                     <div className="w-full h-36 rounded-xl bg-gray-100 overflow-hidden relative border border-gray-100 mb-3">
                       <img
-                        src={prod.imagenUrl || PRESET_IMAGENES[0].url}
+                        src={resolveProductImage(prod)}
                         alt={prod.nombre}
                         className="w-full h-full object-cover"
                         onError={(e) => { e.target.src = '/logo_icono_tienda.png'; }}
@@ -595,7 +664,7 @@ export const ProveedorDashboard = () => {
                     <tr key={prod.id} className="hover:bg-gray-50/80 transition">
                       <td className="py-3 px-4 flex items-center gap-3">
                         <img
-                          src={prod.imagenUrl || PRESET_IMAGENES[0].url}
+                          src={resolveProductImage(prod)}
                           alt=""
                           className="w-9 h-9 rounded-lg object-cover border border-gray-200"
                           onError={(e) => { e.target.src = '/logo_icono_tienda.png'; }}
@@ -1009,6 +1078,15 @@ export const ProveedorDashboard = () => {
           </div>
         </div>
       )}
+
+      <CargaMasivaModal
+        isOpen={modalCargaMasiva}
+        onClose={() => setModalCargaMasiva(false)}
+        onImportSuccess={() => {
+          cargarProductos();
+        }}
+        apiCall={(lista) => proveedorService.crearProductosLote(lista)}
+      />
     </div>
   );
 };

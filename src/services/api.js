@@ -429,6 +429,15 @@ export const proveedorService = {
     return handleResponse(res);
   },
 
+  crearProductosLote: async (listaProductos) => {
+    const res = await fetch(`${API_BASE_URL}/proveedores/productos/lote`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(listaProductos),
+    });
+    return handleResponse(res);
+  },
+
   actualizarProducto: async (id, datos) => {
     const res = await fetch(`${API_BASE_URL}/proveedores/productos/${id}`, {
       method: 'PUT',

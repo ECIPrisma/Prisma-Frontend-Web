@@ -33,15 +33,10 @@ export const Login = () => {
         setCodigoTotp('');
         setError('');
       } else {
-        // Demostración local / contingencia si backend está offline
-        login({
-          id: 1,
-          email: email || 'distribuidora@prisma.com',
-          nombreCompleto: 'Distribuidora Central Bogotá',
-          rol: 'ROLE_PROVEEDOR',
-          token: 'demo-jwt-token'
-        });
-        return;
+        if (requiereTotp) {
+          setCodigoTotp('');
+        }
+        setError(err.message || 'Error al iniciar sesión');
       }
     } finally {
       setCargando(false);
@@ -168,8 +163,15 @@ export const Login = () => {
           </button>
         </form>
 
-        <div className="pt-2 text-center text-[11px] text-prisma-text-secondary">
-          <span>Acceso seguro protegido mediante cifrado JWT y SSL</span>
+        <div className="pt-3 text-center text-[11px] text-prisma-text-secondary space-y-2.5">
+          <a
+            href="/pitch/"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition shadow-sm w-full justify-center"
+          >
+            <span>Portal de Presentación Final (Directrices Sábado 21)</span>
+            <ArrowRight className="w-3.5 h-3.5 text-amber-600" />
+          </a>
+          <div>Acceso seguro protegido mediante cifrado JWT y SSL</div>
         </div>
       </div>
     </div>
