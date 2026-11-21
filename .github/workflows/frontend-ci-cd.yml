@@ -72,14 +72,14 @@ jobs:
       - name: Comprobar si AWS EC2 está encendido
         id: ping-ec2
         run: |
-          HOST="${{ secrets.EC2_HOST || 'eciprisma.duckdns.org' }}"
+          HOST="eciprisma.duckdns.org"
           echo "Comprobando disponibilidad de AWS EC2 en $HOST:22..."
-          if nc -z -w 3 "$HOST" 22; then
+          if nc -z -w 5 "$HOST" 22; then
             echo "ec2_online=true" >> $GITHUB_OUTPUT
             echo "AWS EC2 está encendido y accesible."
           else
             echo "ec2_online=false" >> $GITHUB_OUTPUT
-            echo "AWS EC2 está apagado para ahorro de créditos. Se omite el despliegue a AWS sin romper el build."
+            echo "AWS EC2 no respondió en el puerto 22."
           fi
 
       - name: Setup Node.js 22
@@ -101,7 +101,7 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         with:
-          host: ${{ secrets.EC2_HOST || 'eciprisma.duckdns.org' }}
+          host: "eciprisma.duckdns.org"
           username: ${{ secrets.EC2_USER || 'ec2-user' }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "dist/*"
@@ -114,7 +114,7 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         with:
-          host: ${{ secrets.EC2_HOST || 'eciprisma.duckdns.org' }}
+          host: "eciprisma.duckdns.org"
           username: ${{ secrets.EC2_USER || 'ec2-user' }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
