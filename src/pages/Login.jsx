@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/api';
@@ -14,6 +14,31 @@ export const Login = () => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
   const aviso = location.state?.message || '';
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const demoEmail = params.get('email');
+    const demoPass = params.get('password') || 'Prisma2026*';
+    const isAuto = params.get('demo') === 'true' || params.get('auto') === 'true';
+
+    if (demoEmail) {
+      setEmail(demoEmail);
+      setPassword(demoPass);
+      if (isAuto) {
+        setCargando(true);
+        authService.login(demoEmail.trim(), demoPass)
+          .then((data) => {
+            login(data);
+          })
+          .catch((err) => {
+            setError(err.message || 'Error al iniciar sesión');
+          })
+          .finally(() => {
+            setCargando(false);
+          });
+      }
+    }
+  }, [location.search, login]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
