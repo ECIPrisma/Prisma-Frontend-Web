@@ -1590,12 +1590,11 @@ body, html {
       <span><strong style="color:var(--teal-deep)">PRISMA</strong>, B2B Marketplace &amp; Supply Chain</span>
       <span> · Ingeniería de Sistemas, Escuela Colombiana de Ingeniería Julio Garavito</span>
     </div>
-    <div style="display:flex;gap:14px;align-items:center;font-size:12px;">
-      <a href="https://github.com/ECIPrisma/Prisma-Backend-Web" target="_blank" rel="noopener noreferrer" style="color:var(--teal-deep);font-weight:600;text-decoration:none;">Backend (Spring Boot)</a>
-      <span style="opacity:0.4;">•</span>
-      <a href="https://github.com/ECIPrisma/Prisma-Frontend-Web" target="_blank" rel="noopener noreferrer" style="color:var(--teal-deep);font-weight:600;text-decoration:none;">Frontend (React)</a>
-      <span style="opacity:0.4;">•</span>
-      <a href="https://github.com/ECIPrisma/Prisma-App" target="_blank" rel="noopener noreferrer" style="color:var(--teal-deep);font-weight:600;text-decoration:none;">App Móvil (Android)</a>
+    <div style="display:flex;gap:14px;align-items:center;font-size:13px;">
+      <a href="https://github.com/ECIPrisma" target="_blank" rel="noopener noreferrer" style="color:var(--teal-deep);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>Organización ECIPrisma en GitHub</span>
+      </a>
     </div>
   </div>
 </footer>
@@ -1604,28 +1603,22 @@ body, html {
 <script>
 /* ===== Enlaces: completa estas URL cuando estén publicadas ===== */
 const LINKS = {
-  apk: "apk/PRISMA-Mobile-release-signed.apk",
-  frontend: "documentos/Documento de Arquitectura FrontEnd PRISMA.pdf",
-  backend: "documentos/Documento de Arquitectura PRISMA.pdf",
-  identidad: "documentos/Manual de Identidad PRISMA.pdf",
-  requerimientos: "documentos/Documento de Requerimientos PRISMA.pdf",
-  ieee: "documentos/Informe Final Proyecto PRISMA IEEE.pdf",
-  gh_backend: "https://github.com/ECIPrisma/Prisma-Backend-Web",
-  gh_frontend: "https://github.com/ECIPrisma/Prisma-Frontend-Web",
-  gh_android: "https://github.com/ECIPrisma/Prisma-App",
+  apk: "/apk/PRISMA-Mobile-release-signed.apk",
+  frontend: "/documentos/Documento%20de%20Arquitectura%20FrontEnd%20PRISMA.pdf",
+  backend: "/documentos/Documento%20de%20Arquitectura%20PRISMA.pdf",
+  identidad: "/documentos/Manual%20de%20Identidad%20PRISMA.pdf",
+  requerimientos: "/documentos/Documento%20de%20Requerimientos%20PRISMA.pdf",
+  ieee: "/documentos/Informe%20Final%20Proyecto%20PRISMA%20IEEE.pdf",
   github: "https://github.com/ECIPrisma"
 };
 const RESOURCES = [
   {key:"apk", title:"Aplicación Android (APK)", text:"Instalador de la app para tenderos: catálogo, rastreo, PIN y Radar Territorial.", icon:"phone", go:"Descargar"},
-  {key:"gh_backend", title:"Repositorio Backend (API)", text:"Código fuente Spring Boot 3.3.4, Java 21, Neon PostgreSQL, seguridad JWT y DuckDB.", icon:"github", go:"GitHub"},
-  {key:"gh_frontend", title:"Repositorio Frontend Web", text:"Portal B2B React 19 + Vite + Tailwind CSS para proveedores y administración.", icon:"github", go:"GitHub"},
-  {key:"gh_android", title:"Repositorio App Móvil", text:"Aplicación nativa Kotlin + Jetpack Compose con geolocalización y confirmación PIN.", icon:"github", go:"GitHub"},
-  {key:"github", title:"Organización ECIPrisma", text:"Repositorios oficiales del proyecto de grado en la Escuela Colombiana de Ingeniería.", icon:"github", go:"Ver Org"},
+  {key:"ieee", title:"Informe Final IEEE", text:"Artículo formal en formato IEEE sobre arquitectura resiliente y telemetría de bajo costo.", icon:"list", go:"Abrir"},
   {key:"frontend", title:"Documentación Frontend", text:"Portal web en React 19 + Vite y cliente Android en Kotlin.", icon:"layout", go:"Abrir"},
   {key:"backend", title:"Documentación Backend", text:"API REST en Spring Boot 3.3.4, modelo de datos y motor analítico DuckDB.", icon:"server", go:"Abrir"},
   {key:"requerimientos", title:"Requerimientos del Sistema", text:"Historias de usuario, criterios de aceptación y atributos de calidad.", icon:"list", go:"Abrir"},
-  {key:"ieee", title:"Informe Final IEEE", text:"Artículo formal en formato IEEE sobre arquitectura resiliente y telemetría de bajo costo.", icon:"list", go:"Abrir"},
-  {key:"identidad", title:"Manual de Identidad Visual", text:"Paleta, tipografía, logotipo y reglas de uso de la marca PRISMA.", icon:"palette", go:"Abrir"}
+  {key:"identidad", title:"Manual de Identidad Visual", text:"Paleta, tipografía, logotipo y reglas de uso de la marca PRISMA.", icon:"palette", go:"Abrir"},
+  {key:"github", title:"Repositorios Oficiales (GitHub)", text:"Organización oficial ECIPrisma con todo el código fuente auditado del ecosistema.", icon:"github", go:"Ver Org"}
 ];
 const ICONS = {
   phone:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/>',
