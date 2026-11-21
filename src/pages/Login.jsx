@@ -18,7 +18,7 @@ export const Login = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const demoEmail = params.get('email');
-    const demoPass = params.get('password') || 'Prisma2026*';
+    const demoPass = params.get('password') || 'admin123';
     const isAuto = params.get('demo') === 'true' || params.get('auto') === 'true';
 
     if (demoEmail) {
