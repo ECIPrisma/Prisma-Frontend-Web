@@ -321,7 +321,7 @@ export const DespachosPage = () => {
       </div>
 
       {/* Pestañas de Vista */}
-      <div className="flex border-b border-prisma-border gap-4 overflow-x-auto">
+      <div className="flex border-b border-prisma-border gap-2 sm:gap-4 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-1">
         <button
           onClick={() => setPestañaActiva('mapa')}
           className={`pb-3 px-1 text-sm font-bold border-b-2 flex items-center gap-2 transition cursor-pointer flex-shrink-0 ${
@@ -390,18 +390,18 @@ export const DespachosPage = () => {
             rutas.map((ruta) => (
               <div 
                 key={ruta.rutaId}
-                className="bg-white rounded-3xl border border-prisma-border shadow-sm p-6 space-y-6"
+                className="bg-white rounded-2xl sm:rounded-3xl border border-prisma-border shadow-sm p-4 sm:p-6 space-y-5 sm:space-y-6"
               >
                 {/* Cabecera de la Ruta */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-prisma-border/60 pb-5">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3.5 bg-prisma-teal/10 text-prisma-teal rounded-2xl">
-                      <Truck className="w-7 h-7" />
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-prisma-border/60 pb-5">
+                  <div className="flex items-start gap-3 sm:gap-4 w-full lg:w-auto">
+                    <div className="p-2.5 sm:p-3.5 bg-prisma-teal/10 text-prisma-teal rounded-2xl shrink-0">
+                      <Truck className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-bold text-prisma-text-primary">{ruta.codigoRuta}</h2>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-bold text-prisma-text-primary break-all">{ruta.codigoRuta}</h2>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold shrink-0 ${
                           ruta.estado === 'VARADO_EN_PERCANCE'
                             ? 'bg-rose-100 text-rose-800 animate-pulse'
                             : ruta.estado === 'EN_EJECUCION'
@@ -411,64 +411,66 @@ export const DespachosPage = () => {
                           {ruta.estado === 'VARADO_EN_PERCANCE' ? 'Camión en Auxilio Mecánico' : ruta.estado === 'EN_EJECUCION' ? 'En Ruta Activa' : ruta.estado}
                         </span>
                       </div>
-                      <p className="text-xs text-prisma-text-secondary flex items-center gap-3 mt-1">
+                      <div className="text-xs text-prisma-text-secondary flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1.5">
                         <span className="flex items-center gap-1 font-semibold text-prisma-text-primary">
-                          <MapPin className="w-3.5 h-3.5 text-prisma-teal" />
-                          {ruta.zonaSector}
+                          <MapPin className="w-3.5 h-3.5 text-prisma-teal shrink-0" />
+                          <span>{ruta.zonaSector}</span>
                         </span>
-                        <span>•</span>
-                        <span>Camión: <strong>{ruta.placaCamion}</strong> ({ruta.modeloCamion})</span>
-                        <span>•</span>
-                        <span>Conductor: <strong>{ruta.nombreRepartidor}</strong></span>
-                      </p>
+                        <span className="hidden sm:inline text-gray-300">•</span>
+                        <span className="bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">Camión: <strong className="text-slate-800">{ruta.placaCamion}</strong> <span className="text-gray-500 hidden sm:inline">({ruta.modeloCamion})</span></span>
+                        <span className="hidden sm:inline text-gray-300">•</span>
+                        <span className="bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">Conductor: <strong className="text-slate-800">{ruta.nombreRepartidor}</strong></span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Acciones y Resumen de Recaudo */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setRutaSeleccionadaMapa(ruta);
-                        setPestañaActiva('mapa');
-                      }}
-                      className="px-3.5 py-2 bg-prisma-teal hover:bg-prisma-teal/90 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
-                    >
-                      <Navigation className="w-4 h-4" />
-                      <span>Monitorear en Vivo</span>
-                    </button>
-
-                    <button
-                      onClick={() => setModalUbicacionRuta(ruta)}
-                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <MapPin className="w-4 h-4 text-slate-600" />
-                      <span>Vista Rápida</span>
-                    </button>
-
-                    {ruta.estado !== 'VARADO_EN_PERCANCE' && ruta.estado !== 'FINALIZADA' && ruta.estado !== 'CANCELADA' && (
+                  <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between sm:justify-start">
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => {
-                          setModalVarado(ruta);
-                          setMotivoVarado('Falla mecánica del motor');
-                          setDetalleVarado('Camión detenido por avería');
+                          setRutaSeleccionadaMapa(ruta);
+                          setPestañaActiva('mapa');
                         }}
-                        className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                        className="px-3.5 py-2 bg-prisma-teal hover:bg-prisma-teal/90 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
                       >
-                        <AlertTriangle className="w-4 h-4" />
-                        <span>Reportar Varado</span>
+                        <Navigation className="w-4 h-4" />
+                        <span>Monitorear en Vivo</span>
                       </button>
-                    )}
 
-                    <div className="flex gap-4 items-center bg-prisma-surface p-2.5 rounded-2xl border border-prisma-border text-xs">
+                      <button
+                        onClick={() => setModalUbicacionRuta(ruta)}
+                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <MapPin className="w-4 h-4 text-slate-600" />
+                        <span>Vista Rápida</span>
+                      </button>
+
+                      {ruta.estado !== 'VARADO_EN_PERCANCE' && ruta.estado !== 'FINALIZADA' && ruta.estado !== 'CANCELADA' && (
+                        <button
+                          onClick={() => {
+                            setModalVarado(ruta);
+                            setMotivoVarado('Falla mecánica del motor');
+                            setDetalleVarado('Camión detenido por avería');
+                          }}
+                          className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                        >
+                          <AlertTriangle className="w-4 h-4" />
+                          <span>Reportar Varado</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 sm:gap-4 items-center bg-prisma-surface p-2 sm:p-2.5 rounded-2xl border border-prisma-border text-xs w-full sm:w-auto justify-around sm:justify-start mt-1 sm:mt-0">
                       <div>
-                        <p className="text-[10px] text-gray-400 uppercase">Recaudado:</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold">Recaudado:</p>
                         <p className="font-bold text-emerald-600 text-sm">
                           ${Number(ruta.recaudoEfectivoCobrado || 0).toLocaleString('es-CO')}
                         </p>
                       </div>
                       <div className="h-7 w-px bg-gray-200"></div>
                       <div>
-                        <p className="text-[10px] text-gray-400 uppercase">Total Esperado:</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold">Total Esperado:</p>
                         <p className="font-bold text-prisma-teal text-sm">
                           ${Number(ruta.recaudoTotalEsperado || 0).toLocaleString('es-CO')}
                         </p>
@@ -505,12 +507,12 @@ export const DespachosPage = () => {
 
                 {/* BARRA DE PROGRESO DE LA RUTA (REQUERIMIENTO DEL USUARIO) */}
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-prisma-text-primary flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 text-xs">
+                    <div className="font-bold text-prisma-text-primary flex flex-wrap items-center gap-1.5">
                       <span>Progreso del Itinerario:</span>
-                      <span className="text-prisma-teal">{ruta.paradasCompletadas} de {ruta.totalParadas} paradas entregadas</span>
-                    </span>
-                    <span className="font-black text-sm text-prisma-teal">{ruta.porcentajeProgreso}%</span>
+                      <span className="text-prisma-teal font-semibold">{ruta.paradasCompletadas} de {ruta.totalParadas} paradas entregadas</span>
+                    </div>
+                    <span className="font-black text-sm text-prisma-teal self-end sm:self-auto">{ruta.porcentajeProgreso}%</span>
                   </div>
 
                   <div className="w-full h-3.5 bg-gray-100 rounded-full overflow-hidden p-0.5 border border-gray-200">
