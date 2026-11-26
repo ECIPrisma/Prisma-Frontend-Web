@@ -192,10 +192,10 @@ export const PqrsProveedorPage = () => {
       )}
 
       {/* Selector de Sección Principal: Reclamos de Tiendas vs Disputas a Prisma */}
-      <div className="flex border-b border-prisma-border bg-white rounded-2xl p-1.5 shadow-sm">
+      <div className="flex flex-col sm:flex-row border border-prisma-border bg-white rounded-2xl p-1.5 shadow-sm gap-1.5">
         <button
           onClick={() => { setSeccionActiva('TENDEROS'); setFiltroEstado('TODAS'); }}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
             seccionActiva === 'TENDEROS'
               ? 'bg-prisma-teal text-white shadow-sm'
               : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-50'
@@ -207,14 +207,14 @@ export const PqrsProveedorPage = () => {
 
         <button
           onClick={() => { setSeccionActiva('A_PRISMA'); setFiltroEstado('TODAS'); }}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
             seccionActiva === 'A_PRISMA'
               ? 'bg-prisma-teal text-white shadow-sm'
               : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-50'
           }`}
         >
           <SendHorizontal className="w-4 h-4" />
-          <span>Mis Disputas Radicadas a Prisma Admin ({disputasHaciaPrisma.length})</span>
+          <span>Mis Disputas ante Prisma ({disputasHaciaPrisma.length})</span>
         </button>
       </div>
 

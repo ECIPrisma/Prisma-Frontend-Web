@@ -170,7 +170,7 @@ export const FlotaPage = () => {
 
         <button
           onClick={() => setModalCrear(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-semibold shadow-sm transition"
+          className="flex items-center gap-2 px-4 py-2.5 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-semibold shadow-sm transition w-full sm:w-auto justify-center cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>+ Registrar Nuevo Camión</span>

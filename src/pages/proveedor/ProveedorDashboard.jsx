@@ -381,10 +381,10 @@ export const ProveedorDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleExportarCatalogo}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-prisma-border hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-prisma-border hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
             title="Exportar a CSV para Excel"
           >
             <Download className="w-3.5 h-3.5 text-gray-500" />
@@ -392,7 +392,7 @@ export const ProveedorDashboard = () => {
           </button>
           <button
             onClick={() => setModalCargaMasiva(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
             title="Importar productos por lote"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-blue-600" />
@@ -400,7 +400,7 @@ export const ProveedorDashboard = () => {
           </button>
           <button
             onClick={() => setModalAbierto(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-prisma-teal hover:bg-prisma-teal-dark text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>

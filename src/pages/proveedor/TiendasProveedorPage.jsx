@@ -291,7 +291,7 @@ export const TiendasProveedorPage = () => {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
           <span className="text-xs font-medium text-prisma-text-secondary whitespace-nowrap">Día de Reparto:</span>
           {['TODOS', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'].map((dia) => (
             <button
