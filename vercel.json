@@ -15,7 +15,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://eciprisma.duckdns.org/api/$1"
+      "destination": "https://server-sabio.tail2474b3.ts.net:8443/api/$1"
     },
     {
       "source": "/(.*)",
