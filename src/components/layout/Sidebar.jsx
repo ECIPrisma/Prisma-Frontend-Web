@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { authService } from '../../services/api';
 import { 
   LayoutDashboard, 
   AlertTriangle, 
@@ -19,11 +20,12 @@ import {
   ShieldCheck,
   Wallet,
   Users,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const rol = user?.rol || user?.usuario?.rol;
   const isAdmin = rol === 'ROLE_PLATFORM_ADMIN' || rol === 'ROLE_ADMIN' || rol === 'ROLE_SOPORTE';
 
@@ -123,7 +125,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           })}
         </nav>
 
-        <div className="pt-4 border-t border-prisma-border shrink-0">
+        <div className="pt-3 border-t border-prisma-border shrink-0 space-y-1">
           <NavLink
             to="/seguridad"
             onClick={handleLinkClick}
@@ -138,6 +140,19 @@ export const Sidebar = ({ isOpen, onClose }) => {
             <ShieldCheck className="w-5 h-5 flex-shrink-0" />
             <span>Seguridad (2FA)</span>
           </NavLink>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (onClose) onClose();
+              authService.logout().catch(() => {});
+              logout();
+            }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition cursor-pointer"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
       </aside>
     </>

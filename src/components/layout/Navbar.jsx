@@ -233,14 +233,14 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
   };
 
   return (
-    <header className="bg-white border-b border-prisma-border h-16 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shadow-sm">
-      <div className="flex items-center gap-2 sm:gap-3">
+    <header className="bg-white border-b border-prisma-border h-16 flex items-center justify-between px-2.5 sm:px-6 sticky top-0 z-30 shadow-sm">
+      <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
         {/* Botón Hamburger para móviles y tablets pequeñas */}
         <button
           type="button"
           onClick={onToggleSidebar}
           aria-label={isSidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
-          className="md:hidden p-2 -ml-1 text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100 rounded-xl transition cursor-pointer"
+          className="md:hidden p-1.5 text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100 rounded-xl transition cursor-pointer shrink-0"
         >
           {isSidebarOpen ? <X className="w-5 h-5 text-prisma-teal" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -248,25 +248,26 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
         <img 
           src="/logo_icono_tienda.png" 
           alt="PRISMA Logo" 
-          className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded-lg p-1 bg-prisma-teal/10"
+          className="h-7 w-7 sm:h-9 sm:w-9 object-contain rounded-lg p-1 bg-prisma-teal/10 shrink-0"
         />
-        <div>
-          <span className="text-lg sm:text-xl font-bold tracking-tight text-prisma-text-primary">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-base sm:text-xl font-bold tracking-tight text-prisma-text-primary">
             PRISMA
           </span>
-          <span className="text-[10px] sm:text-xs ml-1.5 sm:ml-2 px-2 py-0.5 rounded-full bg-prisma-orange/20 text-prisma-orange-dark font-semibold">
+          <span className="hidden sm:inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-prisma-orange/20 text-prisma-orange-dark font-semibold whitespace-nowrap">
             {isPlatformAdmin ? 'Administrador' : 'Distribuidor'}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
         {/* Campanita Interactiva con Popover */}
         <div className="relative" ref={popoverRef}>
           <button 
             onClick={() => setIsOpen(!isOpen)}
             title="Centro de Notificaciones"
-            className={`relative p-2 rounded-full transition cursor-pointer ${
+            aria-label="Centro de Notificaciones"
+            className={`relative p-1.5 sm:p-2 rounded-full transition cursor-pointer ${
               isOpen 
                 ? 'bg-prisma-teal/10 text-prisma-teal' 
                 : 'text-prisma-text-secondary hover:text-prisma-text-primary hover:bg-gray-100'
@@ -282,8 +283,8 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
 
           {/* Menú Flotante de Notificaciones */}
           {isOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-prisma-border overflow-hidden z-50 animate-in fade-in duration-200">
-              <div className="p-4 bg-gray-50/80 border-b border-prisma-border flex items-center justify-between">
+            <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:mt-2 sm:w-96 max-w-sm sm:max-w-none mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border border-prisma-border overflow-hidden z-50 animate-in fade-in duration-200">
+              <div className="p-3.5 sm:p-4 bg-gray-50/80 border-b border-prisma-border flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-sm text-prisma-text-primary">Notificaciones</h3>
                   {cantidadNoLeidas > 0 && (
@@ -303,9 +304,9 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
                 )}
               </div>
 
-              <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
+              <div className="max-h-80 sm:max-h-96 overflow-y-auto divide-y divide-gray-100">
                 {notificaciones.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-prisma-text-secondary space-y-2">
+                  <div className="p-6 sm:p-8 text-center text-xs text-prisma-text-secondary space-y-2">
                     <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 opacity-80" />
                     <p className="font-semibold text-prisma-text-primary">Todo al día</p>
                     <p>No tienes incidentes ni alertas pendientes en la red.</p>
@@ -317,21 +318,21 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
                       <div
                         key={n.id}
                         onClick={() => handleAbrirNotificacion(n)}
-                        className={`p-3.5 flex items-start gap-3 hover:bg-gray-50/80 transition cursor-pointer ${
+                        className={`p-3 flex items-start gap-2.5 sm:gap-3 hover:bg-gray-50/80 transition cursor-pointer ${
                           estaLeida ? 'opacity-65 bg-white' : 'bg-emerald-50/20'
                         }`}
                       >
                         <div className="mt-0.5 flex-shrink-0">
                           {n.icono === 'camion' ? (
-                            <span className="p-2 rounded-xl bg-red-100 text-red-700 flex items-center justify-center">
+                            <span className="p-1.5 sm:p-2 rounded-xl bg-red-100 text-red-700 flex items-center justify-center">
                               <Truck className="w-4 h-4" />
                             </span>
                           ) : n.estado === 'ABIERTO' || n.tipo === 'alerta' ? (
-                            <span className="p-2 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                            <span className="p-1.5 sm:p-2 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
                               <AlertTriangle className="w-4 h-4" />
                             </span>
                           ) : (
-                            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                            <span className="p-1.5 sm:p-2 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
                               <CheckCircle className="w-4 h-4" />
                             </span>
                           )}
@@ -376,13 +377,16 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
           )}
         </div>
 
-        <div className="flex items-center gap-3 pl-3 border-l border-prisma-border">
-          <div className="w-8 h-8 rounded-full bg-prisma-teal text-white flex items-center justify-center font-bold text-sm">
+        <div className="flex items-center gap-2 pl-1.5 sm:pl-3 border-l border-prisma-border">
+          <div 
+            title={`${nombre} (${email})`}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-prisma-teal text-white flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 cursor-default"
+          >
             {nombre.charAt(0) || 'U'}
           </div>
-          <div className="hidden md:block text-left text-xs">
-            <p className="font-semibold text-prisma-text-primary leading-tight">{nombre}</p>
-            <p className="text-prisma-text-secondary">{email}</p>
+          <div className="hidden lg:block text-left text-xs max-w-[140px]">
+            <p className="font-semibold text-prisma-text-primary leading-tight truncate">{nombre}</p>
+            <p className="text-prisma-text-secondary truncate">{email}</p>
           </div>
         </div>
 
@@ -391,17 +395,19 @@ export const Navbar = ({ onToggleSidebar, isSidebarOpen }) => {
           onClick={() => navigate('/seguridad')}
           aria-label="Seguridad de la cuenta"
           title="Seguridad de la cuenta"
-          className="p-2 text-gray-500 hover:text-prisma-teal hover:bg-prisma-teal/10 rounded-lg transition cursor-pointer"
+          className="p-1.5 sm:p-2 text-gray-500 hover:text-prisma-teal hover:bg-prisma-teal/10 rounded-lg transition cursor-pointer"
         >
-          <Shield className="w-5 h-5" />
+          <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
         <button
+          type="button"
           onClick={handleCerrarSesion}
+          aria-label="Cerrar sesión"
           title="Cerrar sesión"
-          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
+          className="p-1.5 sm:p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition cursor-pointer shrink-0"
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
     </header>
