@@ -1057,6 +1057,7 @@ body, html {
       <li><a href="#problema">Problema</a></li>
       <li><a href="#solucion">Solución</a></li>
       <li><a href="#como-funciona">Funcionamiento</a></li>
+      <li><a href="#video-demo">Video Demo</a></li>
       <li><a href="#modelo">Modelo</a></li>
       <li><a href="#crecimiento">Crecimiento</a></li>
       <li><a href="#accesos-demo">Accesos Demo</a></li>
@@ -1412,6 +1413,35 @@ body, html {
 </section>
 
 
+<!-- ============ DEMOSTRACIÓN EN VIDEO DEL FLUJO PRINCIPAL ============ -->
+<section class="band s-mist" id="video-demo" aria-labelledby="t-video-demo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-tag" data-reveal>Demostración en Video E2E</span>
+      <h2 class="h2" id="t-video-demo" data-reveal style="--i:1">Demostración en vivo del flujo principal (97 segundos).</h2>
+      <p class="sub" data-reveal style="--i:2">Observa la integración en tiempo real entre la aplicación móvil Android nativa y el portal web empresarial: desde la compra en 1-click del tendero con PIN criptográfico y el despacho en camión de reparto, hasta la validación física en mostrador y la liquidación contable auditada.</p>
+    </div>
+
+    <div style="max-width:960px;margin:32px auto 0;border-radius:20px;overflow:hidden;box-shadow:0 24px 48px -12px rgba(20,68,72,0.18);border:2px solid rgba(27,94,99,0.18);background:#000;">
+      <video controls preload="metadata" style="width:100%;display:block;aspect-ratio:16/9;background:#000;">
+        <source src="/video/DEMOSTRACION_FLUJO_PRINCIPAL_PRISMA_E2E.mp4" type="video/mp4">
+        Tu navegador no soporta la reproducción directa de video HTML5. Puedes ver o descargar el video en la sección de recursos.
+      </video>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:16px;margin-top:24px;flex-wrap:wrap;">
+      <a class="btn btn-secondary btn-small" href="/video/DEMOSTRACION_FLUJO_PRINCIPAL_PRISMA_E2E.mp4" download="DEMOSTRACION_FLUJO_PRINCIPAL_PRISMA_E2E.mp4" style="border-radius:999px;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Descargar Video MP4 (20.9 MB)</span>
+      </a>
+      <a class="btn btn-primary btn-small" href="#accesos-demo" style="border-radius:999px;">
+        <span>Probar Accesos en Vivo ↓</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+
 <!-- ============ BANCO DE PRUEBAS & ACCESOS DEMO ============ -->
 <section class="band s-light" id="accesos-demo" aria-labelledby="t-demo">
   <div class="wrap">
@@ -1612,6 +1642,7 @@ body, html {
 /* ===== Enlaces: completa estas URL cuando estén publicadas ===== */
 const LINKS = {
   apk: "/apk/PRISMA-Mobile-release-signed.apk",
+  video: "/video/DEMOSTRACION_FLUJO_PRINCIPAL_PRISMA_E2E.mp4",
   frontend: "/documentos/Documento%20de%20Arquitectura%20FrontEnd%20PRISMA.pdf",
   backend: "/documentos/Documento%20de%20Arquitectura%20PRISMA.pdf",
   identidad: "/documentos/Manual%20de%20Identidad%20PRISMA.pdf",
@@ -1621,6 +1652,7 @@ const LINKS = {
 };
 const RESOURCES = [
   {key:"apk", title:"Aplicación Android (APK)", text:"Instalador de la app para tenderos: catálogo, rastreo, PIN y Radar Territorial.", icon:"phone", go:"Descargar"},
+  {key:"video", title:"Video Demostración E2E (HD)", text:"Video oficial del flujo principal transaccional de 4 fases (Tendero, Proveedor, Conductor y Auditoría).", icon:"video", go:"Ver Video"},
   {key:"ieee", title:"Informe Final IEEE", text:"Artículo formal en formato IEEE sobre arquitectura resiliente y telemetría de bajo costo.", icon:"list", go:"Abrir"},
   {key:"frontend", title:"Documentación Frontend", text:"Portal web en React 19 + Vite y cliente Android en Kotlin.", icon:"layout", go:"Abrir"},
   {key:"backend", title:"Documentación Backend", text:"API REST en Spring Boot 3.3.4, modelo de datos y motor analítico DuckDB.", icon:"server", go:"Abrir"},
@@ -1630,6 +1662,7 @@ const RESOURCES = [
 ];
 const ICONS = {
   phone:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/>',
+  video:'<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
   layout:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>',
   server:'<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/>',
   palette:'<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="15.5" cy="10" r="1.2"/><path d="M12 21a2.5 2.5 0 010-5h2a3 3 0 003-3"/>',
