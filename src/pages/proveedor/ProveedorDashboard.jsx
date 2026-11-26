@@ -38,8 +38,20 @@ const PRESET_IMAGENES = [
     url: '/products/real_coca_vidrio.jpg',
   },
   {
+    nombre: 'Coca-Cola 400ml PET',
+    url: '/products/real_coca_400ml.jpg',
+  },
+  {
     nombre: 'Coca-Cola 3 Litros PET',
     url: '/products/real_coca_3l.jpg',
+  },
+  {
+    nombre: 'Jugo Del Valle Fresh 1.5L',
+    url: '/products/real_delvalle.jpg',
+  },
+  {
+    nombre: 'Agua Brisa 600ml',
+    url: '/products/real_agua_brisa.jpg',
   },
   {
     nombre: 'Manzana Postobón 400ml',
@@ -62,25 +74,47 @@ const PRESET_IMAGENES = [
     url: '/products/real_monster.jpg',
   },
   {
-    nombre: 'Agua Brisa 600ml',
-    url: '/products/real_agua_brisa.jpg',
+    nombre: 'Powerade 500ml',
+    url: '/products/real_powerade.jpg',
+  },
+  {
+    nombre: 'Jugo Hit Mora 500ml',
+    url: '/products/real_hit_mora.jpg',
+  },
+  {
+    nombre: 'Bretaña Soda 300ml',
+    url: '/products/real_bretana.jpg',
   },
 ];
 
 export const resolveProductImage = (prod) => {
   if (!prod) return PRESET_IMAGENES[0].url;
+  if (prod.imagenUrl && prod.imagenUrl.startsWith('/products/')) return prod.imagenUrl;
   const name = (prod.nombre || '').toLowerCase();
   const sku = (prod.sku || '').toUpperCase();
-  if (name.includes('quatro') || sku.includes('BEV-QT-400')) {
+
+  if (name.includes('del valle') || name.includes('valle') || sku.includes('VALLE') || sku.includes('DELVALLE')) {
+    return '/products/real_delvalle.jpg';
+  }
+  if (name.includes('hit') || sku.includes('HIT')) {
+    return '/products/real_hit_mora.jpg';
+  }
+  if (name.includes('powerade') || sku.includes('POWER')) {
+    return '/products/real_powerade.jpg';
+  }
+  if (name.includes('bretaña') || name.includes('bretana') || sku.includes('BRETANA')) {
+    return '/products/real_bretana.jpg';
+  }
+  if (name.includes('quatro') || sku.includes('BEV-QT-400') || sku.includes('QUATRO')) {
     return '/products/real_quatro.jpg';
   }
-  if (name.includes('sprite')) {
+  if (name.includes('sprite') || sku.includes('SPRITE')) {
     return '/products/real_sprite.jpg';
   }
-  if (name.includes('monster')) {
+  if (name.includes('monster') || sku.includes('MONSTER')) {
     return '/products/real_monster.jpg';
   }
-  if (name.includes('brisa') || name.includes('agua')) {
+  if (name.includes('brisa') || name.includes('agua') || sku.includes('BRISA')) {
     return '/products/real_agua_brisa.jpg';
   }
   if (name.includes('manzana') || name.includes('postob')) {
@@ -92,10 +126,13 @@ export const resolveProductImage = (prod) => {
   if (name.includes('3') && name.includes('coca')) {
     return '/products/real_coca_3l.jpg';
   }
-  if (name.includes('vidrio')) {
+  if (name.includes('vidrio') || sku.includes('RET')) {
     return '/products/real_coca_vidrio.jpg';
   }
-  if (name.includes('coca')) {
+  if (name.includes('400') && name.includes('coca')) {
+    return '/products/real_coca_400ml.jpg';
+  }
+  if (name.includes('coca') || sku.includes('KO')) {
     return '/products/real_coca_15l.jpg';
   }
   return prod.imagenUrl || PRESET_IMAGENES[0].url;

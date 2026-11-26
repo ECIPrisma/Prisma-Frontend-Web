@@ -10,11 +10,23 @@ const ZONAS = ['Sur', 'Kennedy Central', 'Bosa', 'Chapinero', 'Suba', 'Engativá
 const IMAGENES_PRODUCTOS = {
   'Coca-Cola 1.5L Retornable': '/products/real_coca_15l.jpg',
   'Coca-Cola 1.5L': '/products/real_coca_15l.jpg',
+  'Coca-Cola Sabor Original 1.5L': '/products/real_coca_15l.jpg',
+  'Coca-Cola Original 400ml Pet': '/products/real_coca_400ml.jpg',
+  'Coca-Cola Vidrio Retornable 350ml': '/products/real_coca_vidrio.jpg',
   'Monster Energy Drink 473ml': '/products/real_monster.jpg',
   'Quatro Toronja 400ml PET': '/products/real_quatro.jpg',
+  'Sprite Lima-Limón 400ml PET': '/products/real_sprite.jpg',
   'Agua Brisa con Gas 600ml': '/products/real_agua_brisa.jpg',
+  'Agua Brisa Manantial Sin Gas 600ml': '/products/real_agua_brisa.jpg',
+  'Jugo Del Valle Fresh Naranja 1.5L': '/products/real_delvalle.jpg',
+  'Jugo Del Valle Frut Citrus 1.5L': '/products/real_delvalle.jpg',
+  'Powerade Ion4 Mountain Berry 500ml': '/products/real_powerade.jpg',
   'Coca-Cola 3 Litros PET': '/products/real_coca_3l.jpg',
+  'Coca-Cola Sabor Original 3 Litros PET': '/products/real_coca_3l.jpg',
   'Manzana Postobón 400ml PET': '/products/real_postobon_manzana.jpg',
+  'Gaseosa Colombiana La Nuestra 400ml': '/products/real_colombiana.jpg',
+  'Jugo Hit Mora 500ml PET': '/products/real_hit_mora.jpg',
+  'Bretaña Soda Mezclador 300ml Vidrio': '/products/real_bretana.jpg',
 };
 
 /**
